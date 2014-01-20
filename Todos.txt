@@ -1,0 +1,52 @@
+* ADSR extension in generators
+* FourierFilters
+
+
+--- Spectral reassignment -----------------------------------------------------
+- Create test data: DONE
+  > with freq in bin-centre
+  > with freq between bins
+  > short timed sinusoid
+- Create hamming, derivative and time-ramped window functions DONE
+- Implement formula
+- Create spectrogram plots
+
+--- Advanced Stft ---
+* Zeropadding
+* Windowing
+* Tiling
+* (hop)
+* Spectrum querying?
+  Opties:
+  - per spectrogram feature extraction
+  - approximated instanteneous frequencies
+
+
+
+
+--- TODO ----------------------------------------------------------------------
+
+PRI_URG     Temp Class SineEvelopeGenerator (=HACK!)
+PRI_URG     Visualisation FourierNoteFilter
+CLEAN       RollingBufferSawtoothTransform
+PRI_HIGH    RootUtilities comments
+PRI_HIGH    RootUtilities graph dressing
+PRI_HIGH    RootUtilities output file handling
+PRI_MED     Mutable logger? (In ConsoleSoundPlayback)
+PRI_MED     What about double sampling rate (type is double)?
+PRI_MED     Support other than 16 bits sample size
+PRI_MED     Complete full support for all wave-file types: two channels, samplerates (e.g. 8000), 32 bits
+PRI_LOW     Make Player interface
+PRI_LOW     Refactor ProgramOptions
+PRI_LOW     Include fourier functionality
+PRI_LOW     Create ClassLogger class
+
+
+--- DONE -----------------------------------------------------------------------
+
+VALIDATED   rev. 97     Validate WAVE-file reading
+VALIDATED   rev. 104    Make WAVE-file write
+VALIDATED   rev. 106    Refactor ISoundFile/WaveFile interface
+
+
+

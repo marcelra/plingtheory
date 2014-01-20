@@ -1,0 +1,6 @@
+# ignore object files
+*.o
+
+# ignore auto-generated files
+bleedingears.pro.user
+Makefile

@@ -1,0 +1,152 @@
+TEMPLATE = app
+CONFIG += console
+CONFIG -= qt
+CONFIG -= app_bundle
+
+SOURCES += main.cpp \
+    RawPcmData.cpp \
+    SoundData.cpp \
+    SamplingInfo.cpp \
+    Logger.cpp \
+    ProgramOptions.cpp \
+    GlobalLogParameters.cpp \
+    Msg.cpp \
+    Exceptions.cpp \
+    WaveFile.cpp \
+    BinaryUtilities.cpp \
+    SingletonStore.cpp \
+    SingletonBase.cpp \
+    RootUtilities.cpp \
+    ConsoleSoundPlayback.cpp \
+    EffectTrianglizer.cpp \
+    TestSuite.cpp \
+    RollingBufferSawtoothTransform.cpp \
+    IGenerator.cpp \
+    GlobalParameters.cpp \
+    Note.cpp \
+    Duration.cpp \
+    SineGenerator.cpp \
+    MonophonicSimpleRandomMusicGenerator.cpp \
+    SquareGenerator.cpp \
+    FourierFilter.cpp \
+    MultiChannelRawPcmData.cpp \
+    NoteList.cpp \
+    FourierNoteFilter.cpp \
+    SineEnvelopeGenerator.cpp \
+    FftwAlgorithm.cpp \
+    ShortTimeFftw.cpp \
+    FourierSpectrum.cpp \
+    ObjectPool.cpp \
+    NaivePeaks.cpp \
+    Peak.cpp \
+    Tone.cpp \
+    FocalTones.cpp \
+    IObjectiveFunction.cpp \
+    TestMath.cpp \
+    TwoDimExampleObjective.cpp \
+    GradDescOptimiser.cpp \
+    RealVector.cpp \
+    LineSearchObjective.cpp \
+    Utils.cpp \
+    AlgorithmExceptions.cpp \
+    WindowFunction.cpp \
+    AlgorithmBase.cpp \
+    StftGraph.cpp \
+    DevSpectralReassignment.cpp \
+    WaveletTransform.cpp \
+    WindowFuncDef.cpp \
+    WaveletContainer.cpp \
+    WaveletSpectrum.cpp \
+    DynamicFourier.cpp \
+    ResonanceMatrixVisualisation.cpp \
+    AdvancedFourierTransform.cpp \
+    AdvancedFourierSpectrum.cpp \
+    StftAlgorithm.cpp
+
+HEADERS += \
+    RawPcmData.h \
+    SoundData.h \
+    SamplingInfo.h \
+    Logger.h \
+    ProgramOptions.h \
+    GlobalLogParameters.h \
+    Msg.h \
+    Exceptions.h \
+    WaveFile.h \
+    BinaryUtilities.h \
+    SingletonStore.h \
+    SingletonBase.h \
+    RootUtilities.h \
+    ConsoleSoundPlayback.h \
+    EffectTrianglizer.h \
+    TestSuite.h \
+    RollingBufferSawtoothTransform.h \
+    IGenerator.h \
+    GlobalParameters.h \
+    Note.h \
+    Duration.h \
+    SineGenerator.h \
+    MonophonicSimpleRandomMusicGenerator.h \
+    SquareGenerator.h \
+    FourierFilter.h \
+    MultiChannelRawPcmData.h \
+    NoteList.h \
+    FourierNoteFilter.h \
+    SineEnvelopeGenerator.h \
+    FftwAlgorithm.h \
+    ShortTimeFftw.h \
+    FourierSpectrum.h \
+    ObjectPool.h \
+    NaivePeaks.h \
+    Peak.h \
+    Tone.h \
+    Typedefs.h \
+    FocalTones.h \
+    IObjectiveFunction.h \
+    TestMath.h \
+    TwoDimExampleObjective.h \
+    GradDescOptimiser.h \
+    RealVector.h \
+    LineSearchObjective.h \
+    Utils.h \
+    AlgorithmExceptions.h \
+    WindowFunction.h \
+    AlgorithmBase.h \
+    IStorable.h \
+    StftGraph.h \
+    DevSpectralReassignment.h \
+    WaveletTransform.h \
+    WindowFuncDef.h \
+    WaveletContainer.h \
+    WaveletSpectrum.h \
+    DynamicFourier.h \
+    ResonanceMatrixVisualisation.h \
+    AdvancedFourierTransform.h \
+    AdvancedFourierSpectrum.h \
+    StftAlgorithm.h
+
+OTHER_FILES += \
+    Todos.txt
+
+
+### BOOST
+macx: LIBS += -L/usr/local/lib/devTools/boost_1_50_0/lib -lboost_filesystem -lboost_system
+linux: LIBS += -L/usr/local/lib/ -lboost_filesystem -lboost_system
+#INCLUDEPATH += /Users/marcelra/devTools/boost_1_50_0/
+#DEPENDPATH += /Users/marcelra/devTools/boost_1_50_0/stage
+
+### ROOT
+macx: LIBS += -L/usr/local/lib/root -lCore -lCint -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lz -pthread -Wl -lm -ldl
+linux: LIBS += -L/usr/root/lib/ -m64 -lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -pthread -lm -ldl -rdynamic
+macx: INCLUDEPATH += /usr/local/include/root
+linux: INCLUDEPATH += /usr/root/include
+DEPENDPATH += /usr/root/include
+
+### FFTW3
+macx: LIBS += -L/usr/local/lib/ -lfftw3
+linux: LIBS += -L/usr/local/lib/ -lfftw3
+
+QMAKE_CXXFLAGS += -g -O3
+
+# macx: PRE_TARGETDEPS += $$PWD/usr/root/lib/libAfterImage.a
+
