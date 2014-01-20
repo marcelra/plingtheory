@@ -146,7 +146,7 @@ DEPENDPATH += /usr/root/include
 macx: LIBS += -L/usr/local/lib/ -lfftw3
 linux: LIBS += -L/usr/local/lib/ -lfftw3
 
-QMAKE_CXXFLAGS += -g -O3
+QMAKE_CXXFLAGS += -g
 
 # macx: PRE_TARGETDEPS += $$PWD/usr/root/lib/libAfterImage.a
 
