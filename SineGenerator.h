@@ -8,7 +8,8 @@ namespace Synthesizer {
 class SineGenerator : public IGenerator
 {
    public:
-      RawPcmData::Ptr generate( size_t length, const SamplingInfo& samplingInfo );
+      SineGenerator( const SamplingInfo& samplingInfo );
+      RawPcmData::Ptr generate( size_t length );
 };
 
 } /// namespace Synthesizer

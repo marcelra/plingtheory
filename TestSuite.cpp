@@ -33,6 +33,8 @@
 #include "ResonanceMatrixVisualisation.h"
 #include "AdvancedFourierTransform.h"
 #include "StftAlgorithm.h"
+#include "AdsrEnvelope.h"
+#include "NoiseGenerator.h"
 
 #include "TLine.h"
 #include "TH2F.h"
@@ -65,10 +67,12 @@ void TestSuite::runCurrentDevelopmentTest()
    // testShortTimeFftw();
    // testDynamicFourier();
    // testAdvancedFourier();
-   testStftAlgorithm();
+   // testStftAlgorithm();
 
    // runTestMath();
    // Dev::test();
+   // testEnvelope();
+   testNoiseGenerator();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -93,7 +97,8 @@ RawPcmData::Ptr TestSuite::generateRandomMusic()
    noteArray.insert( noteArray.end(), noteArray4.begin(), noteArray4.end() );
    noteArray.insert( noteArray.end(), noteArray5.begin(), noteArray5.end() );
 
-   Synthesizer::SquareGenerator synth;
+   SamplingInfo samplingInfo( 44100 );
+   Synthesizer::SquareGenerator synth( samplingInfo );
    synth.setAmplitude(0.5);
 
    Music::MonophonicSimpleRandomMusicGenerator randomMusic( noteArray, 1 );
@@ -327,11 +332,11 @@ void TestSuite::testSineGenerator()
    msg << Msg::Info << "Running testSineGenerator..." << Msg::EndReq;
 
    /// Define output format
-   SamplingInfo sampleInfo;
-   RawPcmData* channel = new RawPcmData( sampleInfo );
+   SamplingInfo samplingInfo;
+   RawPcmData* channel = new RawPcmData( samplingInfo );
 
    /// Setup synthesizer and notes to play
-   Synthesizer::SineGenerator sine;
+   Synthesizer::SineGenerator sine( samplingInfo );
    sine.setAmplitude( 0.5 );
 
    Music::Note c( Music::Note::C, 4 );
@@ -342,12 +347,12 @@ void TestSuite::testSineGenerator()
 
    /// Generate 'c'-note
    sine.setFrequency( c.getFrequency() );
-   noteData = sine.generate( 2 * oneSec, sampleInfo );
+   noteData = sine.generate( 2 * oneSec );
    channel->pasteAtEnd( *noteData );
 
    /// Generate 'es'-note
    sine.setFrequency( es.getFrequency() );
-   noteData = sine.generate( 2 * oneSec, sampleInfo );
+   noteData = sine.generate( 2 * oneSec );
    channel->pasteAtEnd( *noteData );
 
    /// Write to wave file
@@ -363,6 +368,7 @@ void TestSuite::testRandomMusic()
    Logger msg( "testRandomMusic" );
    msg << Msg::Info << "Running testRandomMusic..." << Msg::EndReq;
 
+   SamplingInfo samplingInfo( 44100 );
    size_t numNotesToGenerate = 400;
 
    Music::Note rootAccomp( Music::Note::C, 4, Music::Duration(1) );
@@ -380,7 +386,7 @@ void TestSuite::testRandomMusic()
 
    /// Generate solo
    Music::MonophonicSimpleRandomMusicGenerator soloGen( soloNoteArray, 4 );
-   Synthesizer::SquareGenerator squareSynth;
+   Synthesizer::SquareGenerator squareSynth( samplingInfo );
    soloGen.useSynthesizer( &squareSynth );
    squareSynth.setAmplitude( 0.05 );
    RawPcmData::Ptr generatedSoloData = soloGen.generateRandomMusic( numNotesToGenerate*4 );
@@ -417,18 +423,18 @@ void TestSuite::testFourierFilter()
    SamplingInfo samplingInfo( 44100 );
    size_t numSamples = samplingInfo.convertSecsToSamples( noteA.getDuration().getSeconds( 120 ) );
 
-   Synthesizer::SineGenerator sineGen;
+   Synthesizer::SineGenerator sineGen( samplingInfo );
    sineGen.setFrequency( noteA.getFrequency() );
    sineGen.setAmplitude( 0.4 );
-   RawPcmData::Ptr firstNote = sineGen.generate( numSamples, samplingInfo );
+   RawPcmData::Ptr firstNote = sineGen.generate( numSamples );
    sineGen.setFrequency( noteB.getFrequency() );
    sineGen.setAmplitude( 0 );
-   RawPcmData::Ptr secondNote = sineGen.generate( numSamples, samplingInfo );
+   RawPcmData::Ptr secondNote = sineGen.generate( numSamples );
 
    firstNote->pasteAtEnd( *secondNote );
 
    sineGen.setAmplitude( 0.4 );
-   secondNote = sineGen.generate( numSamples, samplingInfo );
+   secondNote = sineGen.generate( numSamples );
 
    firstNote->pasteAtEnd( *secondNote );
 
@@ -665,8 +671,9 @@ void TestSuite::testIntegration()
    std::vector< TLine* > detectedTones;
    std::vector< Music::Note > detectedNotes;
 
-   RawPcmData* regeneratedData = new RawPcmData( SamplingInfo() );
-   Synthesizer::SineGenerator synth;
+   SamplingInfo samplingInfo( 44100 );
+   RawPcmData* regeneratedData = new RawPcmData( samplingInfo );
+   Synthesizer::SineGenerator synth( samplingInfo );
    synth.setAmplitude(0.5);
 
    for ( size_t iSpec = 0; iSpec < stft.getNumSpectra(); ++iSpec )
@@ -730,7 +737,7 @@ void TestSuite::testIntegration()
             line->SetLineColor( kBlack );
             line->SetLineWidth( 2 );
             detectedTones.push_back( line );
-            regeneratedData->pasteAtEnd( *synth.generate( nSamples, regeneratedData->getSamplingInfo() ) );
+            regeneratedData->pasteAtEnd( *synth.generate( nSamples ) );
          }
          else
          {
@@ -952,12 +959,12 @@ void TestSuite::testAdvancedFourier()
    msg << Msg::Info << "Running testAdvancedFourier..." << Msg::EndReq;
 
    SamplingInfo samplingInfo( 44100 );
-   Synthesizer::SineGenerator sinGen;
+   Synthesizer::SineGenerator sinGen( samplingInfo );
 
    sinGen.setFrequency( 440 );
    sinGen.setAmplitude( 0.5 );
 
-   RawPcmData::Ptr data = sinGen.generate( 44100, samplingInfo );
+   RawPcmData::Ptr data = sinGen.generate( 44100 );
 
    size_t windowSize = 8192;
    WaveAnalysis::AdvancedFourierTransform ftAlg( samplingInfo, windowSize, WaveAnalysis::HanningWindowFuncDef(), 3 * windowSize );
@@ -986,7 +993,7 @@ void TestSuite::testStftAlgorithm()
    msg << Msg::Info << "Running testStftAlgorithm..." << Msg::EndReq;
 
    SamplingInfo samplingInfo( 44100 );
-   Synthesizer::SineGenerator sinGen;
+   Synthesizer::SineGenerator sinGen( samplingInfo );
 
    sinGen.setFrequency( 440 );
    sinGen.setAmplitude( 0.5 );
@@ -1034,4 +1041,39 @@ void TestSuite::testStftAlgorithm()
 
    delete mcData;
 
+}
+
+void TestSuite::testEnvelope()
+{
+   Logger msg( "testEnvelope" );
+   msg << Msg::Info << "Running testEnvelope..." << Msg::EndReq;
+
+   Synthesizer::AdsrEnvelope envelope( 100, 50, 400, 0.8, 50 );
+   RealVector v( 1000 );
+   for ( size_t i = 0; i < v.size(); ++i )
+   {
+      v[i] = envelope.getEnvelope( i );
+   }
+
+   TCanvas* c = new TCanvas();
+   TGraph* gr = RootUtilities::createGraph( v );
+   gr->Draw( "AL" );
+
+   SamplingInfo samplingInfo( 44100 );
+   Synthesizer::SineGenerator square( samplingInfo );
+   square.setFrequency( 880 * 4 );
+   square.setEnvelope( new Synthesizer::AdsrEnvelope( envelope ) );
+   RawPcmData::Ptr data = square.generate( 1000 );
+
+   RootUtilities::createGraph( *data )->Draw( "AL" );
+}
+
+void TestSuite::testNoiseGenerator()
+{
+   SamplingInfo samplingInfo( 44100 );
+   Synthesizer::NoiseGenerator noiseGen( samplingInfo );
+   RawPcmData::Ptr data = noiseGen.generate( 1000 );
+   TGraph* gr = RootUtilities::createGraph( *data );
+   new TCanvas();
+   gr->Draw( "AL" );
 }

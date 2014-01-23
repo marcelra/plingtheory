@@ -4,24 +4,28 @@
 
 namespace Synthesizer {
 
-RawPcmData::Ptr SquareGenerator::generate( size_t length, const SamplingInfo& samplingInfo )
+SquareGenerator::SquareGenerator( const SamplingInfo& samplingInfo ) :
+   IGenerator( samplingInfo )
+{}
+
+RawPcmData::Ptr SquareGenerator::generate( size_t length )
 {
-   RawPcmData::Ptr data( new RawPcmData( samplingInfo, length ) );
+   RawPcmData* data = new RawPcmData( getSamplingInfo(), length );
 
-   double sampleRate = samplingInfo.getSamplingRate();
-
-   double phaseStep = 2*M_PI*getFrequency()/sampleRate;
+   double phaseStep = getSamplingInfo().getPhaseStepPerSample( getFrequency() );
    double phase = getPhase();
    double amplitude = getAmplitude();
+   const ISynthEnvelope& envelope = getEnvelope();
 
    for ( size_t iSample = 0; iSample < length; ++iSample )
    {
       phase += phaseStep;
-      (*data)[iSample] = sin( phase ) > 0? amplitude : -amplitude;
+      double currentAmp = amplitude * envelope.getEnvelope( iSample );
+      (*data)[iSample] = sin( phase ) > 0? currentAmp : -currentAmp;
    }
 
    setPhase( phase );
-   return data;
+   return RawPcmData::Ptr( data );
 }
 
 } /// namespace Synthesizer

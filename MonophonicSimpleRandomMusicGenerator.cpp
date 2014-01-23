@@ -56,7 +56,7 @@ RawPcmData::Ptr MonophonicSimpleRandomMusicGenerator::generateRandomMusic( size_
    std::auto_ptr< Synthesizer::SineGenerator > defaultSynth( 0 );
    if ( !generator )
    {
-      defaultSynth.reset( new Synthesizer::SineGenerator() );
+      defaultSynth.reset( new Synthesizer::SineGenerator( samplingInfo ) );
       m_synth = defaultSynth.get();
       m_synth->setAmplitude( 0.2 );
    }
@@ -98,7 +98,7 @@ RawPcmData::Ptr MonophonicSimpleRandomMusicGenerator::generateRandomMusic( size_
 
       /// Generate wave data for each note
       m_synth->setFrequency( note.getFrequency() );
-      RawPcmData::Ptr noteData = m_synth->generate( numSamples, samplingInfo );
+      RawPcmData::Ptr noteData = m_synth->generate( numSamples );
       rawPcmData->mixAdd( *noteData, mixOffset );
       mixOffset += numSamples;
    }

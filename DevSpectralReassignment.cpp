@@ -17,19 +17,20 @@ namespace
 
 RawPcmData::Ptr generateSineTestSample( double frequency )
 {
-   Synthesizer::SineGenerator sinGen;
+   SamplingInfo samplingInfo( 44100 );
+   Synthesizer::SineGenerator sinGen( samplingInfo );
    sinGen.setFrequency( frequency );
    sinGen.setAmplitude( 0.5 );
    sinGen.setPhase( 0 );
 
-   return sinGen.generate( 44100, SamplingInfo() );
+   return sinGen.generate( 44100 );
 }
 
 RawPcmData::Ptr generateChirpTestSample( double frequency, size_t offset, size_t length )
 {
-   RawPcmData* result = new RawPcmData( SamplingInfo(), offset, 0 );
-   Synthesizer::SineGenerator sinGen;
-   SamplingInfo samplingInfo;
+   SamplingInfo samplingInfo( 44100 );
+   RawPcmData* result = new RawPcmData( samplingInfo, offset, 0 );
+   Synthesizer::SineGenerator sinGen( samplingInfo );
    double period = samplingInfo.getPeriodInSamples( frequency );
    sinGen.setFrequency( frequency );
    sinGen.setAmplitude( 0.5 );
@@ -37,7 +38,7 @@ RawPcmData::Ptr generateChirpTestSample( double frequency, size_t offset, size_t
    /// Modify length to a multiple number of periods
    size_t nPeriods = length / period;
    length = nPeriods * period;
-   result->pasteAtEnd( *sinGen.generate( length, SamplingInfo() ) );
+   result->pasteAtEnd( *sinGen.generate( length ) );
    RawPcmData end( SamplingInfo(), 44100 - offset - length, 0 );
    result->pasteAtEnd( end );
    return RawPcmData::Ptr( result );

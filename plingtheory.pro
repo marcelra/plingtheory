@@ -61,7 +61,10 @@ SOURCES += main.cpp \
     ResonanceMatrixVisualisation.cpp \
     AdvancedFourierTransform.cpp \
     AdvancedFourierSpectrum.cpp \
-    StftAlgorithm.cpp
+    StftAlgorithm.cpp \
+    AdsrEnvelope.cpp \
+    ISynthEnvelope.cpp \
+    NoiseGenerator.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -123,7 +126,10 @@ HEADERS += \
     ResonanceMatrixVisualisation.h \
     AdvancedFourierTransform.h \
     AdvancedFourierSpectrum.h \
-    StftAlgorithm.h
+    StftAlgorithm.h \
+    AdsrEnvelope.h \
+    ISynthEnvelope.h \
+    NoiseGenerator.h
 
 OTHER_FILES += \
     Todos.txt

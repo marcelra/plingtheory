@@ -8,7 +8,8 @@ namespace Synthesizer {
 class SquareGenerator : public IGenerator
 {
    public:
-      RawPcmData::Ptr generate( size_t length, const SamplingInfo& samplingInfo );
+      SquareGenerator( const SamplingInfo& samplingInfo );
+      RawPcmData::Ptr generate( size_t length );
 };
 
 } /// namespace Synthesizer

@@ -4,20 +4,23 @@
 
 namespace Synthesizer {
 
-RawPcmData::Ptr SineGenerator::generate( size_t length, const SamplingInfo& samplingInfo )
+SineGenerator::SineGenerator( const SamplingInfo& samplingInfo ) :
+   IGenerator( samplingInfo )
+{}
+
+RawPcmData::Ptr SineGenerator::generate( size_t length )
 {
-   RawPcmData* data = new RawPcmData( samplingInfo, length );
+   RawPcmData* data = new RawPcmData( getSamplingInfo(), length );
 
-   double sampleRate = samplingInfo.getSamplingRate();
-
-   double phaseStep = 2*M_PI*getFrequency()/sampleRate;
+   double phaseStep = getSamplingInfo().getPhaseStepPerSample( getFrequency() );
    double phase = getPhase();
    double amplitude = getAmplitude();
+   const ISynthEnvelope& envelope = getEnvelope();
 
    for ( size_t iSample = 0; iSample < length; ++iSample )
    {
-      double val = amplitude * sin( phase );
       phase += phaseStep;
+      double val = amplitude * envelope.getEnvelope( iSample ) * sin( phase );
       (*data)[iSample] = val;
    }
 

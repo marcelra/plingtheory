@@ -1,8 +1,9 @@
 #ifndef IGENERATOR_H
 #define IGENERATOR_H
 
-#include "RawPcmData.h"
+#include "ISynthEnvelope.h"
 #include "Note.h"
+#include "RawPcmData.h"
 
 #include <vector>
 
@@ -16,6 +17,10 @@ class IGenerator
 {
    public:
       /**
+       * Constructor
+       */
+      IGenerator( const SamplingInfo& samplingInfo );
+      /**
        * Virtual destructor
        */
       virtual ~IGenerator();
@@ -24,7 +29,7 @@ class IGenerator
        * Generate produces generated sound data. It is expected to also update the phase at the end.
        * This function should be overridden by derived classes
        */
-      virtual RawPcmData::Ptr generate( size_t length, const SamplingInfo& samplingInfo ) = 0;
+      virtual RawPcmData::Ptr generate( size_t length ) = 0;
 
       /**
        * Generate a sequence of notes (TODO: test)
@@ -43,6 +48,11 @@ class IGenerator
        * Set the phase
        */
       void setPhase( double phase );
+      /**
+       * Set the envelope
+       * The envelope is owned by the IGenerator class
+       */
+      void setEnvelope( ISynthEnvelope* envelope );
 
       /**
        * Obtain the amplitude (i.e. max-value, not the current amplitude)
@@ -56,11 +66,31 @@ class IGenerator
        * Obtain the phase. This phase is recommended to reflect the current phase.
        */
       double getPhase() const;
+      /**
+       * Get the envelope
+       */
+      const ISynthEnvelope& getEnvelope() const;
+      ISynthEnvelope& getEnvelope();
+      /**
+       * Get the SamplingInfo object
+       */
+      const SamplingInfo& getSamplingInfo() const;
+      SamplingInfo& getSamplingInfo();
 
    protected:
-      double         m_amplitude;
-      double         m_frequency;
-      double         m_phase;
+      ISynthEnvelope*  m_envelope;
+      SamplingInfo     m_samplingInfo;
+      double           m_amplitude;
+      double           m_frequency;
+      double           m_phase;
+
+   /**
+    * Blocked copy-constructor and assignment
+    */
+   private:
+      IGenerator( const IGenerator& other );
+      IGenerator& operator=( const IGenerator& other );
+
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -94,6 +124,16 @@ inline double IGenerator::getFrequency() const
 inline double IGenerator::getPhase() const
 {
    return m_phase;
+}
+
+inline const SamplingInfo& IGenerator::getSamplingInfo() const
+{
+   return m_samplingInfo;
+}
+
+inline SamplingInfo& IGenerator::getSamplingInfo()
+{
+   return m_samplingInfo;
 }
 
 } /// End of namespace Synthesizer

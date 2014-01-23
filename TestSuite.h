@@ -40,6 +40,8 @@ class TestSuite
        * Music generation tests
        */
       static void testSineGenerator();
+      static void testNoiseGenerator();
+      static void testEnvelope();
       static void testRandomMusic();
 
       /**
