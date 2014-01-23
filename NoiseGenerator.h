@@ -7,10 +7,22 @@
 
 namespace Synthesizer {
 
+/**
+ * @class NoiseGenerator
+ * @brief Synthesizer that generates white noise
+ */
 class NoiseGenerator : public IGenerator
 {
    public:
+      /**
+       * constructor (@see IGenerator)
+       * @param seed: supply seed for random number generator. Seed will be unique for every instance of NoiseGenerator
+       * if the value given is smaller than 0
+       */
       NoiseGenerator( const SamplingInfo& samplingInfo, int seed = -1 );
+      /**
+       * generate (@see IGenerator)
+       */
       RawPcmData::Ptr generate( size_t length );
 
    private:
