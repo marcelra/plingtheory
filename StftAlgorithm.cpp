@@ -38,7 +38,7 @@ void StftAlgorithm::execute( const RawPcmData& data )
 
    double numHopsD = data.size() / getHopShift();
    double currentSampleD = 0;
-   size_t numHops = numHopsD;
+   size_t numHops = numHopsD + 1;
    for ( size_t iHop = 0; iHop < numHops; ++iHop )
    {
       size_t currentSampleI = currentSampleD;
