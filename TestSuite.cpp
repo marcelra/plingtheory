@@ -1090,8 +1090,23 @@ void TestSuite::testNoiseGenerator()
 {
    SamplingInfo samplingInfo( 44100 );
    Synthesizer::NoiseGenerator noiseGen( samplingInfo );
-   RawPcmData::Ptr data = noiseGen.generate( 1000 );
+   noiseGen.setAmplitude( 1 );
+   RawPcmData::Ptr data = noiseGen.generate( 44100 );
+
+   Synthesizer::SquareGenerator toneGen( samplingInfo );
+   toneGen.setAmplitude( 1 );
+   toneGen.setFrequency( 440 );
+   toneGen.setEnvelope( new Synthesizer::AdsrEnvelope( 10000, 5000, 10000, 0.5, 5000 ) );
+   data->mixAdd( *toneGen.generate( 44100 ) );
+
    TGraph* gr = RootUtilities::createGraph( *data );
    new TCanvas();
    gr->Draw( "AL" );
+
+   size_t windowSize = 4096;
+   WaveAnalysis::StftAlgorithm stftAlg( samplingInfo, windowSize, WaveAnalysis::HanningWindowFuncDef(), windowSize, 2 );
+   stftAlg.execute( *data );
+
+   Visualisation::StftGraph stftGraph( stftAlg );
+   stftGraph.create();
 }
