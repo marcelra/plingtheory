@@ -20,7 +20,7 @@ RawPcmData::Ptr SawtoothGenerator::generate( size_t length )
    double amplitude = getAmplitude();
    const ISynthEnvelope& envelope = getEnvelope();
 
-   double val = ;
+   double val = 0;
    double valStep = 2 * M_PI / getSamplingInfo().getPeriodInSamples( getFrequency() );
    std::cout << "valStep = " << valStep << std::endl;
 
@@ -48,6 +48,11 @@ RawPcmData::Ptr SawtoothGenerator::generate( size_t length )
    {
       phase = -val * M_PI * 0.5 + M_PI;
    }
+   else
+   {
+      phase = 2 * M_PI + val;
+   }
+
    setPhase( phase );
    return RawPcmData::Ptr( data );
 }
