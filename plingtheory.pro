@@ -64,7 +64,8 @@ SOURCES += main.cpp \
     StftAlgorithm.cpp \
     AdsrEnvelope.cpp \
     ISynthEnvelope.cpp \
-    NoiseGenerator.cpp
+    NoiseGenerator.cpp \
+    SawtoothGenerator.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -129,7 +130,8 @@ HEADERS += \
     StftAlgorithm.h \
     AdsrEnvelope.h \
     ISynthEnvelope.h \
-    NoiseGenerator.h
+    NoiseGenerator.h \
+    SawtoothGenerator.h
 
 OTHER_FILES += \
     Todos.txt
