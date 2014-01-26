@@ -64,7 +64,6 @@ void TestSuite::runCurrentDevelopmentTest()
    // testPeakDetection();
    // testAlgorithmFramework();
    // testIntegration();
-   // testWaveletTransform();
 
    // testShortTimeFftw();
    // testDynamicFourier();
@@ -775,157 +774,6 @@ void TestSuite::testIntegration()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// testWaveletTransform
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void TestSuite::testWaveletTransform()
-{
-//    Logger msg( "testWaveletTransform" );
-//    msg << Msg::Info << "Running testWaveletTransform..." << Msg::EndReq;
-//    RawPcmData::Ptr data = generateRandomMusic();
-//
-//    size_t fourierSize = 512;
-//    size_t zeroPadding = 4;
-//    size_t dataOffset = 0;
-//
-//    assert( dataOffset + zeroPadding*fourierSize < data->size() );
-//
-//    /// Do the ordinary Fourier transform
-//    WaveAnalysis::FftwAlgorithm fftwNormal( fourierSize );
-//
-//    const std::complex<double>* fsNormal = fftwNormal.transform( &(*data)[dataOffset] );
-//    WaveAnalysis::FourierSpectrum fourSpec( data->getSamplingInfo(), fsNormal, fsNormal + fftwNormal.getSpectrumDimension() );
-//
-//    std::vector<double> xArrNormal = fourSpec.getFrequencies();
-//    std::vector<double> yArrNormal = fourSpec.getMagnitude();
-//
-//    new TCanvas( "can1", "Normal Fourier" );
-//    TGraph* grNormal = RootUtilities::createGraph( xArrNormal, yArrNormal );
-//    grNormal->Draw( "AL " );
-//
-//    new TCanvas( "can2", "Reversed normal fourier - original" );
-//    const double* reverse = fftwNormal.reverseTransform( &fourSpec[0] );
-//    RealVector diffNormal( reverse, reverse + fftwNormal.getNumSamples() );
-//    for ( size_t i = 0; i < diffNormal.size(); ++i )
-//    {
-//       diffNormal[i] -= fftwNormal.getNumSamples() * (*data)[i + dataOffset];
-//    }
-//
-//    TGraph* grDiffNormal = RootUtilities::createGraph( diffNormal );
-//    grDiffNormal->Draw( "AL" );
-//
-//    /// Do the padded, windowed transform
-//    std::vector< double > paddedDataSet( &(*data)[dataOffset], &(*data)[dataOffset + fourierSize] );
-//    paddedDataSet.resize( zeroPadding * fourierSize, 0 );
-//    WaveAnalysis::HanningWindowFunction hann( fourierSize );
-//    for ( size_t i = 0; i < fourierSize; ++i )
-//    {
-//       paddedDataSet[i] *= hann.calc( i );
-//    }
-//
-//    new TCanvas( "can3", "Padded and windowed data set" );
-//    RootUtilities::createGraph( paddedDataSet )->Draw( "AL" );
-//
-//    WaveAnalysis::FftwAlgorithm fftwPadded( fourierSize * zeroPadding );
-//    std::complex<double>* fsPadded = const_cast< std::complex<double>* >( fftwPadded.transform( &paddedDataSet[0] ) );
-//
-//    std::vector< std::complex< double > > fsPadFiltered( fsPadded, fsPadded + fftwPadded.getSpectrumDimension() );
-//
-//    double iCutMax = fourierSize/2 + 1;
-//    double iCutMin = fourierSize/2;
-//    for ( size_t i = 0; i < fftwPadded.getSpectrumDimension(); ++ i )
-//    {
-//       // fsPadded[i] *= ( 0.5 + 0.5 * erf( (i - iCut) / 0.001 ) );
-//       fsPadFiltered[i] *= ( i < iCutMin )? 0 : ( ( i > iCutMax )? 1 : ( i - iCutMin ) / ( 1.0*iCutMax - iCutMin ) );
-//    }
-//
-//    WaveAnalysis::FourierSpectrum fourSpecPadded( data->getSamplingInfo(), fsPadded, fsPadded + fftwPadded.getSpectrumDimension() );
-//
-//    std::vector<double> xArrPadded = fourSpecPadded.getFrequencies();
-//    std::vector<double> yArrPadded = fourSpecPadded.getMagnitude();
-//
-//    new TCanvas( "can4", "Fourier spectrum padded" );
-//    RootUtilities::createGraph( xArrPadded, yArrPadded )->Draw( "AL" );
-//
-//    const double* reversePadded = fftwPadded.reverseTransform( fsPadded );
-//    RealVector revPadVec( reversePadded, reversePadded + fftwPadded.getNumSamples() );
-//
-//    const double* reversePadFiltered = fftwPadded.reverseTransform( &fsPadFiltered[0] );
-//    RealVector revPadFilterVec( reversePadFiltered, reversePadFiltered + fftwPadded.getNumSamples() );
-//
-//    for ( size_t i = 0; i < fourierSize; ++i )
-//    {
-//       revPadVec[i] *= 1./fftwPadded.getNumSamples()/hann.calc(i);
-//       revPadFilterVec[i] *= 1./fftwPadded.getNumSamples()/hann.calc(i);
-//    }
-//
-//    revPadVec.resize( fourierSize );
-//    revPadFilterVec.resize( fourierSize );
-//
-//    // new TCanvas( "can5", "Reverted padded distribution" );
-//    // RootUtilities::createGraph( revPadVec )->Draw( "AL" );
-//
-//    size_t waveletFourierSize = fourierSize / 2;
-//
-//    revPadVec.resize( revPadVec.size() / 2 );
-//    revPadFilterVec.resize( revPadFilterVec.size() / 2 );
-//    WaveAnalysis::HanningWindowFunction winFuncLay2( revPadVec.size() );
-//    for ( size_t i = 0; i < revPadVec.size(); ++i )
-//    {
-//       revPadVec[i] *= winFuncLay2.calc( i );
-//       revPadFilterVec[i] *= winFuncLay2.calc( i );
-//    }
-//
-//    revPadVec.resize( revPadVec.size() * zeroPadding );
-//    revPadFilterVec.resize( revPadFilterVec.size() * zeroPadding );
-//
-//    new TCanvas( "can6", "Wavelet layer2" );
-//    RootUtilities::createGraph( revPadVec )->Draw( "AL" );
-//    TGraph* revPadFilterGr = RootUtilities::createGraph( revPadFilterVec );
-//    revPadFilterGr->SetLineColor( kRed );
-//    revPadFilterGr->Draw( "LSAME" );
-//
-//    WaveAnalysis::FftwAlgorithm wavelet2( waveletFourierSize * zeroPadding );
-//    const std::complex< double >* spec = wavelet2.transform( &revPadVec[0] );
-//    WaveAnalysis::FourierSpectrum specLay2( data->getSamplingInfo(), spec, spec + wavelet2.getSpectrumDimension() );
-//    const std::complex< double >* specFilter = wavelet2.transform( &revPadFilterVec[0] );
-//    WaveAnalysis::FourierSpectrum specFilterLay2( data->getSamplingInfo(), specFilter, specFilter + wavelet2.getSpectrumDimension() );
-//
-//    new TCanvas( "can7", "Wavelet spectrum layer2 filtered" );
-//    RootUtilities::createGraph( specLay2.getFrequencies(), specLay2.getMagnitude() )->Draw( "AL" );
-//    TGraph* filteredGr = RootUtilities::createGraph( specFilterLay2.getFrequencies(), specFilterLay2.getMagnitude() );
-//    filteredGr->SetLineColor( kRed );
-//    filteredGr->Draw( "LSAME" );
-
-   Logger msg( "testWaveletTransform" );
-   msg << Msg::Info << "Running testWaveletTransform..." << Msg::EndReq;
-   RawPcmData::Ptr data = generateRandomMusic();
-
-   size_t maxSize = 4096;
-   size_t nLayers = 6;
-   size_t zeroPadding = 1;
-   size_t hopRate = 1;
-   WaveAnalysis::WaveletTransform wt( maxSize, nLayers, zeroPadding, hopRate, WaveAnalysis::HannPoissonWindowFuncDef() );
-
-   const WaveAnalysis::WaveletContainer& wc = wt.execute( *data );
-   std::cout << wc.getNumLayers() << std::endl;
-   std::cout << wc.getNumSpectraInLayer( 0 ) << std::endl;
-
-   for ( size_t i = 0; i < wc.getNumLayers(); ++i )
-   {
-      const WaveAnalysis::WaveletSpectrum& ws = wc.getWaveletSpectrum( i, 0 );
-      new TCanvas();
-      assert( false );
-      // const RealVector& spec = ws.getMagnitudeVec();
-      // const RealVector& freqs = wc.getBinFrequencies( i );
-      // TGraph* g = RootUtilities::createGraph( freqs, spec );
-      // g->Draw( "AL" );
-   }
-
-   msg << Msg::Info << "testWaveletTransform done" << Msg::EndReq;
-
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// testDynamicFourier
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void TestSuite::testDynamicFourier()
@@ -1074,7 +922,7 @@ void TestSuite::testEnvelope()
       v[i] = envelope.getEnvelope( i );
    }
 
-   TCanvas* c = new TCanvas();
+   new TCanvas();
    TGraph* gr = RootUtilities::createGraph( v );
    gr->Draw( "AL" );
 

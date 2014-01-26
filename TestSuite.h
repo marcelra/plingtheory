@@ -52,7 +52,6 @@ class TestSuite
       static void testFourierFilter();
       static void testFourierNoteFilter();
       static void testFourierNoteFilterExternalFile();
-      static void testWaveletTransform();
       static void testDynamicFourier();
       static void testAdvancedFourier();
       static void testStftAlgorithm();

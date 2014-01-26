@@ -58,7 +58,6 @@ TCanvas* StftGraph::create()
       const WaveAnalysis::AdvancedFourierSpectrum& spec = m_stftAlg.getSpectrum( iX );
       for ( size_t iY = 0; iY < nBinsY; ++iY )
       {
-         double yVal = 0;
          m_hist->SetBinContent( iX + 1, iY + 1, spec.getMagnitudeInBin( iY ) );
       }
    }

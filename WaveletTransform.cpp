@@ -35,8 +35,6 @@ WaveletContainer WaveletTransform::execute( const RawPcmData& data )
    msg << Msg::Debug << "In WaveletTransform::execute" << Msg::EndReq;
    WaveletContainer waveletContainer( m_fourierSize, m_nLayers, m_zeroPadding, m_hopRate, data.getSamplingInfo() );
 
-
-   size_t fourierSize = m_fourierSize;
    size_t windowSize = m_fourierSize;
    for ( size_t iLayer = 0; iLayer < m_nLayers; ++iLayer )
    {
