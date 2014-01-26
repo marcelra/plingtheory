@@ -71,6 +71,10 @@ class IGenerator
        */
       double getPhase() const;
       /**
+       * Obtain the phase modulo 2pi, (i.e. between (0, 2pi))
+       */
+      double getModPhase() const;
+      /**
        * Get the envelope phase
        */
       size_t getEnvelopePhase() const

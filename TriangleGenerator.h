@@ -1,5 +1,5 @@
-#ifndef SAWTOOTHGENERATOR_H
-#define SAWTOOTHGENERATOR_H
+#ifndef TRIANGLEGENERATOR_H
+#define TRIANGLEGENERATOR_H
 
 #include "IGenerator.h"
 
@@ -26,4 +26,4 @@ class TriangleGenerator : public IGenerator
 
 } /// namespace Synthesizer
 
-#endif // SAWTOOTHGENERATOR_H
+#endif // TRIANGLEGENERATOR_H
