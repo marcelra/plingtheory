@@ -32,7 +32,10 @@ StftGraph::~StftGraph()
 TCanvas* StftGraph::create()
 {
    assert( m_canvas == 0 );
-   assert( m_stftAlg.getNumSpectra() > 0 );
+   if ( !m_stftAlg.hasExecuted() || m_stftAlg.getNumSpectra() == 0 )
+   {
+      throw ExceptionDataNotPrepared( "StftGraph", "StftAlgorithm data" );
+   }
 
    size_t nBinsX = m_stftAlg.getNumSpectra();
    size_t nBinsY = m_stftAlg.getSpectrum( 0 ).size();

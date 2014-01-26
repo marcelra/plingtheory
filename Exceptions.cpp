@@ -182,3 +182,21 @@ const char* ExceptionTestFailed::getType() const
 {
    return "ExceptionTestFailed";
 }
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// ExceptionDataNotPrepared
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ExceptionDataNotPrepared::ExceptionDataNotPrepared( const std::string& requester, const std::string& dataName )
+{
+   std::stringstream msg;
+   msg << "Data " << dataName << " requested by " << requester << " is not prepared or available.";
+   setMessage( msg.str() );
+}
+
+const char* ExceptionDataNotPrepared::getType() const
+{
+   return "ExceptionDataNotPrepared";
+}
+
