@@ -128,6 +128,4 @@ class ExceptionDataNotPrepared : public BaseException
       const char* getType() const;
 };
 
-
-
 #endif // EXCEPTIONS_H
