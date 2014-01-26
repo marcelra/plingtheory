@@ -21,11 +21,7 @@ RawPcmData::Ptr TriangleGenerator::generate( size_t length )
    double valStep = 2*M_PI / getSamplingInfo().getPeriodInSamples( getFrequency() );
 
    /// Calculate phase between (0, 2*pi)
-   double phase = fmod( getPhase(), 2*M_PI );
-   if ( phase < 0 )
-   {
-      phase += 2*M_PI;
-   }
+   double phase = getModPhase();
 
    /// Calculate val and valStep from the phase
    double val;

@@ -65,7 +65,8 @@ SOURCES += main.cpp \
     AdsrEnvelope.cpp \
     ISynthEnvelope.cpp \
     NoiseGenerator.cpp \
-    TriangleGenerator.cpp
+    TriangleGenerator.cpp \
+    SawtoothGenerator.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -131,7 +132,8 @@ HEADERS += \
     AdsrEnvelope.h \
     ISynthEnvelope.h \
     NoiseGenerator.h \
-    TriangleGenerator.h
+    TriangleGenerator.h \
+    SawtoothGenerator.h
 
 OTHER_FILES += \
     Todos.txt

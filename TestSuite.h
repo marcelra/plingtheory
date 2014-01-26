@@ -41,6 +41,7 @@ class TestSuite
        */
       static void testSineGenerator();
       static void testNoiseGenerator();
+      static void testTriangleGenerator();
       static void testSawtoothGenerator();
       static void testEnvelope();
       static void testRandomMusic();

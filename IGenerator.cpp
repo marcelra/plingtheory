@@ -1,5 +1,7 @@
 #include "IGenerator.h"
 
+#include <math.h>
+
 namespace Synthesizer
 {
 
@@ -10,8 +12,8 @@ IGenerator::IGenerator( const SamplingInfo& samplingInfo ) :
    m_envelope( new TrivialEnvelope() ),
    m_samplingInfo( samplingInfo ),
    m_amplitude( 1 ),
-   m_phase( 0 ),
    m_frequency( 440 ),
+   m_phase( 0 ),
    m_envelopePhase( 0 )
 {}
 
@@ -74,6 +76,22 @@ const ISynthEnvelope& IGenerator::getEnvelope() const
 ISynthEnvelope& IGenerator::getEnvelope()
 {
    return *m_envelope;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// getModPhase
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+double IGenerator::getModPhase() const
+{
+   double rawPhase = fmod( getPhase(), 2*M_PI );
+   if ( rawPhase < 0 )
+   {
+      return rawPhase + 2*M_PI;
+   }
+   else
+   {
+      return rawPhase;
+   }
 }
 
 } /// namespace Synthesizer
