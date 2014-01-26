@@ -61,7 +61,6 @@ TCanvas* ResonanceMatrixVisualisation::drawSelection( size_t nBinsTime, size_t i
    {
       double sampleIndexDouble = 0;
       double sampleIndexStep = ( iSampleEnd - iSampleBeg ) / ( static_cast<double>( nBinsTime + 1) );
-      size_t lastBin = nBinsTime;
       for ( size_t iBin = 0; iBin < nBinsTime; ++iBin )
       {
          sampleIndexDouble += sampleIndexStep;

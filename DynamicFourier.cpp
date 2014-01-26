@@ -41,7 +41,6 @@ ResonanceMatrix DynamicFourier::execute( const RawPcmData& data ) const
       assert( transform.size() == data.size() );
 
       std::vector< double >& ampOverTime = result[iFreq];
-      double prevPhase = 0;
       size_t nSamplesPeriod = data.getSamplingInfo().getPeriodInSamples( frequency );
       // size_t nSamplesPeriod = 0;
       for ( size_t i = 0; i < transform.size() - nSamplesPeriod; ++i )
