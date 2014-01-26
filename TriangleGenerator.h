@@ -11,13 +11,13 @@ namespace Synthesizer
  * @brief Class that generates triangle waves
  * TODO: rename class to TriangleGenerator
  */
-class SawtoothGenerator : public IGenerator
+class TriangleGenerator : public IGenerator
 {
    public:
       /**
        * constructor (@see IGenerator)
        */
-      SawtoothGenerator( const SamplingInfo& samplingInfo );
+      TriangleGenerator( const SamplingInfo& samplingInfo );
       /**
        * generate (@see IGenerator)
        */

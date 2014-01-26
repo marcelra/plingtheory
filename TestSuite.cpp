@@ -35,7 +35,7 @@
 #include "StftAlgorithm.h"
 #include "AdsrEnvelope.h"
 #include "NoiseGenerator.h"
-#include "SawtoothGenerator.h"
+#include "TriangleGenerator.h"
 
 #include "TLine.h"
 #include "TH2F.h"
@@ -1122,7 +1122,7 @@ void TestSuite::testSawtoothGenerator()
    msg << Msg::Info << "Running testSawtoothGenerator..." << Msg::EndReq;
 
    SamplingInfo samplingInfo( 44100 );
-   Synthesizer::SawtoothGenerator toneGen( samplingInfo );
+   Synthesizer::TriangleGenerator toneGen( samplingInfo );
    toneGen.setAmplitude( 1 );
    toneGen.setFrequency( 440 );
    toneGen.setEnvelope( new Synthesizer::AdsrEnvelope( 10000, 5000, 10000, 0.5, 5000 ) );
