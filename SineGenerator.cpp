@@ -4,24 +4,29 @@
 
 namespace Synthesizer {
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// constructor
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 SineGenerator::SineGenerator( const SamplingInfo& samplingInfo ) :
    IGenerator( samplingInfo )
 {}
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// generate
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 RawPcmData::Ptr SineGenerator::generate( size_t length )
 {
    RawPcmData* data = new RawPcmData( getSamplingInfo(), length );
 
    double phaseStep = getSamplingInfo().getPhaseStepPerSample( getFrequency() );
    double phase = getPhase();
-   double amplitude = getAmplitude();
-   const ISynthEnvelope& envelope = getEnvelope();
 
    for ( size_t iSample = 0; iSample < length; ++iSample )
    {
       phase += phaseStep;
-      double val = amplitude * envelope.getEnvelope( iSample ) * sin( phase );
+      double val = sin( phase ) * getCurrentSampleAmplitude();
       (*data)[iSample] = val;
+      nextSample();
    }
 
    setPhase( phase );

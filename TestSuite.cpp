@@ -1118,14 +1118,35 @@ void TestSuite::testNoiseGenerator()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void TestSuite::testSawtoothGenerator()
 {
+   Logger msg( "testSawtoothGenerator" );
+   msg << Msg::Info << "Running testSawtoothGenerator..." << Msg::EndReq;
+
    SamplingInfo samplingInfo( 44100 );
    Synthesizer::SawtoothGenerator toneGen( samplingInfo );
    toneGen.setAmplitude( 1 );
    toneGen.setFrequency( 440 );
    toneGen.setEnvelope( new Synthesizer::AdsrEnvelope( 10000, 5000, 10000, 0.5, 5000 ) );
+   toneGen.setPhase( 0 );
+
+   RawPcmData dataCombined( samplingInfo );
+   for ( size_t i = 0; i < 100; ++i )
+   {
+      dataCombined.pasteAtEnd( *toneGen.generate( 44100 / 100 ) );
+   }
+
+   toneGen.setPhase( 0 );
    RawPcmData::Ptr data = toneGen.generate( 44100 );
 
-   TGraph* gr = RootUtilities::createGraph( *data );
+   TGraph* grRaw = RootUtilities::createGraph( *data );
    new TCanvas();
-   gr->Draw( "AL" );
+   grRaw->Draw( "AL" );
+
+   RealVectorPtr correctData = data->copyToVectorData();
+   RealVectorPtr testData = dataCombined.copyToVectorData();
+   TGraph* grPhaseCheck = RootUtilities::createGraph( *testData );
+   new TCanvas();
+   grPhaseCheck->Draw( "AL" );
+
+   MultiChannelRawPcmData sawtoothMcRpcm( new RawPcmData( dataCombined ) );
+   WaveFile::write( "sawtooth.wav", sawtoothMcRpcm );
 }

@@ -18,13 +18,11 @@ RawPcmData::Ptr NoiseGenerator::generate( size_t length )
 {
    RawPcmData* result = new RawPcmData( getSamplingInfo(), length );
 
-   double amplitude = getAmplitude();
-   const ISynthEnvelope& envelope = getEnvelope();
-
    for ( size_t iSample = 0; iSample < length; ++iSample )
    {
-      double val = m_ranGen.Uniform( -1, 1 ) * amplitude * envelope.getEnvelope( iSample );
+      double val = m_ranGen.Uniform( -1, 1 ) * getCurrentSampleAmplitude();
       (*result)[iSample] = val;
+      nextSample();
    }
 
    return RawPcmData::Ptr( result );

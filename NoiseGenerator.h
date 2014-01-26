@@ -3,6 +3,7 @@
 
 #include "IGenerator.h"
 
+/// ROOT includes
 #include "TRandom3.h"
 
 namespace Synthesizer {

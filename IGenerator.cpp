@@ -11,7 +11,8 @@ IGenerator::IGenerator( const SamplingInfo& samplingInfo ) :
    m_samplingInfo( samplingInfo ),
    m_amplitude( 1 ),
    m_phase( 0 ),
-   m_frequency( 440 )
+   m_frequency( 440 ),
+   m_envelopePhase( 0 )
 {}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -42,6 +43,7 @@ RawPcmData::Ptr IGenerator::generate( const std::vector< Music::Note >& notes, d
       size_t numSamples = note.getDuration().getNumSamples( bpm, samplingInfo );
       double frequency = note.getFrequency();
       setFrequency( frequency );
+      resetEnvelopePhase();
       RawPcmData::Ptr oneNoteData = generate( numSamples );
       result->mixAdd( *oneNoteData, currentOffset );
       currentOffset += numSamples;

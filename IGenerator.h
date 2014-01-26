@@ -53,6 +53,10 @@ class IGenerator
        * The envelope is owned by the IGenerator class
        */
       void setEnvelope( ISynthEnvelope* envelope );
+      /**
+       * Resets the envelope phase (this effectively starts a new note)
+       */
+      void resetEnvelopePhase();
 
       /**
        * Obtain the amplitude (i.e. max-value, not the current amplitude)
@@ -66,6 +70,23 @@ class IGenerator
        * Obtain the phase. This phase is recommended to reflect the current phase.
        */
       double getPhase() const;
+      /**
+       * Get the envelope phase
+       */
+      size_t getEnvelopePhase() const
+      {
+         return m_envelopePhase;
+      }
+
+      /**
+       * Should be called after a sample has been generated
+       */
+      void nextSample();
+      /**
+       * Get current sample amplitude ( = amplitude * envelope )
+       */
+      double getCurrentSampleAmplitude() const;
+
       /**
        * Get the envelope
        */
@@ -83,6 +104,7 @@ class IGenerator
       double           m_amplitude;
       double           m_frequency;
       double           m_phase;
+      size_t           m_envelopePhase;
 
    /**
     * Blocked copy-constructor and assignment
@@ -111,6 +133,11 @@ inline void IGenerator::setPhase( double phase )
    m_phase = phase;
 }
 
+inline void IGenerator::resetEnvelopePhase()
+{
+   m_envelopePhase = 0;
+}
+
 inline double IGenerator::getAmplitude() const
 {
    return m_amplitude;
@@ -134,6 +161,16 @@ inline const SamplingInfo& IGenerator::getSamplingInfo() const
 inline SamplingInfo& IGenerator::getSamplingInfo()
 {
    return m_samplingInfo;
+}
+
+inline void IGenerator::nextSample()
+{
+   ++m_envelopePhase;
+}
+
+inline double IGenerator::getCurrentSampleAmplitude() const
+{
+   return m_amplitude * m_envelope->getEnvelope( m_envelopePhase );
 }
 
 } /// End of namespace Synthesizer
