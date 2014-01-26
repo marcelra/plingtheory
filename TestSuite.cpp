@@ -1013,8 +1013,8 @@ void TestSuite::testSawtoothGenerator()
    SamplingInfo samplingInfo( 44100 );
    Synthesizer::SawtoothGenerator toneGen( samplingInfo );
    toneGen.setAmplitude( 1 );
-   toneGen.setFrequency( 440 );
-   toneGen.setEnvelope( new Synthesizer::AdsrEnvelope( 10000, 5000, 10000, 0.5, 5000 ) );
+   toneGen.setFrequency( 1071 );
+   // toneGen.setEnvelope( new Synthesizer::AdsrEnvelope( 10000, 5000, 10000, 0.5, 5000 ) );
    toneGen.setPhase( 0 );
 
    RawPcmData dataCombined( samplingInfo );
@@ -1040,8 +1040,15 @@ void TestSuite::testSawtoothGenerator()
    MultiChannelRawPcmData sawtoothMcRpcm( new RawPcmData( dataCombined ) );
    WaveFile::write( "sawtooth.wav", sawtoothMcRpcm );
 
-   WaveAnalysis::StftAlgorithm stftAlg( samplingInfo );
-   stftAlg.execute( dataCombined );
-   Visualisation::StftGraph stftGraph( stftAlg );
-   stftGraph.create();
+   WaveAnalysis::AdvancedFourierTransform ft( samplingInfo, 4096 * 10, WaveAnalysis::RectangularWindowFuncDef(), 0 );
+   double* arr = &((*data)[0]);
+   WaveAnalysis::AdvancedFourierSpectrum::Ptr spec = ft.transform( arr );
+   TGraph* grSpec = RootUtilities::createGraph( spec->getFrequencies(), spec->getMagnitude() );
+   new TCanvas();
+   grSpec->Draw( "AL" );
+
+   // WaveAnalysis::StftAlgorithm stftAlg( samplingInfo, 4096, WaveAnalysis::RectangularWindowFuncDef(), 4096, 2 );
+   // stftAlg.execute( dataCombined );
+   // Visualisation::StftGraph stftGraph( stftAlg );
+   // stftGraph.create();
 }

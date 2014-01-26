@@ -1,6 +1,5 @@
-* ADSR extension in generators
+* Anti-aliasing in generators: https://ccrma.stanford.edu/~stilti/papers/blit.pdf
 * FourierFilters
-
 
 --- Spectral reassignment -----------------------------------------------------
 - Create test data: DONE
@@ -44,9 +43,7 @@ PRI_LOW     Create ClassLogger class
 
 --- DONE -----------------------------------------------------------------------
 
-VALIDATED   rev. 97     Validate WAVE-file reading
-VALIDATED   rev. 104    Make WAVE-file write
-VALIDATED   rev. 106    Refactor ISoundFile/WaveFile interface
+* ADSR extension in generators
 
 
 
