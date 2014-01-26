@@ -1192,8 +1192,8 @@ void TestSuite::testSawtoothGenerator()
    MultiChannelRawPcmData sawtoothMcRpcm( new RawPcmData( dataCombined ) );
    WaveFile::write( "sawtooth.wav", sawtoothMcRpcm );
 
-   // WaveAnalysis::StftAlgorithm stftAlg( samplingInfo );
-   // stftAlg.execute( dataCombined );
-   // Visualisation::StftGraph stftGraph( stftAlg );
-   // stftGraph.create();
+   WaveAnalysis::StftAlgorithm stftAlg( samplingInfo );
+   stftAlg.execute( dataCombined );
+   Visualisation::StftGraph stftGraph( stftAlg );
+   stftGraph.create();
 }

@@ -39,7 +39,7 @@ class StftAlgorithm
        * Parameter function similar to the AdvancedFourierTransform
        * @param hopsPerWindow, number of hops per windowSize.
        */
-      StftAlgorithm( const SamplingInfo& samplingInfo, size_t windowSize = 4096, const WindowFuncDef& windowFuncDef = HanningWindowFuncDef(), size_t numSamplesZeroPadding = 4096, double hopsPerWindow = 0 );
+      StftAlgorithm( const SamplingInfo& samplingInfo, size_t windowSize = 4096, const WindowFuncDef& windowFuncDef = HanningWindowFuncDef(), size_t numSamplesZeroPadding = 4096, double hopsPerWindow = 2 );
       /**
        * Destructor
        */
