@@ -173,7 +173,7 @@ const char* ExceptionEmptyMultiChannelRawPcmData::getType() const
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ExceptionTestFailed::ExceptionTestFailed( const std::string& testMethod, const std::string& reason )
 {
-   std::stringstream msg;
+   std::ostringstream msg;
    msg << "Method " << testMethod << " failed: " << reason;
    setMessage( msg.str() );
 }
@@ -190,7 +190,7 @@ const char* ExceptionTestFailed::getType() const
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ExceptionDataNotPrepared::ExceptionDataNotPrepared( const std::string& requester, const std::string& dataName )
 {
-   std::stringstream msg;
+   std::ostringstream msg;
    msg << "Data " << dataName << " requested by " << requester << " is not prepared or available.";
    setMessage( msg.str() );
 }
