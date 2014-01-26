@@ -118,5 +118,16 @@ class ExceptionTestFailed : public BaseException
       const char* getType() const;
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// Exception raised when data is not well prepared
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class ExceptionDataNotPrepared : public BaseException
+{
+   public:
+      ExceptionDataNotPrepared( const std::string& requester, const std::string& dataName );
+      const char* getType() const;
+};
+
+
 
 #endif // EXCEPTIONS_H

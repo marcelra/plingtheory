@@ -52,6 +52,11 @@ class StftAlgorithm
       RawPcmData::Ptr reverseExecute();
 
       /**
+       * Check whether the algorithm has executed
+       */
+      bool hasExecuted() const;
+
+      /**
        * Get the total number of Fourier spectra produced
        */
       size_t getNumSpectra() const;
