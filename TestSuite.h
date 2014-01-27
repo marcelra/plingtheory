@@ -49,9 +49,6 @@ class TestSuite
       /**
        * Fourier algorithms
        */
-      static void testFourierFilter();
-      static void testFourierNoteFilter();
-      static void testFourierNoteFilterExternalFile();
       static void testDynamicFourier();
       static void testAdvancedFourier();
       static void testStftAlgorithm();

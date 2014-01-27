@@ -28,10 +28,8 @@ SOURCES += main.cpp \
     SineGenerator.cpp \
     MonophonicSimpleRandomMusicGenerator.cpp \
     SquareGenerator.cpp \
-    FourierFilter.cpp \
     MultiChannelRawPcmData.cpp \
     NoteList.cpp \
-    FourierNoteFilter.cpp \
     SineEnvelopeGenerator.cpp \
     FftwAlgorithm.cpp \
     ShortTimeFftw.cpp \
@@ -93,7 +91,6 @@ HEADERS += \
     SineGenerator.h \
     MonophonicSimpleRandomMusicGenerator.h \
     SquareGenerator.h \
-    FourierFilter.h \
     MultiChannelRawPcmData.h \
     NoteList.h \
     FourierNoteFilter.h \
