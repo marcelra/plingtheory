@@ -4,7 +4,6 @@
 #include "GlobalParameters.h"
 
 #include "EffectTrianglizer.h"
-#include "FourierFilter.h"
 #include "MonophonicSimpleRandomMusicGenerator.h"
 #include "RollingBufferSawtoothTransform.h"
 #include "RootUtilities.h"
@@ -14,7 +13,6 @@
 
 #include "Note.h"
 #include "NoteList.h"
-#include "FourierNoteFilter.h"
 #include "FftwAlgorithm.h"
 #include "FourierSpectrum.h"
 #include "ShortTimeFftw.h"
@@ -410,133 +408,6 @@ void TestSuite::testRandomMusic()
 
    MultiChannelRawPcmData waveData( generatedDataLeft.release(), generatedDataRight.release() );
    WaveFile::write( GlobalParameters::getTrunkPath() + "testResults/randomMonoMusic.wav", waveData );
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// testFourierFilter
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void TestSuite::testFourierFilter()
-{
-   Logger msg( "testFourierFilter" );
-   msg << Msg::Info << "Running testFourierFilter..." << Msg::EndReq;
-
-   Music::Note noteA( Music::Note::A, 3, Music::Duration(1) );
-   Music::Note noteB( Music::Note::B, 3, Music::Duration(1) );
-
-   SamplingInfo samplingInfo( 44100 );
-   size_t numSamples = samplingInfo.convertSecsToSamples( noteA.getDuration().getSeconds( 120 ) );
-
-   Synthesizer::SineGenerator sineGen( samplingInfo );
-   sineGen.setFrequency( noteA.getFrequency() );
-   sineGen.setAmplitude( 0.4 );
-   RawPcmData::Ptr firstNote = sineGen.generate( numSamples );
-   sineGen.setFrequency( noteB.getFrequency() );
-   sineGen.setAmplitude( 0 );
-   RawPcmData::Ptr secondNote = sineGen.generate( numSamples );
-
-   firstNote->pasteAtEnd( *secondNote );
-
-   sineGen.setAmplitude( 0.4 );
-   secondNote = sineGen.generate( numSamples );
-
-   firstNote->pasteAtEnd( *secondNote );
-
-   RawPcmData* data = firstNote.get();
-
-   TGraph* graph = RootUtilities::createGraph( *data );
-   new TCanvas( "waveCanvas", "waveCanvas" );
-   graph->Draw( "AL" );
-
-   WaveAnalysis::FourierFilter fourierFilterA( noteA.getFrequency(), 5, samplingInfo );
-   RawPcmData::Ptr fourierDataA = fourierFilterA.apply( *data );
-
-
-   Music::Note noteTest( Music::Note::B, 3, Music::Duration(1) );
-   WaveAnalysis::FourierFilter fourierFilterTest( noteTest.getFrequency(), 5, samplingInfo );
-   RawPcmData::Ptr fourierDataTest = fourierFilterTest.apply( *data );
-
-   new TCanvas( "fourierCanvas", "fourierCanvas" );
-   TGraph* graphFilterCorrect = RootUtilities::createGraph( *fourierDataA );
-   graphFilterCorrect->Draw( "AL" );
-
-   TGraph* graphFilterTest = RootUtilities::createGraph( *fourierDataTest );
-   graphFilterTest->Draw( "LSAME" );
-   graphFilterTest->SetLineColor( kRed );
-
-   double aNoteAmp[4] = {0.05, 0.05, 0, 0};
-   double aNoteX[4] = {0, 1.0*numSamples, numSamples+1.0, 3.0*numSamples};
-   double bNoteAmp[4] = {0, 0, 0.05, 0.05};
-   double bNoteX[4] = {0, 2.0*numSamples, 2*numSamples + 1.0, 3.0*numSamples};
-
-   TGraph* gTrueA = new TGraph( 4, aNoteX, aNoteAmp );
-   TGraph* gTrueB = new TGraph( 4, bNoteX, bNoteAmp );
-   gTrueA->SetLineColor( kBlue );
-   gTrueB->SetLineColor( kGreen );
-   gTrueA->SetLineWidth( 2 );
-   gTrueB->SetLineWidth( 2 );
-
-
-   gTrueA->Draw( "LSAME" );
-   gTrueB->Draw( "LSAME" );
-
-   TLegend* legend = RootUtilities::createDefaultLegend();
-   legend->AddEntry( gTrueA, "Note A", "l" );
-   legend->AddEntry( gTrueB, "Note B", "l" );
-   legend->AddEntry( graphFilterCorrect, "Filter A", "l" );
-   legend->AddEntry( graphFilterTest, "Filter B", "l" );
-   legend->Draw();
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// testFourierNoteFilter
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void TestSuite::testFourierNoteFilter()
-{
-   Logger msg("testFourierNoteFilter");
-   msg << Msg::Info << "Running testFourierNoteFilter..." << Msg::EndReq;
-
-   RawPcmData::Ptr musicData = generateRandomMusic();
-
-   WaveAnalysis::FourierNoteFilter noteFilter( *musicData );
-
-   noteFilter.visualiseResults();
-
-   // /// Reverse
-   // RawPcmData* reverseData = new RawPcmData( musicData->getSamplingInfo(), musicData->size(), 0 );
-   // noteFilter.reverseGenerate( *reverseData );
-//
-   // MultiChannelRawPcmData reverseOutput( reverseData );
-   // WaveFile::write( "reverseData.wav", reverseOutput );
-//
-   // MultiChannelRawPcmData soundData( musicData.release() );
-   // WaveFile::write( "test.wav", soundData );
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// testFourierNoteFilterExternalFile
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void TestSuite::testFourierNoteFilterExternalFile()
-{
-   Logger msg( "testFourierNoteFilterExternalFile" );
-   msg << Msg::Info << "Running testFourierFilterExternalFile..." << Msg::EndReq;
-
-   MultiChannelRawPcmData* data = WaveFile::read( "/Users/marcelra/Dev/Suite_soundArchive/atc_intro.wav" );
-   // MultiChannelRawPcmData* data = WaveFile::read( "/Users/marcelra/Dev/Suite_soundArchive/outcry.wav" );
-   // MultiChannelRawPcmData* data = WaveFile::read( "/Users/marcelra/Dev/Suite_soundArchive/de_spaghetti_ontknoping.wav" );
-   RawPcmData musicData = RawPcmData( data->getChannel( 0 ) );
-   delete data;
-
-   WaveAnalysis::FourierNoteFilter noteFilter( musicData );
-
-   // TCanvas* can = noteFilter.visualiseResults();
-   // can->Update();
-
-   RawPcmData* reverseData = new RawPcmData( musicData.getSamplingInfo(), musicData.size()*2, 0 );
-   noteFilter.executeAndReverse( *reverseData );
-
-   MultiChannelRawPcmData reverseOutput( reverseData );
-   WaveFile::write( "reverseData2.wav", reverseOutput );
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
