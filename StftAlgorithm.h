@@ -62,6 +62,11 @@ class StftAlgorithm
       size_t getNumSpectra() const;
 
       /**
+       * Get the number of frequencies in the spectra
+       */
+      size_t getSpectrumDimension() const;
+
+      /**
        * Get the spectrum by index
        */
       AdvancedFourierSpectrum& getSpectrum( size_t spectrumIndex );

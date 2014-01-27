@@ -5,7 +5,6 @@
 #include <complex>
 #include <fftw3.h>
 
-#include "FourierSpectrum.h"
 #include "RawPcmData.h"
 #include "Typedefs.h"
 
@@ -49,17 +48,6 @@ class FftwAlgorithm
        * Get the number of frequency components in the Fourier spectrum.
        */
       size_t getSpectrumDimension() const;
-
-      /**
-       * Transforms and scales (by 1/sqrt(N)) the timeData
-       * Padding will be done when offset + nSamples > timeData.size()
-       */
-      FourierSpectrum::Ptr transform( const RawPcmData& timeData, size_t offset );
-
-      /**
-       * Transforms and scales (by 1/sqrt(N)) the fourierData
-       */
-      RawPcmData::Ptr transform( const FourierSpectrum& fourierData );
 
    /// TODO: temporary exposure for development of Spectral reassignment
    // protected:

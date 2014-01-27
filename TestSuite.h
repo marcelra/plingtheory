@@ -57,7 +57,6 @@ class TestSuite
        * FFTW algorithms
        */
       static void testFftw();
-      static void testShortTimeFftw();
 
       /**
        * Feature data
