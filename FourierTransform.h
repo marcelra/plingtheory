@@ -1,7 +1,7 @@
-#ifndef ADVANCEDFOURIERTRANSFORM_H
-#define ADVANCEDFOURIERTRANSFORM_H
+#ifndef FOURIERTRANSFORM_H
+#define FOURIERTRANSFORM_H
 
-#include "AdvancedFourierSpectrum.h"
+#include "FourierSpectrum.h"
 #include "FftwAlgorithm.h"
 #include "SamplingInfo.h"
 #include "WindowFuncDef.h"
@@ -17,7 +17,7 @@ namespace WaveAnalysis
  * Altough the reverse transformation is able to transform any Fourier spectrum, results will be wrong in general if the
  * window function does not match the window function used to create the spectrum.
  */
-class AdvancedFourierTransform
+class FourierTransform
 {
    public:
       /**
@@ -28,16 +28,16 @@ class AdvancedFourierTransform
        *        to perform reverse transformations.
        * @param numSamplesZeroPadding: the number of samples (zeroes) that are appended to the windowed data.
        */
-      AdvancedFourierTransform( const SamplingInfo& samplingInfo, size_t windowSize = 4096, const WindowFuncDef& windowFuncDef = HanningWindowFuncDef(), size_t numSamplesZeroPadding = 0 );
+      FourierTransform( const SamplingInfo& samplingInfo, size_t windowSize = 4096, const WindowFuncDef& windowFuncDef = HanningWindowFuncDef(), size_t numSamplesZeroPadding = 0 );
 
       /**
        * Transform double array @param data. The array shoud at least be greater than the number of window samples
        */
-      AdvancedFourierSpectrum::Ptr transform( const double* data );
+      FourierSpectrum::Ptr transform( const double* data );
       /**
        * Reverse transform of Fourier spectrum @param spectrum. Asserts if the window function is not invertible.
        */
-      RealVectorPtr transform( const AdvancedFourierSpectrum& spectrum );
+      RealVectorPtr transform( const FourierSpectrum& spectrum );
 
       /**
        * Obtain a reference to the SamplingInfo object.
@@ -73,7 +73,7 @@ class AdvancedFourierTransform
        */
       const RealVector&         getSpectrumFrequencies() const;
       /**
-       * Returns the number of frequencies
+       * Returns the number of frequencies in spectrum
        */
       size_t getSpectrumDimension() const;
 
@@ -101,49 +101,49 @@ class AdvancedFourierTransform
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Inline methods
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-inline const SamplingInfo& AdvancedFourierTransform::getSamplingInfo() const
+inline const SamplingInfo& FourierTransform::getSamplingInfo() const
 {
    return m_samplingInfo;
 }
 
-inline size_t AdvancedFourierTransform::getWindowSize() const
+inline size_t FourierTransform::getWindowSize() const
 {
    return m_windowSize;
 }
 
-inline size_t AdvancedFourierTransform::getNumSamplesZeroPadding() const
+inline size_t FourierTransform::getNumSamplesZeroPadding() const
 {
    return m_numSamplesZeroPadding;
 }
 
-inline size_t AdvancedFourierTransform::getTotalFourierSize() const
+inline size_t FourierTransform::getTotalFourierSize() const
 {
    return m_windowSize + m_numSamplesZeroPadding;
 }
 
-inline const WindowFunction& AdvancedFourierTransform::getWindowFunction() const
+inline const WindowFunction& FourierTransform::getWindowFunction() const
 {
    return *m_windowFunction;
 }
 
-inline bool AdvancedFourierTransform::isInvertible() const
+inline bool FourierTransform::isInvertible() const
 {
    return m_windowFuncDef->isInvertible();
 }
 
-inline double AdvancedFourierTransform::getLowestFrequency() const
+inline double FourierTransform::getLowestFrequency() const
 {
    return m_samplingInfo.getSamplingRate() / getTotalFourierSize();
 }
 
-inline const RealVector& AdvancedFourierTransform::getSpectrumFrequencies() const
+inline const RealVector& FourierTransform::getSpectrumFrequencies() const
 {
    return m_frequencies;
 }
 
-inline size_t AdvancedFourierTransform::getSpectrumDimension() const
+inline size_t FourierTransform::getSpectrumDimension() const
 {
-   return m_frequencies.size();
+   return m_algorithm.getSpectrumDimension();
 }
 
 } /// namespace WaveAnalysis

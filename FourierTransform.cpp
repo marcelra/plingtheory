@@ -1,4 +1,4 @@
-#include "AdvancedFourierTransform.h"
+#include "FourierTransform.h"
 
 namespace WaveAnalysis
 {
@@ -15,7 +15,7 @@ namespace WaveAnalysis
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// constructor
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-AdvancedFourierTransform::AdvancedFourierTransform( const SamplingInfo& samplingInfo, size_t windowSize, const WindowFuncDef& windowFuncDef, size_t numSamplesZeroPadding ) :
+FourierTransform::FourierTransform( const SamplingInfo& samplingInfo, size_t windowSize, const WindowFuncDef& windowFuncDef, size_t numSamplesZeroPadding ) :
    m_samplingInfo( samplingInfo ),
    m_windowSize( windowSize ),
    m_windowFuncDef( windowFuncDef.clone() ),
@@ -30,7 +30,7 @@ AdvancedFourierTransform::AdvancedFourierTransform( const SamplingInfo& sampling
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// initFftwArrays
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void AdvancedFourierTransform::initFftwArrays()
+void FourierTransform::initFftwArrays()
 {
    double* arr = m_algorithm.getTimeDataWorkingArray();
    for ( size_t i = 0; i < getTotalFourierSize(); ++i )
@@ -43,7 +43,7 @@ void AdvancedFourierTransform::initFftwArrays()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// initFrequencyList
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void AdvancedFourierTransform::initFrequencyList()
+void FourierTransform::initFrequencyList()
 {
    size_t numFrequencies = m_algorithm.getSpectrumDimension();
    m_frequencies.resize( numFrequencies );
@@ -57,7 +57,7 @@ void AdvancedFourierTransform::initFrequencyList()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// transform
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-AdvancedFourierSpectrum::Ptr AdvancedFourierTransform::transform( const double* data )
+FourierSpectrum::Ptr FourierTransform::transform( const double* data )
 {
    if ( m_needsInitTimeArr )
    {
@@ -76,13 +76,13 @@ AdvancedFourierSpectrum::Ptr AdvancedFourierTransform::transform( const double* 
 
    Complex* resultFirst = m_algorithm.getFourierDataWorkingArray();
    Complex* resultLast = m_algorithm.getFourierDataWorkingArray() + m_algorithm.getSpectrumDimension();
-   return AdvancedFourierSpectrum::Ptr( new AdvancedFourierSpectrum( *this, resultFirst, resultLast ) );
+   return FourierSpectrum::Ptr( new FourierSpectrum( *this, resultFirst, resultLast ) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// transform (reverse)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-RealVectorPtr AdvancedFourierTransform::transform( const AdvancedFourierSpectrum& spectrum )
+RealVectorPtr FourierTransform::transform( const FourierSpectrum& spectrum )
 {
    /// Check conditions
    assert( isInvertible() );

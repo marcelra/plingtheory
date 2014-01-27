@@ -109,7 +109,7 @@ size_t StftAlgorithm::getNumSpectra() const
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// getSpectrum
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-AdvancedFourierSpectrum& StftAlgorithm::getSpectrum( size_t spectrumIndex )
+FourierSpectrum& StftAlgorithm::getSpectrum( size_t spectrumIndex )
 {
    return *m_transformedData[spectrumIndex];
 }
@@ -117,7 +117,7 @@ AdvancedFourierSpectrum& StftAlgorithm::getSpectrum( size_t spectrumIndex )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// getSpectrum
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-const AdvancedFourierSpectrum& StftAlgorithm::getSpectrum( size_t spectrumIndex ) const
+const FourierSpectrum& StftAlgorithm::getSpectrum( size_t spectrumIndex ) const
 {
    return *m_transformedData[spectrumIndex];
 }
@@ -125,15 +125,15 @@ const AdvancedFourierSpectrum& StftAlgorithm::getSpectrum( size_t spectrumIndex 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// getClosestSpectrumAt
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-AdvancedFourierSpectrum& StftAlgorithm::getClosestSpectrumAt( size_t sampleIndex )
+FourierSpectrum& StftAlgorithm::getClosestSpectrumAt( size_t sampleIndex )
 {
-   return const_cast< AdvancedFourierSpectrum& >( const_cast< const StftAlgorithm* >( this )->getClosestSpectrumAt( sampleIndex ) );
+   return const_cast< FourierSpectrum& >( const_cast< const StftAlgorithm* >( this )->getClosestSpectrumAt( sampleIndex ) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// getClosestSpectrumAt
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-const AdvancedFourierSpectrum& StftAlgorithm::getClosestSpectrumAt( size_t sampleIndex ) const
+const FourierSpectrum& StftAlgorithm::getClosestSpectrumAt( size_t sampleIndex ) const
 {
    size_t spectrumIndex = sampleIndex / getHopShift();
    assert( spectrumIndex < m_transformedData.size() );

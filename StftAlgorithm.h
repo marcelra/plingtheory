@@ -1,8 +1,8 @@
 #ifndef STFTALGORITHM_H
 #define STFTALGORITHM_H
 
-#include "AdvancedFourierTransform.h"
-#include "AdvancedFourierSpectrum.h"
+#include "FourierTransform.h"
+#include "FourierSpectrum.h"
 #include "RawPcmData.h"
 
 namespace WaveAnalysis
@@ -69,8 +69,8 @@ class StftAlgorithm
       /**
        * Get the spectrum by index
        */
-      AdvancedFourierSpectrum& getSpectrum( size_t spectrumIndex );
-      const AdvancedFourierSpectrum& getSpectrum( size_t spectrumIndex ) const;
+      FourierSpectrum& getSpectrum( size_t spectrumIndex );
+      const FourierSpectrum& getSpectrum( size_t spectrumIndex ) const;
 
       const WindowLocation& getWindowLocation( size_t spectrumIndex ) const;
       WindowLocation getWindowLocationNoOverlap( size_t spectrumIndex ) const;
@@ -78,8 +78,8 @@ class StftAlgorithm
       /**
        * Find the spectrum closed to sample with index @param sapleIndex
        */
-      AdvancedFourierSpectrum& getClosestSpectrumAt( size_t sampleIndex );
-      const AdvancedFourierSpectrum& getClosestSpectrumAt( size_t sampleIndex ) const;
+      FourierSpectrum& getClosestSpectrumAt( size_t sampleIndex );
+      const FourierSpectrum& getClosestSpectrumAt( size_t sampleIndex ) const;
 
    private:
       /**
@@ -94,8 +94,8 @@ class StftAlgorithm
    private:
       bool                                     m_hasExecuted;       //! Bool indicating whether the algorithm has executed.
       double                                   m_hopsPerWindow;     //! The hop-rate as given by the user
-      AdvancedFourierTransform                 m_transform;         //! The worker transform
-      std::vector< AdvancedFourierSpectrum* >  m_transformedData;   //! The produced data
+      FourierTransform                 m_transform;         //! The worker transform
+      std::vector< FourierSpectrum* >  m_transformedData;   //! The produced data
       std::vector< WindowLocation >            m_windowLocations;
 
    /**

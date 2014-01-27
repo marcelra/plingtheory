@@ -52,15 +52,15 @@ SOURCES += main.cpp \
     WindowFuncDef.cpp \
     DynamicFourier.cpp \
     ResonanceMatrixVisualisation.cpp \
-    AdvancedFourierTransform.cpp \
-    AdvancedFourierSpectrum.cpp \
     StftAlgorithm.cpp \
     AdsrEnvelope.cpp \
     ISynthEnvelope.cpp \
     NoiseGenerator.cpp \
     TriangleGenerator.cpp \
     SawtoothGenerator.cpp \
-    IFourierFilter.cpp
+    IFourierFilter.cpp \
+    FourierSpectrum.cpp \
+    FourierTransform.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -114,15 +114,15 @@ HEADERS += \
     WindowFuncDef.h \
     DynamicFourier.h \
     ResonanceMatrixVisualisation.h \
-    AdvancedFourierTransform.h \
-    AdvancedFourierSpectrum.h \
     StftAlgorithm.h \
     AdsrEnvelope.h \
     ISynthEnvelope.h \
     NoiseGenerator.h \
     TriangleGenerator.h \
     SawtoothGenerator.h \
-    IFourierFilter.h
+    IFourierFilter.h \
+    FourierSpectrum.h \
+    FourierTransform.h
 
 OTHER_FILES += \
     Todos.txt

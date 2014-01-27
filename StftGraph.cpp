@@ -55,7 +55,7 @@ TCanvas* StftGraph::create()
 
    for ( size_t iX = 0; iX < nBinsX; ++iX )
    {
-      const WaveAnalysis::AdvancedFourierSpectrum& spec = m_stftAlg.getSpectrum( iX );
+      const WaveAnalysis::FourierSpectrum& spec = m_stftAlg.getSpectrum( iX );
       for ( size_t iY = 0; iY < nBinsY; ++iY )
       {
          m_hist->SetBinContent( iX + 1, iY + 1, spec.getMagnitudeInBin( iY ) );
