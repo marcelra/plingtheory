@@ -18,6 +18,9 @@ GradDescOptimiser::GradDescOptimiser( const IObjectiveFunction& func, const Real
    assert( m_func.getNumParameters() > 0 && m_func.getNumParameters() == startValues.size() );
 }
 
+GradDescOptimiser::~GradDescOptimiser()
+{}
+
 RealVector GradDescOptimiser::solve()
 {
    double currentObjective = m_func.evaluate( m_input );

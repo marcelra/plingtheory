@@ -18,6 +18,7 @@ class GradDescOptimiser
 {
    public:
       GradDescOptimiser( const IObjectiveFunction& func, const RealVector& startValues );
+      virtual ~GradDescOptimiser();
 
       virtual RealVector solve();
 
