@@ -28,7 +28,7 @@ class AdvancedFourierTransform
        *        to perform reverse transformations.
        * @param numSamplesZeroPadding: the number of samples (zeroes) that are appended to the windowed data.
        */
-      AdvancedFourierTransform( const SamplingInfo& samplingInfo, size_t windowSize = 4096, const WindowFuncDef& windowFuncDef = HanningWindowFuncDef(), size_t numSamplesZeroPadding = 4096 );
+      AdvancedFourierTransform( const SamplingInfo& samplingInfo, size_t windowSize = 4096, const WindowFuncDef& windowFuncDef = HanningWindowFuncDef(), size_t numSamplesZeroPadding = 0 );
 
       /**
        * Transform double array @param data. The array shoud at least be greater than the number of window samples
@@ -72,6 +72,10 @@ class AdvancedFourierTransform
        * Returns a vector containing all the frequencies that are probed by the transform.
        */
       const RealVector&         getSpectrumFrequencies() const;
+      /**
+       * Returns the number of frequencies
+       */
+      size_t getSpectrumDimension() const;
 
    private:
       /**
@@ -135,6 +139,11 @@ inline double AdvancedFourierTransform::getLowestFrequency() const
 inline const RealVector& AdvancedFourierTransform::getSpectrumFrequencies() const
 {
    return m_frequencies;
+}
+
+inline size_t AdvancedFourierTransform::getSpectrumDimension() const
+{
+   return m_frequencies.size();
 }
 
 } /// namespace WaveAnalysis

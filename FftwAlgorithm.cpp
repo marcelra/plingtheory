@@ -73,64 +73,6 @@ size_t FftwAlgorithm::getSpectrumDimension() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// transform (time->spectrum)
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-FourierSpectrum::Ptr FftwAlgorithm::transform( const RawPcmData& timeData, size_t offset )
-{
-   /// This is considered an error
-   if ( offset > timeData.size() )
-   {
-      assert( false );
-   }
-   /// Check if padding is needed
-   size_t lastSamplePos = offset + getFourierSize();
-   double* paddedDataSet = 0;
-   if ( lastSamplePos > timeData.size() )
-   {
-      /// Construct data set with zero-padding
-      double* paddedDataSet = new double[ getFourierSize() ];
-      size_t iPad = 0;
-      for ( size_t iSample = offset; iSample < timeData.size(); ++iSample, ++iPad )
-      {
-         paddedDataSet[iPad] = timeData[iSample];
-      }
-      size_t numSamples = getFourierSize();
-      for ( ; iPad < numSamples; ++iPad )
-      {
-         paddedDataSet[iPad] = 0;
-      }
-   }
-   /// Transform
-   const Complex* first = transform( paddedDataSet? paddedDataSet : &timeData[offset] );
-   /// Copy data
-   FourierSpectrum::Ptr result( new FourierSpectrum( timeData.getSamplingInfo(), first, first + getSpectrumDimension() ) );
-   /// Scale by 1/sqrt(n)
-   ::Scale< Complex > scale( 1.0 / sqrt( getFourierSize() ) );
-   std::for_each( result->begin(), result->end(), scale );
-   /// Clear padded data set
-   if ( paddedDataSet )
-   {
-      delete paddedDataSet;
-   }
-   return result;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// transform (spectrum->time)
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-RawPcmData::Ptr FftwAlgorithm::transform( const FourierSpectrum& fourierData )
-{
-   /// Transform
-   const double* first = reverseTransform( &fourierData[0] );
-   /// Copy data
-   RawPcmData::Ptr result ( new RawPcmData( fourierData.getSamplingInfo(), first, first + getFourierSize() ) );
-   /// Scale by 1/sqrt(n)
-   ::Scale< double > scale(  1.0 / sqrt( getFourierSize() ) );
-   std::for_each( result->begin(), result->end(), scale );
-   return result;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// transform
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const Complex* FftwAlgorithm::transform( const double* timeData )

@@ -14,8 +14,6 @@
 #include "Note.h"
 #include "NoteList.h"
 #include "FftwAlgorithm.h"
-#include "FourierSpectrum.h"
-#include "ShortTimeFftw.h"
 #include "ObjectPool.h"
 #include "Peak.h"
 #include "Tone.h"
@@ -25,8 +23,6 @@
 #include "AlgorithmBase.h"
 #include "StftGraph.h"
 #include "DevSpectralReassignment.h"
-#include "WaveletTransform.h"
-#include "WaveletContainer.h"
 #include "DynamicFourier.h"
 #include "ResonanceMatrixVisualisation.h"
 #include "AdvancedFourierTransform.h"
@@ -423,9 +419,9 @@ void TestSuite::testFftw()
    const RawPcmData* musicData = &data->getChannel( 0 );
 
    size_t nSamples = 512;
-   WaveAnalysis::FftwAlgorithm fftw( nSamples );
-   WaveAnalysis::FourierSpectrum::Ptr fsp = fftw.transform( *musicData, 0 );
-   RawPcmData::Ptr original = fftw.transform( *fsp );
+   WaveAnalysis::AdvancedFourierTransform ft( data->getSamplingInfo(), nSamples );
+   WaveAnalysis::AdvancedFourierSpectrum::Ptr fsp = ft.transform( &(*musicData)[0] );
+   RealVectorPtr original = ft.transform( *fsp );
 
    /// Note that original has only 512 samples
    double tolerance = 1e-12;
@@ -437,31 +433,6 @@ void TestSuite::testFftw()
       }
    }
    msg << Msg::Info << "Test passed!" << Msg::EndReq;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// testShortTimeFftw
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void TestSuite::testShortTimeFftw()
-{
-   Logger msg( "testShortTimeFftw" );
-   msg << Msg::Info << "Running testShortTimeFftw..." << Msg::EndReq;
-
-   MultiChannelRawPcmData* data = WaveFile::read( "/Users/marcelra/Dev/Suite_soundArchive/atc_intro.wav" );
-   const RawPcmData* musicData = &data->getChannel( 0 );
-   // const RawPcmData::Ptr musicData = generateRandomMusic();
-
-   msg << Msg::Info << "Applying fourier transforms..." << Msg::EndReq;
-   size_t nSamples = 4096;
-   WaveAnalysis::ShortTimeFftw stft( nSamples, *musicData, WaveAnalysis::RectangularWindowFuncDef() );
-   msg << Msg::Info << "Fourier transforms done." << Msg::EndReq;
-
-   // Visualisation::StftGraph stftGraph( stft );
-   // stftGraph.create();
-
-   // MultiChannelRawPcmData data( new RawPcmData( *musicData ) );
-   // WaveFile::write( "musicData.wav", data );
-   // delete data;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -539,7 +510,8 @@ void TestSuite::testIntegration()
    //const RawPcmData::Ptr musicData = generateRandomMusic();
 
    size_t nSamples = 2048;
-   WaveAnalysis::ShortTimeFftw stft( nSamples, *musicData, WaveAnalysis::HannPoissonWindowFuncDef() );
+   WaveAnalysis::StftAlgorithm stft( musicData->getSamplingInfo(), nSamples, WaveAnalysis::HannPoissonWindowFuncDef() );
+   stft.execute( *musicData );
 
    TH2F* result = new TH2F( "result", "result", stft.getNumSpectra(), -0.5, stft.getNumSpectra() - 0.5, stft.getSpectrumDimension(), -0.5, stft.getSpectrumDimension() );
    std::vector< TLine* > detectedTones;
@@ -555,7 +527,7 @@ void TestSuite::testIntegration()
       bool doMonitor = iSpec == 5;
 
       msg << Msg::Always << "Processing fourier spectrum " << iSpec << Msg::EndReq;
-      WaveAnalysis::FourierSpectrum spec = stft.getSpectrum( iSpec );
+      WaveAnalysis::AdvancedFourierSpectrum spec = stft.getSpectrum( iSpec );
       std::vector<double> specMag = spec.getMagnitude();
       // for ( size_t iLpFilter = 0; iLpFilter < 0; ++iLpFilter )
       // {

@@ -32,8 +32,6 @@ SOURCES += main.cpp \
     NoteList.cpp \
     SineEnvelopeGenerator.cpp \
     FftwAlgorithm.cpp \
-    ShortTimeFftw.cpp \
-    FourierSpectrum.cpp \
     ObjectPool.cpp \
     NaivePeaks.cpp \
     Peak.cpp \
@@ -51,10 +49,7 @@ SOURCES += main.cpp \
     AlgorithmBase.cpp \
     StftGraph.cpp \
     DevSpectralReassignment.cpp \
-    WaveletTransform.cpp \
     WindowFuncDef.cpp \
-    WaveletContainer.cpp \
-    WaveletSpectrum.cpp \
     DynamicFourier.cpp \
     ResonanceMatrixVisualisation.cpp \
     AdvancedFourierTransform.cpp \
@@ -97,8 +92,6 @@ HEADERS += \
     FourierNoteFilter.h \
     SineEnvelopeGenerator.h \
     FftwAlgorithm.h \
-    ShortTimeFftw.h \
-    FourierSpectrum.h \
     ObjectPool.h \
     NaivePeaks.h \
     Peak.h \
@@ -118,10 +111,7 @@ HEADERS += \
     IStorable.h \
     StftGraph.h \
     DevSpectralReassignment.h \
-    WaveletTransform.h \
     WindowFuncDef.h \
-    WaveletContainer.h \
-    WaveletSpectrum.h \
     DynamicFourier.h \
     ResonanceMatrixVisualisation.h \
     AdvancedFourierTransform.h \
