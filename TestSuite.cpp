@@ -25,7 +25,7 @@
 #include "DevSpectralReassignment.h"
 #include "DynamicFourier.h"
 #include "ResonanceMatrixVisualisation.h"
-#include "AdvancedFourierTransform.h"
+#include "FourierTransform.h"
 #include "StftAlgorithm.h"
 #include "AdsrEnvelope.h"
 #include "NoiseGenerator.h"
@@ -57,7 +57,7 @@ void TestSuite::runCurrentDevelopmentTest()
    // testFeatureData();
    // testPeakDetection();
    // testAlgorithmFramework();
-   // testIntegration();
+   testIntegration();
 
    // testShortTimeFftw();
    // testDynamicFourier();
@@ -69,7 +69,7 @@ void TestSuite::runCurrentDevelopmentTest()
    // testEnvelope();
    // testNoiseGenerator();
    // testTriangleGenerator();
-   testSawtoothGenerator();
+   // testSawtoothGenerator();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -419,8 +419,8 @@ void TestSuite::testFftw()
    const RawPcmData* musicData = &data->getChannel( 0 );
 
    size_t nSamples = 512;
-   WaveAnalysis::AdvancedFourierTransform ft( data->getSamplingInfo(), nSamples );
-   WaveAnalysis::AdvancedFourierSpectrum::Ptr fsp = ft.transform( &(*musicData)[0] );
+   WaveAnalysis::FourierTransform ft( data->getSamplingInfo(), nSamples );
+   WaveAnalysis::FourierSpectrum::Ptr fsp = ft.transform( &(*musicData)[0] );
    RealVectorPtr original = ft.transform( *fsp );
 
    /// Note that original has only 512 samples
@@ -510,7 +510,7 @@ void TestSuite::testIntegration()
    //const RawPcmData::Ptr musicData = generateRandomMusic();
 
    size_t nSamples = 2048;
-   WaveAnalysis::StftAlgorithm stft( musicData->getSamplingInfo(), nSamples, WaveAnalysis::HannPoissonWindowFuncDef() );
+   WaveAnalysis::StftAlgorithm stft( musicData->getSamplingInfo(), nSamples, WaveAnalysis::HannPoissonWindowFuncDef(), nSamples * 3, 2 );
    stft.execute( *musicData );
 
    TH2F* result = new TH2F( "result", "result", stft.getNumSpectra(), -0.5, stft.getNumSpectra() - 0.5, stft.getSpectrumDimension(), -0.5, stft.getSpectrumDimension() );
@@ -527,7 +527,7 @@ void TestSuite::testIntegration()
       bool doMonitor = iSpec == 5;
 
       msg << Msg::Always << "Processing fourier spectrum " << iSpec << Msg::EndReq;
-      WaveAnalysis::AdvancedFourierSpectrum spec = stft.getSpectrum( iSpec );
+      WaveAnalysis::FourierSpectrum spec = stft.getSpectrum( iSpec );
       std::vector<double> specMag = spec.getMagnitude();
       // for ( size_t iLpFilter = 0; iLpFilter < 0; ++iLpFilter )
       // {
@@ -671,9 +671,9 @@ void TestSuite::testAdvancedFourier()
    RawPcmData::Ptr data = sinGen.generate( 44100 );
 
    size_t windowSize = 8192;
-   WaveAnalysis::AdvancedFourierTransform ftAlg( samplingInfo, windowSize, WaveAnalysis::HanningWindowFuncDef(), 3 * windowSize );
+   WaveAnalysis::FourierTransform ftAlg( samplingInfo, windowSize, WaveAnalysis::HanningWindowFuncDef(), 3 * windowSize );
 
-   WaveAnalysis::AdvancedFourierSpectrum::Ptr spec = ftAlg.transform( &(*data)[0] );
+   WaveAnalysis::FourierSpectrum::Ptr spec = ftAlg.transform( &(*data)[0] );
    RealVectorPtr dataRev = ftAlg.transform( *spec );
    RealVectorPtr dataVec = data->copyToVectorData();
    dataVec->resize( 8192 );
@@ -728,7 +728,7 @@ void TestSuite::testStftAlgorithm()
       msg << Msg::Info << "Spectrum i = " << i << ": No overlap     [" << winLocNoOv.getFirstSample() << ", " << winLocNoOv.getLastSample() << "]" << Msg::EndReq;
    }
 
-   const WaveAnalysis::AdvancedFourierSpectrum& spec = stftAlg.getSpectrum( 0 );
+   const WaveAnalysis::FourierSpectrum& spec = stftAlg.getSpectrum( 0 );
    new TCanvas();
    TGraph* gr = RootUtilities::createGraph( spec.getFrequencies(), spec.getMagnitude() );
    gr->Draw( "AL" );
@@ -883,9 +883,9 @@ void TestSuite::testSawtoothGenerator()
    MultiChannelRawPcmData sawtoothMcRpcm( new RawPcmData( dataCombined ) );
    WaveFile::write( "sawtooth.wav", sawtoothMcRpcm );
 
-   WaveAnalysis::AdvancedFourierTransform ft( samplingInfo, 4096 * 10, WaveAnalysis::RectangularWindowFuncDef(), 0 );
+   WaveAnalysis::FourierTransform ft( samplingInfo, 4096 * 10, WaveAnalysis::RectangularWindowFuncDef(), 0 );
    double* arr = &((*data)[0]);
-   WaveAnalysis::AdvancedFourierSpectrum::Ptr spec = ft.transform( arr );
+   WaveAnalysis::FourierSpectrum::Ptr spec = ft.transform( arr );
    TGraph* grSpec = RootUtilities::createGraph( spec->getFrequencies(), spec->getMagnitude() );
    new TCanvas();
    grSpec->Draw( "AL" );

@@ -1,5 +1,5 @@
-#ifndef ADVANCEDFOURIERSPECTRUM_H
-#define ADVANCEDFOURIERSPECTRUM_H
+#ifndef FOURIERSPECTRUM_H
+#define FOURIERSPECTRUM_H
 
 #include "RealVector.h"
 #include "SamplingInfo.h"
@@ -8,7 +8,7 @@
 /// Forward declaration
 namespace WaveAnalysis
 {
-   class AdvancedFourierTransform;
+   class FourierTransform;
 }
 
 namespace WaveAnalysis
@@ -19,10 +19,10 @@ namespace WaveAnalysis
  * @brief Fourier spectrum created by the AdvancedFourierTransform class. Contains information needed for reversing
  * the transform.
  */
-class AdvancedFourierSpectrum : private ComplexVector
+class FourierSpectrum : private ComplexVector
 {
    public:
-      AdvancedFourierSpectrum( const AdvancedFourierTransform& transform, const Complex* first, const Complex* last );
+      FourierSpectrum( const FourierTransform& transform, const Complex* first, const Complex* last );
 
       using ComplexVector::at;
       using ComplexVector::operator[];
@@ -75,10 +75,10 @@ class AdvancedFourierSpectrum : private ComplexVector
        */
       RealVector getPhase() const;
 
-      typedef std::auto_ptr< AdvancedFourierSpectrum > Ptr;
+      typedef std::auto_ptr< FourierSpectrum > Ptr;
 
    private:
-      const AdvancedFourierTransform&    m_transform;      //! Pointer to the transform
+      const FourierTransform&    m_transform;      //! Pointer to the transform
 };
 
 } /// namespace WaveAnalysis
