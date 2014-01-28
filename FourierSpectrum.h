@@ -1,15 +1,10 @@
 #ifndef FOURIERSPECTRUM_H
 #define FOURIERSPECTRUM_H
 
+#include "FourierConfig.h"
 #include "RealVector.h"
 #include "SamplingInfo.h"
 #include "Typedefs.h"
-
-/// Forward declaration
-namespace WaveAnalysis
-{
-   class FourierTransform;
-}
 
 namespace WaveAnalysis
 {
@@ -22,7 +17,7 @@ namespace WaveAnalysis
 class FourierSpectrum : private ComplexVector
 {
    public:
-      FourierSpectrum( const FourierTransform& transform, const Complex* first, const Complex* last );
+      FourierSpectrum( FourierConfig::CSPtr, const Complex* first, const Complex* last );
 
       using ComplexVector::at;
       using ComplexVector::operator[];
@@ -78,7 +73,7 @@ class FourierSpectrum : private ComplexVector
       typedef std::auto_ptr< FourierSpectrum > Ptr;
 
    private:
-      const FourierTransform&    m_transform;      //! Pointer to the transform
+      FourierConfig::CSPtr m_config;      //! Pointer to the configuration of the transform
 };
 
 } /// namespace WaveAnalysis

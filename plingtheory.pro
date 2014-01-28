@@ -60,7 +60,9 @@ SOURCES += main.cpp \
     SawtoothGenerator.cpp \
     IFourierFilter.cpp \
     FourierSpectrum.cpp \
-    FourierTransform.cpp
+    FourierTransform.cpp \
+    FourierConfig.cpp \
+    RawStftData.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -122,7 +124,9 @@ HEADERS += \
     SawtoothGenerator.h \
     IFourierFilter.h \
     FourierSpectrum.h \
-    FourierTransform.h
+    FourierTransform.h \
+    FourierConfig.h \
+    RawStftData.h
 
 OTHER_FILES += \
     Todos.txt
