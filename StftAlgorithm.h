@@ -94,8 +94,8 @@ class StftAlgorithm
    private:
       bool                                     m_hasExecuted;       //! Bool indicating whether the algorithm has executed.
       double                                   m_hopsPerWindow;     //! The hop-rate as given by the user
-      FourierTransform                 m_transform;         //! The worker transform
-      std::vector< FourierSpectrum* >  m_transformedData;   //! The produced data
+      FourierTransform                         m_transform;         //! The worker transform
+      std::vector< FourierSpectrum* >          m_transformedData;   //! The produced data
       std::vector< WindowLocation >            m_windowLocations;
 
    /**

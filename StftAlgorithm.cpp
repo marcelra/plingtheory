@@ -33,7 +33,7 @@ StftAlgorithm::~StftAlgorithm()
 void StftAlgorithm::execute( const RawPcmData& data )
 {
    assert( !m_hasExecuted );
-   assert( m_transform.getSamplingInfo() == data.getSamplingInfo() );
+   assert( m_transform.getConfig().getSamplingInfo() == data.getSamplingInfo() );
    assert( getHopShift() > 1 );
 
    double numHopsD = data.size() / getHopShift();
@@ -42,10 +42,10 @@ void StftAlgorithm::execute( const RawPcmData& data )
    for ( size_t iHop = 0; iHop < numHops; ++iHop )
    {
       size_t currentSampleI = currentSampleD;
-      WindowLocation windowLocation( currentSampleI, currentSampleI + m_transform.getWindowSize() );
+      WindowLocation windowLocation( currentSampleI, currentSampleI + m_transform.getConfig().getWindowSize() );
       m_windowLocations.push_back( windowLocation );
 
-      if ( currentSampleI + m_transform.getWindowSize() < data.size() )
+      if ( currentSampleI + m_transform.getConfig().getWindowSize() < data.size() )
       {
          const double* timeData = &(data[currentSampleI]);
          m_transformedData.push_back( m_transform.transform( timeData ).release() );
@@ -67,10 +67,10 @@ void StftAlgorithm::execute( const RawPcmData& data )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 RawPcmData::Ptr StftAlgorithm::reverseExecute()
 {
-   assert( m_transform.isInvertible() );
+   assert( m_transform.getConfig().isInvertible() );
 
    /// Create RawPcmData object
-   const SamplingInfo& samplingInfo = m_transform.getSamplingInfo();
+   const SamplingInfo& samplingInfo = m_transform.getConfig().getSamplingInfo();
    size_t numSamplesData = getWindowLocationNoOverlap( getNumSpectra() - 1 ).getLastSample();
    RawPcmData* result = new RawPcmData( samplingInfo, numSamplesData );
 
@@ -94,7 +94,7 @@ RawPcmData::Ptr StftAlgorithm::reverseExecute()
 RealVector StftAlgorithm::extendDataWithZeros( const RawPcmData& data, size_t currentSample )
 {
    RealVector result( data.begin() + currentSample, data.end() );
-   result.resize( m_transform.getWindowSize(), 0 );
+   result.resize( m_transform.getConfig().getWindowSize(), 0 );
    return result;
 }
 
@@ -146,7 +146,7 @@ const FourierSpectrum& StftAlgorithm::getClosestSpectrumAt( size_t sampleIndex )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 double StftAlgorithm::getHopShift() const
 {
-   return m_transform.getWindowSize() / m_hopsPerWindow;
+   return m_transform.getConfig().getWindowSize() / m_hopsPerWindow;
 }
 
 const StftAlgorithm::WindowLocation& StftAlgorithm::getWindowLocation( size_t spectrumIndex ) const
@@ -192,7 +192,7 @@ StftAlgorithm::WindowLocation StftAlgorithm::getWindowLocationNoOverlap( size_t 
 
 size_t StftAlgorithm::getSpectrumDimension() const
 {
-   return m_transform.getSpectrumDimension();
+   return m_transform.getConfig().getSpectrumDimension();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

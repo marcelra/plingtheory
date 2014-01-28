@@ -16,16 +16,16 @@ namespace WaveAnalysis
 /// constructor
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 FourierTransform::FourierTransform( const SamplingInfo& samplingInfo, size_t windowSize, const WindowFuncDef& windowFuncDef, size_t numSamplesZeroPadding ) :
-   m_samplingInfo( samplingInfo ),
-   m_windowSize( windowSize ),
-   m_windowFuncDef( windowFuncDef.clone() ),
-   m_windowFunction( windowFuncDef.createWindowFunction( windowSize ) ),
-   m_numSamplesZeroPadding( numSamplesZeroPadding ),
-   m_algorithm( getTotalFourierSize() ),
+   m_config( new FourierConfig( samplingInfo, windowSize, windowFuncDef, numSamplesZeroPadding ) ),
+   m_algorithm( m_config->getTotalFourierSize() ),
    m_needsInitTimeArr( true )
-{
-   initFrequencyList();
-}
+{}
+
+FourierTransform::FourierTransform( FourierConfig::CSPtr config ) :
+   m_config( config ),
+   m_algorithm( m_config->getTotalFourierSize() ),
+   m_needsInitTimeArr( true )
+{}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// initFftwArrays
@@ -33,25 +33,11 @@ FourierTransform::FourierTransform( const SamplingInfo& samplingInfo, size_t win
 void FourierTransform::initFftwArrays()
 {
    double* arr = m_algorithm.getTimeDataWorkingArray();
-   for ( size_t i = 0; i < getTotalFourierSize(); ++i )
+   for ( size_t i = 0; i < m_config->getTotalFourierSize(); ++i )
    {
       arr[i] = 0;
    }
    m_needsInitTimeArr = false;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// initFrequencyList
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void FourierTransform::initFrequencyList()
-{
-   size_t numFrequencies = m_algorithm.getSpectrumDimension();
-   m_frequencies.resize( numFrequencies );
-   double lowestFrequency = getLowestFrequency();
-   for ( size_t i = 0; i < numFrequencies; ++i )
-   {
-      m_frequencies[i] = lowestFrequency * i;
-   }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -65,9 +51,9 @@ FourierSpectrum::Ptr FourierTransform::transform( const double* data )
    }
 
    double* arr = m_algorithm.getTimeDataWorkingArray();
-   const WindowFunction& winFunc = getWindowFunction();
+   const WindowFunction& winFunc = m_config->getWindowFunction();
 
-   for ( size_t iSample = 0; iSample < getWindowSize(); ++iSample )
+   for ( size_t iSample = 0; iSample < m_config->getWindowSize(); ++iSample )
    {
       arr[iSample] = data[iSample] * winFunc.calc( iSample );
    }
@@ -76,7 +62,7 @@ FourierSpectrum::Ptr FourierTransform::transform( const double* data )
 
    Complex* resultFirst = m_algorithm.getFourierDataWorkingArray();
    Complex* resultLast = m_algorithm.getFourierDataWorkingArray() + m_algorithm.getSpectrumDimension();
-   return FourierSpectrum::Ptr( new FourierSpectrum( *this, resultFirst, resultLast ) );
+   return FourierSpectrum::Ptr( new FourierSpectrum( m_config, resultFirst, resultLast ) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -85,8 +71,8 @@ FourierSpectrum::Ptr FourierTransform::transform( const double* data )
 RealVectorPtr FourierTransform::transform( const FourierSpectrum& spectrum )
 {
    /// Check conditions
-   assert( isInvertible() );
-   assert( spectrum.size() == m_algorithm.getSpectrumDimension() );
+   assert( m_config->isInvertible() );
+   assert( spectrum.size() == m_config->getSpectrumDimension() );
 
    /// Fill complex Fftw array with spectrum data
    Complex* arr = m_algorithm.getFourierDataWorkingArray();
@@ -100,8 +86,8 @@ RealVectorPtr FourierTransform::transform( const FourierSpectrum& spectrum )
    m_needsInitTimeArr = true;
 
    /// Get sizes
-   size_t windowSize = getWindowSize();
-   size_t totalFourierSize = getWindowSize() + getNumSamplesZeroPadding();
+   size_t windowSize = m_config->getWindowSize();
+   size_t totalFourierSize = m_config->getTotalFourierSize();
 
    /// Build result, this is still multiplied by WindowFunction
    double* first = m_algorithm.getTimeDataWorkingArray();
@@ -109,7 +95,7 @@ RealVectorPtr FourierTransform::transform( const FourierSpectrum& spectrum )
    RealVector* result = new RealVector( first, last );
 
    /// Undo windowing
-   const WindowFunction& winFunc = getWindowFunction();
+   const WindowFunction& winFunc = m_config->getWindowFunction();
    for ( size_t iSample = 0; iSample < windowSize; ++iSample )
    {
       (*result)[iSample] /= ( winFunc.calc( iSample ) * totalFourierSize );
