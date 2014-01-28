@@ -62,7 +62,8 @@ SOURCES += main.cpp \
     FourierSpectrum.cpp \
     FourierTransform.cpp \
     FourierConfig.cpp \
-    RawStftData.cpp
+    RawStftData.cpp \
+    DevSuite.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -126,7 +127,8 @@ HEADERS += \
     FourierSpectrum.h \
     FourierTransform.h \
     FourierConfig.h \
-    RawStftData.h
+    RawStftData.h \
+    DevSuite.h
 
 OTHER_FILES += \
     Todos.txt

@@ -58,7 +58,7 @@ void TestSuite::runCurrentDevelopmentTest()
    // testFeatureData();
    // testPeakDetection();
    // testAlgorithmFramework();
-   testIntegration();
+   // testIntegration();
 
    // testShortTimeFftw();
    // testDynamicFourier();
@@ -896,3 +896,4 @@ void TestSuite::testSawtoothGenerator()
    // Visualisation::StftGraph stftGraph( stftAlg );
    // stftGraph.create();
 }
+
