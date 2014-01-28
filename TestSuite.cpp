@@ -31,6 +31,7 @@
 #include "NoiseGenerator.h"
 #include "TriangleGenerator.h"
 #include "SawtoothGenerator.h"
+#include "RawStftData.h"
 
 #include "TLine.h"
 #include "TH2F.h"
@@ -511,9 +512,9 @@ void TestSuite::testIntegration()
 
    size_t nSamples = 2048;
    WaveAnalysis::StftAlgorithm stft( musicData->getSamplingInfo(), nSamples, WaveAnalysis::HannPoissonWindowFuncDef(), nSamples * 3, 2 );
-   stft.execute( *musicData );
+   WaveAnalysis::RawStftData::Ptr stftData = stft.execute( *musicData );
 
-   TH2F* result = new TH2F( "result", "result", stft.getNumSpectra(), -0.5, stft.getNumSpectra() - 0.5, stft.getSpectrumDimension(), -0.5, stft.getSpectrumDimension() );
+   TH2F* result = new TH2F( "result", "result", stftData->getNumSpectra(), -0.5, stftData->getNumSpectra() - 0.5, stft.getSpectrumDimension(), -0.5, stft.getSpectrumDimension() );
    std::vector< TLine* > detectedTones;
    std::vector< Music::Note > detectedNotes;
 
@@ -522,12 +523,12 @@ void TestSuite::testIntegration()
    Synthesizer::SineGenerator synth( samplingInfo );
    synth.setAmplitude(0.5);
 
-   for ( size_t iSpec = 0; iSpec < stft.getNumSpectra(); ++iSpec )
+   for ( size_t iSpec = 0; iSpec < stftData->getNumSpectra(); ++iSpec )
    {
       bool doMonitor = iSpec == 5;
 
       msg << Msg::Always << "Processing fourier spectrum " << iSpec << Msg::EndReq;
-      WaveAnalysis::FourierSpectrum spec = stft.getSpectrum( iSpec );
+      WaveAnalysis::FourierSpectrum spec = stftData->getSpectrum( iSpec );
       std::vector<double> specMag = spec.getMagnitude();
       // for ( size_t iLpFilter = 0; iLpFilter < 0; ++iLpFilter )
       // {
@@ -717,26 +718,26 @@ void TestSuite::testStftAlgorithm()
 //  WaveAnalysis::StftConfiguration stftConf( samplingInfo, windowSize, WaveAnalysis::HanningWindowFuncDef(), 3 * windowSize, 8 );
 
    WaveAnalysis::StftAlgorithm stftAlg( samplingInfo, windowSize, WaveAnalysis::HanningWindowFuncDef(), 3 * windowSize, 2 );
-   stftAlg.execute( *data );
+   WaveAnalysis::RawStftData::Ptr stftData = stftAlg.execute( *data );
 
-   for ( size_t i = 0; i < stftAlg.getNumSpectra(); ++i )
+   for ( size_t i = 0; i < stftData->getNumSpectra(); ++i )
    {
-      const WaveAnalysis::StftAlgorithm::WindowLocation& winLoc = stftAlg.getWindowLocation( i );
-      const WaveAnalysis::StftAlgorithm::WindowLocation& winLocNoOv = stftAlg.getWindowLocationNoOverlap( i );
+      const WaveAnalysis::RawStftData::WindowLocation& winLoc = stftData->getWindowLocation( i );
+      const WaveAnalysis::RawStftData::WindowLocation& winLocNoOv = stftData->getWindowLocationNoOverlap( i );
       msg << Msg::Info << "-------------------------------------------------------" << Msg::EndReq;
       msg << Msg::Info << "Spectrum i = " << i << ": Windowlocation [" << winLoc.getFirstSample() << ", " << winLoc.getLastSample() << "]" << Msg::EndReq;
       msg << Msg::Info << "Spectrum i = " << i << ": No overlap     [" << winLocNoOv.getFirstSample() << ", " << winLocNoOv.getLastSample() << "]" << Msg::EndReq;
    }
 
-   const WaveAnalysis::FourierSpectrum& spec = stftAlg.getSpectrum( 0 );
+   const WaveAnalysis::FourierSpectrum& spec = stftData->getSpectrum( 0 );
    new TCanvas();
    TGraph* gr = RootUtilities::createGraph( spec.getFrequencies(), spec.getMagnitude() );
    gr->Draw( "AL" );
 
-   Visualisation::StftGraph stftGraph( stftAlg );
+   Visualisation::StftGraph stftGraph( *stftData );
    stftGraph.create();
 
-   RawPcmData::Ptr reverse = stftAlg.reverseExecute();
+   RawPcmData::Ptr reverse = stftAlg.reverseExecute( *stftData );
    msg << Msg::Info << data->size() << ", " << reverse->size() << Msg::EndReq;
 
    new TCanvas();
@@ -800,9 +801,9 @@ void TestSuite::testNoiseGenerator()
 
    size_t windowSize = 4096;
    WaveAnalysis::StftAlgorithm stftAlg( samplingInfo, windowSize, WaveAnalysis::HanningWindowFuncDef(), windowSize, 2 );
-   stftAlg.execute( *data );
+   WaveAnalysis::RawStftData::Ptr stftData = stftAlg.execute( *data );
 
-   Visualisation::StftGraph stftGraph( stftAlg );
+   Visualisation::StftGraph stftGraph( *stftData );
    stftGraph.create();
 }
 
