@@ -11,7 +11,7 @@ class TH2F;
 
 namespace WaveAnalysis
 {
-   class StftAlgorithm;
+   class RawStftData;
 }
 
 namespace Visualisation
@@ -21,7 +21,7 @@ namespace Visualisation
 class StftGraph
 {
    public:
-      StftGraph( const WaveAnalysis::StftAlgorithm& fftwAlg );
+      StftGraph( const WaveAnalysis::RawStftData& fftwData );
       virtual ~StftGraph();
 
       TCanvas* create();
@@ -33,7 +33,7 @@ class StftGraph
       TH2F* getGraph();
 
    private:
-      const WaveAnalysis::StftAlgorithm&  m_stftAlg;
+      const WaveAnalysis::RawStftData&  m_stftData;
 
    private:
       TCanvas*  m_canvas;

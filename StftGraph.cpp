@@ -13,8 +13,8 @@ namespace Visualisation
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Constructor
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-StftGraph::StftGraph( const WaveAnalysis::StftAlgorithm& fftwAlg ) :
-   m_stftAlg( fftwAlg ),
+StftGraph::StftGraph( const WaveAnalysis::RawStftData& stftData ) :
+   m_stftData( stftData ),
    m_canvas( 0 ),
    m_hist( 0 )
 {
@@ -32,13 +32,13 @@ StftGraph::~StftGraph()
 TCanvas* StftGraph::create()
 {
    assert( m_canvas == 0 );
-   if ( !m_stftAlg.hasExecuted() || m_stftAlg.getNumSpectra() == 0 )
+   if ( m_stftData.getNumSpectra() == 0 )
    {
       throw ExceptionDataNotPrepared( "StftGraph", "StftAlgorithm data" );
    }
 
-   size_t nBinsX = m_stftAlg.getNumSpectra();
-   size_t nBinsY = m_stftAlg.getSpectrum( 0 ).size();
+   size_t nBinsX = m_stftData.getNumSpectra();
+   size_t nBinsY = m_stftData.getSpectrum( 0 ).size();
 
    m_canvas = new TCanvas();
 
@@ -55,7 +55,7 @@ TCanvas* StftGraph::create()
 
    for ( size_t iX = 0; iX < nBinsX; ++iX )
    {
-      const WaveAnalysis::FourierSpectrum& spec = m_stftAlg.getSpectrum( iX );
+      const WaveAnalysis::FourierSpectrum& spec = m_stftData.getSpectrum( iX );
       for ( size_t iY = 0; iY < nBinsY; ++iY )
       {
          m_hist->SetBinContent( iX + 1, iY + 1, spec.getMagnitudeInBin( iY ) );
