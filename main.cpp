@@ -1,4 +1,5 @@
 /// Framework classes
+#include "DevSuite.h"
 #include "Exceptions.h"
 #include "GlobalLogParameters.h"
 #include "Logger.h"
@@ -149,7 +150,8 @@ int runTests( const ProgramOptions* programOptions )
    int exitCode = 0;
    try
    {
-      TestSuite::runCurrentDevelopmentTest();
+      // TestSuite::runCurrentDevelopmentTest();
+      DevSuite::execute();
    }
    catch ( ExceptionTestFailed exc )
    {

@@ -4,7 +4,10 @@
 class DevSuite
 {
    public:
-      DevSuite();
+      static void execute();
+
+   public:
+      static void devSidelobeSubtraction();
 };
 
 #endif // DEVSUITE_H
