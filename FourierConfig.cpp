@@ -46,5 +46,27 @@ double FourierConfig::getLowestFrequency() const
    return m_samplingInfo.getSamplingRate() / getTotalFourierSize();
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// Global functions
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+bool operator!=( const FourierConfig& fc1, const FourierConfig& fc2 )
+{
+   if ( fc1.m_samplingInfo          != fc2.m_samplingInfo ) return true;
+   if ( fc1.m_windowSize            != fc2.m_windowSize ) return true;
+   if ( fc1.m_windowFuncDef         != fc2.m_windowFuncDef ) return true;
+   if ( fc1.m_numSamplesZeroPadding != fc2.m_numSamplesZeroPadding ) return true;
+
+   /// Other data is generated via these data
+   return false;
+}
+
+bool operator==( const FourierConfig& fc1, const FourierConfig& fc2 )
+{
+   return !( fc1 != fc2 );
+}
 
 } /// namespace WaveAnalysis

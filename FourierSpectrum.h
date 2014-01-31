@@ -17,7 +17,23 @@ namespace WaveAnalysis
 class FourierSpectrum : private ComplexVector
 {
    public:
-      FourierSpectrum( FourierConfig::CSPtr, const Complex* first, const Complex* last );
+      /**
+       * Constructor.
+       * @param fourierConfig: the configuration of the Fourier transform that created the spectrum
+       * @param first: starting iterator to the complex data
+       * @param last: end iteration to the complex data
+       */
+      FourierSpectrum( FourierConfig::CSPtr fourierConfig, const Complex* first, const Complex* last );
+      /**
+       * Copy-constructor and assignment operator
+       */
+      FourierSpectrum( const FourierSpectrum& other );
+      FourierSpectrum& operator=( const FourierSpectrum& other );
+
+      /**
+       * Destructor
+       */
+      virtual ~FourierSpectrum();
 
       using ComplexVector::at;
       using ComplexVector::operator[];
@@ -33,19 +49,23 @@ class FourierSpectrum : private ComplexVector
        * Access the sampling info object
        */
       const SamplingInfo& getSamplingInfo() const;
+      /**
+       * Access the fourier configuration
+       */
+      const FourierConfig& getConfig() const;
 
       /**
        * Get the frequency of bin indexed by @param binIndex
        */
-      double getFrequencyOfBin( size_t binIndex ) const;
+      virtual double getFrequencyOfBin( size_t binIndex ) const;
       /**
        * Obtain frequencies for all bins in the spectrum
        */
-      const RealVector& getFrequencies() const;
+      virtual const RealVector& getFrequencies() const;
       /**
        * Get interpolated frequency
        */
-      double getFrequency( double x ) const;
+      virtual double getFrequency( double x ) const;
 
       /**
        * Get the number of samples (degrees of freedom) in the time domain (i.e. N in time -> N/2 + 1 in complex)
@@ -73,7 +93,7 @@ class FourierSpectrum : private ComplexVector
       typedef std::auto_ptr< FourierSpectrum > Ptr;
 
    private:
-      FourierConfig::CSPtr m_config;      //! Pointer to the configuration of the transform
+      FourierConfig::CSPtr    m_config;      //! Pointer to the configuration of the transform
 };
 
 } /// namespace WaveAnalysis

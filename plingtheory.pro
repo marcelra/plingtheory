@@ -63,7 +63,9 @@ SOURCES += main.cpp \
     FourierTransform.cpp \
     FourierConfig.cpp \
     RawStftData.cpp \
-    DevSuite.cpp
+    DevSuite.cpp \
+    SpectralReassignmentTransform.cpp \
+    SRSpectrum.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -128,7 +130,9 @@ HEADERS += \
     FourierTransform.h \
     FourierConfig.h \
     RawStftData.h \
-    DevSuite.h
+    DevSuite.h \
+    SpectralReassignmentTransform.h \
+    SRSpectrum.h
 
 OTHER_FILES += \
     Todos.txt

@@ -1,19 +1,77 @@
 #include "DevSuite.h"
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// execute
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void DevSuite::execute()
+{
+   devSpectralReassignment();
+   // devSidelobeSubtraction();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// Include section
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#include "Logger.h"
 #include "RawPcmData.h"
 #include "FourierSpectrum.h"
 #include "FourierTransform.h"
 #include "SineGenerator.h"
+#include "SquareGenerator.h"
 #include "RootUtilities.h"
 #include "Utils.h"
+#include "SpectralReassignmentTransform.h"
 
-void DevSuite::execute()
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// devSpectralReassignment
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void DevSuite::devSpectralReassignment()
 {
-   devSidelobeSubtraction();
+   Logger msg( "devSpectralReassignment" );
+   msg << Msg::Info << "Running devSpectralReassignment..." << Msg::EndReq;
+
+   double freq = 2000;
+
+   SamplingInfo samplingInfo( 44100 );
+   size_t fourierSize = 1024;
+
+   Synthesizer::SquareGenerator sineGen( samplingInfo );
+   sineGen.setAmplitude( 0.5 );
+   sineGen.setFrequency( freq );
+   RawPcmData::Ptr data = sineGen.generate( 44100 );
+
+   WaveAnalysis::SpectralReassignmentTransform specTrans( samplingInfo, fourierSize, 0, 2 );
+   WaveAnalysis::RawStftData::Ptr trans = specTrans.execute( *data );
+
+   const WaveAnalysis::SRSpectrum& specReass = dynamic_cast< const WaveAnalysis::SRSpectrum& >( trans->getSpectrum( 0 ) );
+   WaveAnalysis::FourierSpectrum spec( specReass );
+
+   const RealVector& freqCorr = specReass.getFrequencyCorrections();
+   new TCanvas();
+   TGraph* grCorr = RootUtilities::createGraph( freqCorr );
+   grCorr->Draw( "AL" );
+
+   size_t index = 0;
+   Utils::getMaxValueAndIndex( spec.getMagnitude(), index );
+   double ratio = spec.getFrequency( index ) - freq;
+   msg << Msg::Info << "Max bin is off by " << ratio << Msg::EndReq;
+   msg << Msg::Info << "Correction given = " << freqCorr[ index ] << Msg::EndReq;
+   msg << Msg::Info << "Correction factor on correction = " << ratio / freqCorr[index] << Msg::EndReq;
+
+   TGraph* gr = RootUtilities::createGraph( spec.getFrequencies(), spec.getMagnitude() );
+   TGraph* grReass = RootUtilities::createGraph( specReass.getFrequencies(), specReass.getMagnitude() );
+
+   new TCanvas();
+   grReass->Draw( "AP" );
+   gr->SetLineColor( kRed );
+   gr->Draw( "LSAME" );
 }
 
-#include "Logger.h"
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// devSidelobeSubtraction
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void DevSuite::devSidelobeSubtraction()
 {
    Logger msg( "devSidelobeSubtraction" );

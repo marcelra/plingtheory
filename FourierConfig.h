@@ -15,6 +15,11 @@ class FourierConfig
    public:
       typedef boost::shared_ptr< const FourierConfig > CSPtr;
    public:
+      /**
+       * Constructor. Create a FourierTransform based on a window size, @param windowSize, with a window function, @windowFuncDef and
+       * number of zero padding samples, @param numSamplesZeroPadding. The sampling information, @param samplingInfo, is needed for the
+       * calculation of frequencies.
+       */
       FourierConfig( const SamplingInfo& samplingInfo, size_t windowSize = 4096, const WindowFuncDef& windowFuncDef = HanningWindowFuncDef(), size_t numSamplesZeroPadding = 0 );
 
       /**
@@ -69,7 +74,27 @@ class FourierConfig
       const WindowFunction*      m_windowFunction;           //! Instantiated window function
       size_t                     m_numSamplesZeroPadding;    //! Number of zero padding samples
       RealVector                 m_frequencies;              //! Frequency list
+
+   /**
+    * Blocked copy-constructor and assignment operators (default impl does not satisfy)
+    */
+   private:
+      FourierConfig( const FourierConfig& other );
+      FourierConfig& operator=( const FourierConfig& other );
+
+   friend bool operator!=( const FourierConfig& fc1, const FourierConfig& fc2 );
+   friend bool operator==( const FourierConfig& fc1, const FourierConfig& fc2 );
 };
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// functions
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Compare two configs
+ */
+bool operator!=( const FourierConfig& fc1, const FourierConfig& fc2 );
+bool operator==( const FourierConfig& fc1, const FourierConfig& fc2 );
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Inline methods
