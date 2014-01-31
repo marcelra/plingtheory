@@ -8,6 +8,9 @@ class DevSuite
 
    public:
       static void devSidelobeSubtraction();
+
+   public:
+      static void devSpectralReassignment();
 };
 
 #endif // DEVSUITE_H

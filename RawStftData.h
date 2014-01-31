@@ -22,6 +22,8 @@ class RawStftData
       {
          public:
             WindowLocation( size_t firstSampleIndex, size_t lastSampleIndex );
+            WindowLocation( const WindowLocation& other );
+            WindowLocation& operator=( const WindowLocation& other );
             size_t getFirstSample() const;
             size_t getLastSample() const;
             size_t getCentre() const;
@@ -55,8 +57,15 @@ class RawStftData
       void addSpectrum( FourierSpectrum* spec, WindowLocation* windowLocation );
 
    private:
-      std::vector< FourierSpectrum* >          m_transformedData;   //! The produced data
-      std::vector< WindowLocation* >            m_windowLocations;
+      std::vector< FourierSpectrum* >           m_transformedData;   //! The produced data
+      std::vector< WindowLocation* >            m_windowLocations;   //! Location of the window in the original data
+
+    /**
+     * Blocked copy-constructor and assignment operator (default impl is not ok)
+     */
+    private:
+      RawStftData( const RawStftData& other );
+      RawStftData& operator=( const RawStftData& other );
 };
 
 } /// namespace WaveAnalysis
