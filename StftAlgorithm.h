@@ -36,6 +36,11 @@ class StftAlgorithm
        */
       size_t getSpectrumDimension() const;
 
+      /**
+       * Get the configuration as constant shared pointer
+       */
+      FourierConfig::CSPtr getConfig() const;
+
    private:
       /**
        * Extends the @param RawPcmData with zeroes to fit the window size (needed for the last batches)

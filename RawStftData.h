@@ -33,7 +33,7 @@ class RawStftData
       };
 
    public:
-      RawStftData();
+      RawStftData( FourierConfig::CSPtr config );
       virtual ~RawStftData();
 
       /**
@@ -53,12 +53,18 @@ class RawStftData
       const WindowLocation& getWindowLocation( size_t spectrumIndex ) const;
       WindowLocation getWindowLocationNoOverlap( size_t spectrumIndex ) const;
 
+      /**
+       * Access the settings of the Fourier algorithm used
+       */
+      const FourierConfig& getConfig() const;
+
    public:
       void addSpectrum( FourierSpectrum* spec, WindowLocation* windowLocation );
 
    private:
       std::vector< FourierSpectrum* >           m_transformedData;   //! The produced data
       std::vector< WindowLocation* >            m_windowLocations;   //! Location of the window in the original data
+      FourierConfig::CSPtr                      m_config;            //! Settings of Fourier algorithm used
 
     /**
      * Blocked copy-constructor and assignment operator (default impl is not ok)

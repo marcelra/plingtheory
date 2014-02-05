@@ -5,6 +5,7 @@
 
 /// ROOT
 #include "TCanvas.h"
+#include "TColor.h"
 #include "TH2F.h"
 
 namespace Visualisation
@@ -13,12 +14,13 @@ namespace Visualisation
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Constructor
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-StftGraph::StftGraph( const WaveAnalysis::RawStftData& stftData ) :
+StftGraph::StftGraph( const WaveAnalysis::RawStftData& stftData, size_t nBinsX, size_t nBinsY ) :
    m_stftData( stftData ),
    m_canvas( 0 ),
-   m_hist( 0 )
-{
-}
+   m_hist( 0 ),
+   m_nBinsX( nBinsX == 0 ? stftData.getNumSpectra() : nBinsX ),
+   m_nBinsY( nBinsY == 0 ? m_stftData.getConfig().getSpectrumDimension() : nBinsY )
+{}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Destructor
@@ -37,28 +39,38 @@ TCanvas* StftGraph::create()
       throw ExceptionDataNotPrepared( "StftGraph", "StftAlgorithm data" );
    }
 
-   size_t nBinsX = m_stftData.getNumSpectra();
-   size_t nBinsY = m_stftData.getSpectrum( 0 ).size();
-
    m_canvas = new TCanvas();
 
    /// TODO: scale according to samples/frequencies
    double xMin = -0.5;
-   double xMax = nBinsX - 0.5;
+   double xMax = m_nBinsX - 0.5;
 
    double yMin = -0.5;
-   double yMax = nBinsY - 0.5;
+   double yMax = m_stftData.getConfig().getSamplingInfo().getNyquistFrequency() + 0.5;
 
    TString uniqueName = RootUtilities::getInstance().generateUniqueName( "StftGraph" );
 
-   m_hist = new TH2F( uniqueName, uniqueName, nBinsX, xMin, xMax, nBinsY, yMin, yMax );
+   double stops[2] = { 0, 1 };
+   double red[2] = { 1, 0 };
+   double green[2] = { 1, 0 };
+   double blue[2] = { 1, 0 };
+   TColor::CreateGradientColorTable( 2, stops, red, green, blue, 255, 1 );
 
-   for ( size_t iX = 0; iX < nBinsX; ++iX )
+   m_hist = new TH2F( uniqueName, uniqueName, m_nBinsX, xMin, xMax, m_nBinsY, yMin, yMax );
+
+   for ( size_t iX = 0; iX < m_nBinsX; ++iX )
    {
-      const WaveAnalysis::FourierSpectrum& spec = m_stftData.getSpectrum( iX );
-      for ( size_t iY = 0; iY < nBinsY; ++iY )
+      size_t specIndex = static_cast< double >( iX ) / m_nBinsX * m_stftData.getNumSpectra();
+      const WaveAnalysis::FourierSpectrum& spec = m_stftData.getSpectrum( specIndex );
+      // for ( size_t iBinY = 0; iBinY < m_nBinsY; ++iBinY )
+      // {
+      //    m_hist->SetBinContent( iX + 1, iBinY + 1, 1e-100 );
+      // }
+      for ( size_t iY = 0; iY < m_stftData.getConfig().getSpectrumDimension(); ++iY )
       {
-         m_hist->SetBinContent( iX + 1, iY + 1, spec.getMagnitudeInBin( iY ) );
+         // size_t binY = m_hist->GetYaxis()->FindBin( spec.getFrequencyOfBin(iY) ) + 1;
+         // m_hist->SetBinContent( iX + 1, binY, spec.getMagnitudeInBin( iY ) );
+         m_hist->Fill( iX + 1, spec.getFrequencyOfBin( iY ), spec.getMagnitudeInBin( iY ) );
       }
    }
 

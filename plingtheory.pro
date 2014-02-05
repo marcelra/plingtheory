@@ -65,7 +65,8 @@ SOURCES += main.cpp \
     RawStftData.cpp \
     DevSuite.cpp \
     SpectralReassignmentTransform.cpp \
-    SRSpectrum.cpp
+    SRSpectrum.cpp \
+    DevSuite.parked.cpp
 
 HEADERS += \
     RawPcmData.h \

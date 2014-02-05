@@ -13,8 +13,7 @@ class TestSuite
       /**
        * TestSuite main entry points
        */
-      static void runCurrentDevelopmentTest();
-      static void runAllTests();
+      static void execute();
       static void runTestMath();
 
       /**
@@ -52,6 +51,7 @@ class TestSuite
       static void testDynamicFourier();
       static void testAdvancedFourier();
       static void testStftAlgorithm();
+      static void testSpectralReassignment();
 
       /**
        * FFTW algorithms

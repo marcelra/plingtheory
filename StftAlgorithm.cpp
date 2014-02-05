@@ -23,7 +23,7 @@ RawStftData::Ptr StftAlgorithm::execute( const RawPcmData& data )
    assert( m_transform.getConfig().getSamplingInfo() == data.getSamplingInfo() );
    assert( getHopShift() > 1 );
 
-   RawStftData* result = new RawStftData();
+   RawStftData* result = new RawStftData( m_transform.getConfigCSPtr() );
 
    double numHopsD = data.size() / getHopShift();
    double currentSampleD = 0;
@@ -97,6 +97,11 @@ double StftAlgorithm::getHopShift() const
 size_t StftAlgorithm::getSpectrumDimension() const
 {
    return m_transform.getConfig().getSpectrumDimension();
+}
+
+FourierConfig::CSPtr StftAlgorithm::getConfig() const
+{
+   return m_transform.getConfigCSPtr();
 }
 
 } /// namespace WaveAnalysis
