@@ -3,7 +3,8 @@
 namespace WaveAnalysis
 {
 
-RawStftData::RawStftData()
+RawStftData::RawStftData( FourierConfig::CSPtr config ) :
+   m_config( config )
 {}
 
 RawStftData::~RawStftData()
@@ -148,6 +149,11 @@ size_t RawStftData::WindowLocation::getLastSample() const
 size_t RawStftData::WindowLocation::getCentre() const
 {
    return ( m_first + m_last ) / 2;
+}
+
+const FourierConfig& RawStftData::getConfig() const
+{
+   return *m_config;
 }
 
 } /// namespace WaveAnalysis

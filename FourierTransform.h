@@ -52,6 +52,7 @@ class FourierTransform
       RealVectorPtr transform( const FourierSpectrum& spectrum );
 
       const FourierConfig& getConfig() const;
+      FourierConfig::CSPtr getConfigCSPtr() const;
 
    private:
       /**
@@ -72,13 +73,17 @@ class FourierTransform
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// getConfig
+/// Inline methods FourierTransform
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 inline const FourierConfig& FourierTransform::getConfig() const
 {
    return *m_config;
 }
 
+inline FourierConfig::CSPtr FourierTransform::getConfigCSPtr() const
+{
+   return m_config;
+}
 
 } /// namespace WaveAnalysis
 

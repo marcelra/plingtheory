@@ -18,6 +18,7 @@
 /// Forward declarations
 ////////////////////////////////////////////////////////////////////////////////
 int runTests( const ProgramOptions* programOptions );
+int runDevelopmentCode( const ProgramOptions* programOptions );
 int finaliseApplication( int exitCode );
 void printUsageAndExit();
 
@@ -105,7 +106,16 @@ int main( int argc, char* argv[] )
    }
 
    /// Run tests
-   int exitCode = runTests( programOptions );
+   int exitCode = 0;
+   if ( programOptions->doRunAllTests() )
+   {
+      exitCode = runTests( programOptions );
+   }
+   if ( exitCode == 0 && programOptions->doRunDevelopmentCode() )
+   {
+      exitCode = runDevelopmentCode( programOptions );
+   }
+
    if ( exitCode == 0 )
    {
       std::cout << "Press CTRL+C to end...";
@@ -150,14 +160,13 @@ int runTests( const ProgramOptions* programOptions )
    int exitCode = 0;
    try
    {
-      // TestSuite::runCurrentDevelopmentTest();
-      DevSuite::execute();
+      TestSuite::execute();
    }
    catch ( ExceptionTestFailed exc )
    {
       gLog() << Msg::Fatal << "Test failed!" << Msg::EndReq;
       gLog() << Msg::Error << exc << Msg::EndReq;
-      exitCode = 2;
+      exitCode = 1;
       finaliseApplication( exitCode );
    }
    catch ( const BaseException& exc )
@@ -170,7 +179,35 @@ int runTests( const ProgramOptions* programOptions )
    catch ( ... )
    {
       gLog() << Msg::Fatal << "Test failed!" << Msg::EndReq;
+      exitCode = 2;
+      finaliseApplication( exitCode );
+   }
+   gLog() << Msg::Info << "Running tests successful." << Msg::EndReq;
+   return exitCode;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// Development area
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int runDevelopmentCode( const ProgramOptions* programOptions )
+{
+   assert( programOptions );
+   int exitCode = 0;
+   try
+   {
+      DevSuite::execute();
+   }
+   catch ( const BaseException& exc )
+   {
+      gLog() << Msg::Fatal << "Test failed!" << Msg::EndReq;
+      gLog() << Msg::Error << exc << Msg::EndReq;
       exitCode = 1;
+      finaliseApplication( exitCode );
+   }
+   catch ( ... )
+   {
+      gLog() << Msg::Fatal << "Test failed!" << Msg::EndReq;
+      exitCode = 2;
       finaliseApplication( exitCode );
    }
    gLog() << Msg::Info << "Running tests successful." << Msg::EndReq;

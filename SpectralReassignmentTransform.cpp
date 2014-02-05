@@ -20,7 +20,7 @@ RawStftData::Ptr SpectralReassignmentTransform::execute( const RawPcmData& data 
 
    assert( stft->getNumSpectra() == stftDerivative->getNumSpectra() );
    assert( stft->getNumSpectra() == stftTimeRamped->getNumSpectra() );
-   RawStftData* result = new RawStftData();
+   RawStftData* result = new RawStftData( m_stft.getConfig() );
 
    for ( size_t iSpec = 0; iSpec < stft->getNumSpectra(); ++iSpec )
    {

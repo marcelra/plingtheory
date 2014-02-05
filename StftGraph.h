@@ -21,7 +21,7 @@ namespace Visualisation
 class StftGraph
 {
    public:
-      StftGraph( const WaveAnalysis::RawStftData& fftwData );
+      StftGraph( const WaveAnalysis::RawStftData& fftwData, size_t nBinsX = 0, size_t nBinsY = 0 );
       virtual ~StftGraph();
 
       TCanvas* create();
@@ -38,6 +38,8 @@ class StftGraph
    private:
       TCanvas*  m_canvas;
       TH2F*     m_hist;
+      size_t    m_nBinsX;
+      size_t    m_nBinsY;
 };
 
 } /// namespace Visualisation

@@ -22,6 +22,8 @@ class ProgramOptions
     */
    public:
       bool doProcessRootEvents() const;
+      bool doRunAllTests() const;
+      bool doRunDevelopmentCode() const;
 
    private:
       bool parseOption( const std::string& option );
@@ -29,6 +31,8 @@ class ProgramOptions
    private:
       bool           m_hasErrors;
       bool           m_doProcessRootEvents;
+      bool           m_doRunAllTests;
+      bool           m_doRunDevelopmentCode;
 
 };
 
