@@ -8,6 +8,7 @@ class DevSuite
 
    public:
       static void devSidelobeSubtraction();
+      static void devPeakFinder();
 
 };
 

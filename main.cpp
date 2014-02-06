@@ -210,6 +210,6 @@ int runDevelopmentCode( const ProgramOptions* programOptions )
       exitCode = 2;
       finaliseApplication( exitCode );
    }
-   gLog() << Msg::Info << "Running tests successful." << Msg::EndReq;
+   gLog() << Msg::Info << "Running development code done." << Msg::EndReq;
    return exitCode;
 }
