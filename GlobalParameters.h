@@ -12,7 +12,6 @@
 class GlobalParameters : SingletonBase
 {
    public:
-      const GlobalParameters& getInstance();
       /**
        * Get the path of the trunk
        */
@@ -29,11 +28,19 @@ class GlobalParameters : SingletonBase
        */
       static const char* getProgramName();
 
-   private:
-      GlobalParameters();
+      /**
+       * Retreive the directory in which the test data is located
+       */
+      static const std::string& getTestDataDir();
 
    private:
-      static GlobalParameters*    s_instance;
+      /**
+       * Sets the directory in which the test data is located
+       */
+      static void setTestDataDir( const std::string& dir );
+
+   private:
+      static std::string       s_testDataDir;
 
 };
 

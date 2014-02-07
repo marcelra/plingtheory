@@ -48,6 +48,7 @@ class ProgramOptions
       bool              m_doProcessRootEvents;
       bool              m_doUseColorLogger;
       std::string       m_logFileName;
+      std::string       m_dataDir;
 };
 
 #endif // PROGRAMOPTIONS_H
