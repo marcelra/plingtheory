@@ -128,4 +128,14 @@ class ExceptionDataNotPrepared : public BaseException
       const char* getType() const;
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// Exception raised when program option is given without argument
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class ExceptionOptionUnknown : public BaseException
+{
+   public:
+      ExceptionOptionUnknown( const std::string& option );
+      const char* getType() const;
+};
+
 #endif // EXCEPTIONS_H

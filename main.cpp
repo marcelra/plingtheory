@@ -2,6 +2,7 @@
 #include "DevSuite.h"
 #include "Exceptions.h"
 #include "GlobalLogParameters.h"
+#include "GlobalParameters.h"
 #include "Logger.h"
 #include "ProgramOptions.h"
 #include "RootUtilities.h"
@@ -14,13 +15,33 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#define DEBUG_APPLICATION 0
+
+#ifdef DEBUG_APPLICATION
+#define DBG_MSG( x ) if ( DEBUG_APPLICATION ) std::cout << "### DBG_MSG: " << x << std::endl;
+#else
+#define DBG_MSG( x )
+#endif
+
 ////////////////////////////////////////////////////////////////////////////////
 /// Forward declarations
 ////////////////////////////////////////////////////////////////////////////////
-int runTests( const ProgramOptions* programOptions );
-int runDevelopmentCode( const ProgramOptions* programOptions );
-int finaliseApplication( int exitCode );
+void runTests( const ProgramOptions* programOptions );
+void runDevelopmentCode( const ProgramOptions* programOptions );
+void finaliseApplication();
 void printUsageAndExit();
+
+enum ProgramStatus
+{
+   PS_OK = 0,
+   PS_UNCAUGHT_INTERNAL_EXCEPTION,
+   PS_UNRECOVERABLE_INTERNAL_EXCEPTION,
+   PS_TEST_FAILED,
+   PS_UNRECOVERABLE_USER_EXCEPTION
+} programStatus;
+
+class StopExecutionException {};
+class ImmediateStopExecutionException {};
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Singal handlers
@@ -28,8 +49,9 @@ void printUsageAndExit();
 void handleSIGINT( int /* signal */ )
 {
    std::cout << std::endl;
-   gLog() << Msg::Verbose << "Caught interrupt" << Msg::EndReq;
-   exit( finaliseApplication( 0 ) );
+   DBG_MSG( "Caught interrupt" );
+   finaliseApplication();
+   exit( programStatus );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -37,59 +59,93 @@ void handleSIGINT( int /* signal */ )
 ////////////////////////////////////////////////////////////////////////////////
 const ProgramOptions* initialiseApplication( int argc, char* argv[] )
 {
-   std::cout << "Intialising the application..." << std::endl;
+   DBG_MSG( "Entering initialiseApplication..." );
+   try
+   {
+      /// Parse program options
+      ProgramOptions* programOptions = 0;
+      try
+      {
+         programOptions = new ProgramOptions( argc, argv );
+      }
+      catch ( const BaseException& exception )
+      {
+         std::cout << exception.getMessage() << std::endl;
 
-   /// Parse program options
-   ProgramOptions* programOptions = new ProgramOptions( argc, argv );
+         std::cout << "\nUsage: " << GlobalParameters::getProgramName() << " [options] [commands]\n";
+         std::cout << "\n";
+         std::cout << "Valid options are:\n";
+         ProgramOptions::printOptions( std::cout );
+         return 0;
+      }
 
-   /// Setup logger
-   initGlobalLogger( Msg::Verbose );
-   Msg::LogLevel threshold = GlobalLogParameters::getInstance().getThreshold();
-   gLog() << Msg::Always << "Global logger online; message threshold is " << Msg::strRep( threshold ) << Msg::EndReq;
+      std::cout << "Running " << GlobalParameters::getProgramName() << "..." << std::endl;
 
-   /// Setup ROOT
-   RootUtilities::initRootApplication();
+      /// Setup logger
+      initGlobalLogger( Msg::Verbose, programOptions->doUseColorLogger(), programOptions->getLogFileName() );
+      Msg::LogLevel threshold = GlobalLogParameters::getInstance().getThreshold();
 
-   /// Handle interrupt signal
-   struct sigaction sigIntHandler;
-   sigIntHandler.sa_handler = &handleSIGINT;
-   sigemptyset( &sigIntHandler.sa_mask );
-   sigIntHandler.sa_flags = 0;
-   sigaction( SIGINT, &sigIntHandler, 0 );
+      DBG_MSG( "Global logger initialised; message threshold is " << Msg::strRep( threshold ) );
 
-   gLog() << Msg::Verbose << "Signal handler active" << Msg::EndReq;
+      /// Setup ROOT
+      RootUtilities::initRootApplication();
 
-   /// Report finalisation complete
-   gLog() << Msg::Info << "Application initialised" << Msg::EndReq;
-   return programOptions;
+      /// Handle interrupt signal
+      struct sigaction sigIntHandler;
+      sigIntHandler.sa_handler = &handleSIGINT;
+      sigemptyset( &sigIntHandler.sa_mask );
+      sigIntHandler.sa_flags = 0;
+      sigaction( SIGINT, &sigIntHandler, 0 );
+
+      /// Report finalisation complete
+      gLog() << Msg::Verbose << "Application initialised" << Msg::EndReq;
+      return programOptions;
+   }
+   catch ( BaseException& exc )
+   {
+      std::cerr << "Exception raised during initialisation!" << Msg::EndReq;
+      std::cerr << exc << std::endl;
+      throw ImmediateStopExecutionException();
+      return 0;
+   }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Finalisation
 ////////////////////////////////////////////////////////////////////////////////
-int finaliseApplication( int exitCode )
+void finaliseApplication()
 {
-   /// Display error if exit code is not equal to zero
-   if (  exitCode != 0 )
+   try
    {
-      gLog() << Msg::Error << "Application exited with code " << exitCode << Msg::EndReq;
+      /// Display error if exit code is not equal to zero
+      if (  programStatus != PS_OK )
+      {
+         gLog() << Msg::Error << "Application exited with code " << programStatus << Msg::EndReq;
+      }
+
+      gLog() << Msg::Info << "Finalising..." << Msg::EndReq;
+
+      /// Clear singletons
+      delete &SingletonStore::getInstance();
+
+      gLog() << Msg::Info << "Bye." << Msg::EndReq;
+
+      /// Close global logger (special singleton)
+      closeGlobalLogger();
+      delete &GlobalLogParameters::getInstance();
+
+      /// This is the exit point if ROOT is running
+      RootUtilities::closeRootAppIfRunning( programStatus );
+
+      /// Exit
+      DBG_MSG( "Leaving " << GlobalParameters::getProgramName() << "( exit code " << programStatus << ")" );
    }
-
-   gLog() << Msg::Info << "Finalising..." << Msg::EndReq;
-
-   /// Clear singletons
-   delete &SingletonStore::getInstance();
-
-   gLog() << Msg::Info << "Bye." << Msg::EndReq;
-
-   /// Close global logger (special singleton)
-   closeGlobalLogger();
-
-   /// This is the exit point if ROOT is running
-   RootUtilities::closeRootAppIfRunning( exitCode );
-
-   /// Exit
-   return exitCode;
+   catch ( BaseException& exc )
+   {
+      std::cerr << "Exception raised during finalisation!" << Msg::EndReq;
+      std::cerr << exc << std::endl;
+      throw ImmediateStopExecutionException();
+   }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -97,67 +153,70 @@ int finaliseApplication( int exitCode )
 ////////////////////////////////////////////////////////////////////////////////
 int main( int argc, char* argv[] )
 {
-   /// Initialise application and parse program options
-   const ProgramOptions* programOptions = initialiseApplication( argc, argv );
-
-   if ( programOptions->hasErrors() )
+   try
    {
-      printUsageAndExit();
-   }
+      try
+      {
+         /// Initialise application and parse program options
+         const ProgramOptions* programOptions = initialiseApplication( argc, argv );
 
-   /// Run tests
-   int exitCode = 0;
-   if ( programOptions->doRunAllTests() )
-   {
-      exitCode = runTests( programOptions );
-   }
-   if ( exitCode == 0 && programOptions->doRunDevelopmentCode() )
-   {
-      exitCode = runDevelopmentCode( programOptions );
-   }
+         if ( !programOptions )
+         {
+            return programStatus;
+         }
 
-   if ( exitCode == 0 )
-   {
-      std::cout << "Press CTRL+C to end...";
-      std::cout.flush();
-   }
-   else
-   {
-      finaliseApplication( exitCode );
-   }
+         /// Run tests
+         if ( programOptions->doRunTests() )
+         {
+            runTests( programOptions );
+         }
+         if ( programOptions->doRunDevelopmentCode() )
+         {
+            runDevelopmentCode( programOptions );
+         }
 
-   /// Finalisation
-   bool doProcessRootEvents = programOptions->doProcessRootEvents();
-   delete programOptions;
+         /// Finalisation
+         bool doProcessRootEvents = programOptions->doProcessRootEvents();
+         delete programOptions;
 
-   if ( doProcessRootEvents )
-   {
-      RootUtilities::processRootEvents();
+         if ( doProcessRootEvents )
+         {
+            if ( programStatus == PS_OK )
+            {
+               std::cout << "Press CTRL+C to end...";
+               std::cout.flush();
+               RootUtilities::processRootEvents();
+            }
+         }
+      }
+      catch ( const StopExecutionException& )
+      {
+         gLog() << Msg::Error << "Trying to shut down gracefully..." << Msg::EndReq;
+      }
+      finaliseApplication();
+      return programStatus;
    }
-   return finaliseApplication( exitCode );
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// printUsageAndExit
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void printUsageAndExit()
-{
-   std::cout << "Usage: ./Suite [options]\n";
-   std::cout << "\n";
-   std::cout << "Valid options are:\n";
-   std::cout << "--disableRoot         : Do not run the root-event loop.\n";
-   std::cout << "                        This causes the application to quit immediately after processing.\n";
-   std::cout << std::endl;
-   finaliseApplication( 1 );
+   catch ( const ImmediateStopExecutionException& )
+   {
+      DBG_MSG( "ImmediateStopExecutionException caught!" );
+      std::cerr << GlobalParameters::getProgramName() << " is shutting down immediately (exitcode = " << programStatus << ")" << std::endl;
+      return programStatus;
+   }
+   catch ( ... )
+   {
+      DBG_MSG( "Uncaught exception in main!" );
+      std::cerr << "Unknown exception occurred!" << std::endl;
+      return PS_UNCAUGHT_INTERNAL_EXCEPTION;
+   }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Test suite
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int runTests( const ProgramOptions* programOptions )
+void runTests( const ProgramOptions* programOptions )
 {
    assert( programOptions );
-   int exitCode = 0;
+   assert( programStatus == PS_OK );
    try
    {
       TestSuite::execute();
@@ -166,33 +225,25 @@ int runTests( const ProgramOptions* programOptions )
    {
       gLog() << Msg::Fatal << "Test failed!" << Msg::EndReq;
       gLog() << Msg::Error << exc << Msg::EndReq;
-      exitCode = 1;
-      finaliseApplication( exitCode );
+      programStatus = PS_TEST_FAILED;
+      throw StopExecutionException();
    }
    catch ( const BaseException& exc )
    {
       gLog() << Msg::Fatal << "Test failed!" << Msg::EndReq;
       gLog() << Msg::Error << exc << Msg::EndReq;
-      exitCode = 1;
-      finaliseApplication( exitCode );
-   }
-   catch ( ... )
-   {
-      gLog() << Msg::Fatal << "Test failed!" << Msg::EndReq;
-      exitCode = 2;
-      finaliseApplication( exitCode );
+      programStatus = PS_UNRECOVERABLE_INTERNAL_EXCEPTION;
+      throw StopExecutionException();
    }
    gLog() << Msg::Info << "Running tests successful." << Msg::EndReq;
-   return exitCode;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Development area
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int runDevelopmentCode( const ProgramOptions* programOptions )
+void runDevelopmentCode( const ProgramOptions* programOptions )
 {
    assert( programOptions );
-   int exitCode = 0;
    try
    {
       DevSuite::execute();
@@ -201,15 +252,8 @@ int runDevelopmentCode( const ProgramOptions* programOptions )
    {
       gLog() << Msg::Fatal << "Test failed!" << Msg::EndReq;
       gLog() << Msg::Error << exc << Msg::EndReq;
-      exitCode = 1;
-      finaliseApplication( exitCode );
-   }
-   catch ( ... )
-   {
-      gLog() << Msg::Fatal << "Test failed!" << Msg::EndReq;
-      exitCode = 2;
-      finaliseApplication( exitCode );
+      programStatus = PS_UNRECOVERABLE_INTERNAL_EXCEPTION;
+      throw StopExecutionException();
    }
    gLog() << Msg::Info << "Running development code done." << Msg::EndReq;
-   return exitCode;
 }

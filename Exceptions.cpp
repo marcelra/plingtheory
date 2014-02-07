@@ -200,3 +200,21 @@ const char* ExceptionDataNotPrepared::getType() const
    return "ExceptionDataNotPrepared";
 }
 
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// ExceptionOptionExpectsArgument
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ExceptionOptionUnknown::ExceptionOptionUnknown( const std::string& option )
+{
+   std::stringstream msg;
+   msg << "Option " << option << " is not a valid option.";
+   setMessage( msg.str() );
+}
+
+const char* ExceptionOptionUnknown::getType() const
+{
+   return "ExceptionOptionUnknown";
+}
+
+

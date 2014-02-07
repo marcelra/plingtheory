@@ -2,38 +2,52 @@
 #define PROGRAMOPTIONS_H
 
 #include <string>
+#include <list>
 
-/**
- * @class ProgramOptions
- * @brief Dedicated parser for command-line arguments
- */
+typedef std::list< std::string > StringList;
+
 class ProgramOptions
 {
    public:
       ProgramOptions( int argc, char* argv[] );
+      ~ProgramOptions();
+      static const ProgramOptions& getInstance();
 
-      /**
-       * Returns true if there are unrecognised options given by the user
-       */
+   public:
       bool hasErrors() const;
+      static void printOptions( std::ostream& os );
 
    /**
-    * Parsed option access
+    * Actions
     */
    public:
-      bool doProcessRootEvents() const;
-      bool doRunAllTests() const;
+      bool doRunTests() const;
       bool doRunDevelopmentCode() const;
 
-   private:
-      bool parseOption( const std::string& option );
+   /**
+    * Options
+    */
+   public:
+      bool                 doProcessRootEvents() const;
+      bool                 doUseColorLogger() const;
+      const std::string&   getLogFileName() const;
 
    private:
-      bool           m_hasErrors;
-      bool           m_doProcessRootEvents;
-      bool           m_doRunAllTests;
-      bool           m_doRunDevelopmentCode;
+      void parseArguments();
 
+   private:
+      static ProgramOptions*   s_instance;
+      StringList               m_argList;
+      bool                     m_hasErrors;
+
+   private:
+      bool              m_doRunTests;
+      bool              m_doRunDevelopmentCode;
+
+   private:
+      bool              m_doProcessRootEvents;
+      bool              m_doUseColorLogger;
+      std::string       m_logFileName;
 };
 
 #endif // PROGRAMOPTIONS_H

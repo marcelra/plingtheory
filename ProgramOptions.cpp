@@ -1,83 +1,110 @@
 #include "ProgramOptions.h"
 
-#include <iostream>
-#include <string>
-#include <vector>
+#include "Exceptions.h"
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// constructor
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#include <iostream>
+
 ProgramOptions::ProgramOptions( int argc, char* argv[] ) :
    m_hasErrors( false ),
-   m_doProcessRootEvents( true )
+   m_doRunTests( false ),
+   m_doRunDevelopmentCode( false ),
+   m_doProcessRootEvents( true ),
+   m_doUseColorLogger( true ),
+   m_logFileName( "" )
 {
+   assert( !s_instance );
    for ( int i = 1; i < argc; ++i )
    {
-      std::string opt = argv[i];
-      bool isParsed = false;
-      if ( opt.find( "--" ) == 0 )
+      m_argList.push_back( argv[i] );
+   }
+   parseArguments();
+}
+
+ProgramOptions::~ProgramOptions()
+{}
+
+const ProgramOptions& ProgramOptions::getInstance()
+{
+   assert( s_instance );
+   return *s_instance;
+}
+
+void ProgramOptions::parseArguments()
+{
+   for ( StringList::iterator it = m_argList.begin(); it != m_argList.end(); )
+   {
+      std::string opt = *it;
+      /// Arguments
+      if ( opt == "develop" )
       {
-         isParsed = parseOption( opt.substr( 2, opt.size() - 2 ) );
+         m_doRunDevelopmentCode = true;
       }
-      if ( !isParsed )
+      else if ( opt == "testall" )
       {
-         m_hasErrors = true;
+         m_doRunTests = true;
       }
+      /// Long options
+      else if ( opt == "--disableroot" )
+      {
+         m_doProcessRootEvents = false;
+      }
+      /// Short options
+      else if ( opt == "-o" )
+      {
+         m_doUseColorLogger = false;
+         ++it;
+         m_logFileName = *it;
+      }
+      else
+      {
+         throw ExceptionOptionUnknown( *it );
+         break;
+      }
+      ++it;
    }
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// hasErrors
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool ProgramOptions::hasErrors() const
 {
    return m_hasErrors;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// parseOption
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool ProgramOptions::parseOption( const std::string& option )
+void ProgramOptions::printOptions( std::ostream& os )
 {
-   if ( option == "disableRoot" )
-   {
-      m_doProcessRootEvents = false;
-      return true;
-   }
-   else if ( option == "runAllTests" )
-   {
-      m_doRunAllTests = true;
-      return true;
-   }
-   else if ( option == "develop" )
-   {
-      m_doRunDevelopmentCode = true;
-      return true;
-   }
-   return false;
+   os << "Commands:\n";
+   os << "develop             : Run development code.\n";
+   os << "testall             : Run all tests.\n";
+   os << "\n";
+   os << "Options:\n";
+   os << "--disableroot       : Do not enter the root event loop.\n";
+   os << "                      This causes the application to terminate directly (i.e. without showing graphs etc.)\n";
+   os << "-o <filename>       : Write all log data to file with name <filename>\n";
+   os.flush();
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// doProcessRootEvents
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool ProgramOptions::doProcessRootEvents() const
+bool ProgramOptions::doRunTests() const
 {
-   return m_doProcessRootEvents;
+   return m_doRunTests;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// doRunAllTests
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool ProgramOptions::doRunAllTests() const
-{
-   return m_doRunAllTests;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// doRunDevelopmentCode
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool ProgramOptions::doRunDevelopmentCode() const
 {
    return m_doRunDevelopmentCode;
 }
 
+bool ProgramOptions::doProcessRootEvents() const
+{
+   return m_doProcessRootEvents;
+}
+
+bool ProgramOptions::doUseColorLogger() const
+{
+   return m_doUseColorLogger;
+}
+
+const std::string& ProgramOptions::getLogFileName() const
+{
+   return m_logFileName;
+}
+
+ProgramOptions* ProgramOptions::s_instance = 0;
