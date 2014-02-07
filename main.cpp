@@ -34,10 +34,10 @@ void printUsageAndExit();
 enum ProgramStatus
 {
    PS_OK = 0,
-   PS_UNCAUGHT_INTERNAL_EXCEPTION,
-   PS_UNRECOVERABLE_INTERNAL_EXCEPTION,
+   PS_UNRECOVERABLE_USER_EXCEPTION,
    PS_TEST_FAILED,
-   PS_UNRECOVERABLE_USER_EXCEPTION
+   PS_UNRECOVERABLE_INTERNAL_EXCEPTION,
+   PS_UNCAUGHT_INTERNAL_EXCEPTION
 } programStatus;
 
 class StopExecutionException {};
@@ -81,7 +81,10 @@ const ProgramOptions* initialiseApplication( int argc, char* argv[] )
       std::cout << "Running " << GlobalParameters::getProgramName() << "..." << std::endl;
 
       /// Setup global parameters
-      GlobalParameters::setTestDataDir( programOptions->getDataDir() );
+      if ( programOptions->getDataDir() != "" )
+      {
+         GlobalParameters::setTestDataDir( programOptions->getDataDir() );
+      }
 
       /// Setup logger
       initGlobalLogger( programOptions->getLogLevel(), programOptions->doUseColorLogger(), programOptions->getLogFileName() );
@@ -101,12 +104,14 @@ const ProgramOptions* initialiseApplication( int argc, char* argv[] )
 
       /// Report finalisation complete
       gLog() << Msg::Verbose << "Application initialised" << Msg::EndReq;
+      DBG_MSG( "Leaving initialiseApplication" );
       return programOptions;
    }
    catch ( BaseException& exc )
    {
-      std::cerr << "Exception raised during initialisation!" << Msg::EndReq;
+      std::cerr << "Exception raised during initialisation!" << std::endl;
       std::cerr << exc << std::endl;
+      programStatus = PS_UNRECOVERABLE_INTERNAL_EXCEPTION;
       throw ImmediateStopExecutionException();
       return 0;
    }
@@ -117,6 +122,7 @@ const ProgramOptions* initialiseApplication( int argc, char* argv[] )
 ////////////////////////////////////////////////////////////////////////////////
 void finaliseApplication()
 {
+   DBG_MSG( "Entering finaliseApplication..." );
    try
    {
       /// Display error if exit code is not equal to zero
@@ -140,6 +146,7 @@ void finaliseApplication()
       RootUtilities::closeRootAppIfRunning( programStatus );
 
       /// Exit
+      DBG_MSG( "Leaving finaliseApplication" );
       DBG_MSG( "Leaving " << GlobalParameters::getProgramName() << "( exit code " << programStatus << ")" );
    }
    catch ( BaseException& exc )
@@ -155,6 +162,7 @@ void finaliseApplication()
 ////////////////////////////////////////////////////////////////////////////////
 int main( int argc, char* argv[] )
 {
+   DBG_MSG( "In main..." );
    try
    {
       try
@@ -164,6 +172,7 @@ int main( int argc, char* argv[] )
 
          if ( !programOptions )
          {
+            programStatus = PS_UNRECOVERABLE_USER_EXCEPTION;
             return programStatus;
          }
 
@@ -193,7 +202,7 @@ int main( int argc, char* argv[] )
       }
       catch ( const StopExecutionException& )
       {
-         gLog() << Msg::Error << "Trying to shut down gracefully..." << Msg::EndReq;
+         gLog() << Msg::Info << "Trying to shut down gracefully..." << Msg::EndReq;
       }
       finaliseApplication();
       return programStatus;
