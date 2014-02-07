@@ -50,7 +50,10 @@ Logger& Logger::operator<<( const Msg::LogLevel& logLevel )
       formatInField( m_name, nameFieldWidth );
       m_stream << Msg::colorCode( m_currentLevel );
       formatInField( Msg::strRep( m_currentLevel ), levelFieldWidth );
-      m_stream << "\033[0m";
+      if ( GlobalLogParameters::getInstance().getUseColors() )
+      {
+         m_stream << "\033[0m";
+      }
    }
 
    return *this;

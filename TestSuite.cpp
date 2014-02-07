@@ -156,7 +156,7 @@ void TestSuite::testEffectTrianglizer()
 {
    Logger msg("testEffectTrianglizer");
    msg << Msg::Info << "Running testEffectTrianglizer..." << Msg::EndReq;
-   MultiChannelRawPcmData* inputData = WaveFile::read( "/Users/marcelra/Dev/Suite_soundArchive/tmp.wav" );
+   MultiChannelRawPcmData* inputData = WaveFile::read( GlobalParameters::getTestDataDir() + "tmp.wav" );
    MultiChannelRawPcmData* outputData = new MultiChannelRawPcmData();
    for ( size_t iChannel = 0; iChannel < inputData->getNumChannels(); ++iChannel )
    {
@@ -256,10 +256,10 @@ void TestSuite::testWaveFile()
    {
       WaveFile waveFile;
       /// Test reading
-      MultiChannelRawPcmData* data = waveFile.read( GlobalParameters::getTrunkPath() + "inputData/scarredSolo.wav" );
+      MultiChannelRawPcmData* data = waveFile.read( GlobalParameters::getTestDataDir() + "anotherDay.wav" );
 
       /// Test writing
-      waveFile.write( GlobalParameters::getTrunkPath() + "testResults/testSoundData.wav", *data );
+      waveFile.write( GlobalParameters::getRunDir() + "testSoundData.wav", *data );
 
       /// Make graph of read data
       std::vector< double > pcmData;
@@ -278,7 +278,7 @@ void TestSuite::testWaveFile()
    catch ( ExceptionFileNotFound exc )
    {
       msg << Msg::Error << exc.getMessage() << Msg::EndReq;
-      assert( false );
+      throw ExceptionTestFailed( "testWaveFile", "No wave file found" );
    }
 }
 
@@ -392,7 +392,7 @@ void TestSuite::testRandomMusic()
    generatedDataRight->mixAdd( *generatedBassData );
 
    MultiChannelRawPcmData waveData( generatedDataLeft.release(), generatedDataRight.release() );
-   WaveFile::write( GlobalParameters::getTrunkPath() + "testResults/randomMonoMusic.wav", waveData );
+   WaveFile::write( GlobalParameters::getRunDir() + "testResults/randomMonoMusic.wav", waveData );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -404,7 +404,7 @@ void TestSuite::testFftw()
    msg << Msg::Info << "Running testFftw..." << Msg::EndReq;
 
    /// Get sample wave-file
-   MultiChannelRawPcmData* data = WaveFile::read( "/Users/marcelra/Dev/Suite_soundArchive/de_spaghetti_ontknoping.wav" );
+   MultiChannelRawPcmData* data = WaveFile::read( GlobalParameters::getTestDataDir() + "de_spaghetti_ontknoping.wav" );
    const RawPcmData* musicData = &data->getChannel( 0 );
 
    size_t nSamples = 512;
@@ -493,7 +493,7 @@ void TestSuite::testIntegration()
    Logger msg( "testShortTimeFftw" );
    msg << Msg::Info << "Running testShortTimeFftw..." << Msg::EndReq;
 
-   MultiChannelRawPcmData* waveFile = WaveFile::read( "/Users/marcelra/Dev/Suite_soundArchive/monophDistGuitar2.wav" );
+   MultiChannelRawPcmData* waveFile = WaveFile::read( GlobalParameters::getTestDataDir() + "monophDistGuitar2.wav" );
    RawPcmData& musicDataRef = waveFile->getChannel( 0 );
    RawPcmData* musicData = &musicDataRef;
    //const RawPcmData::Ptr musicData = generateRandomMusic();
@@ -613,8 +613,8 @@ void TestSuite::testDynamicFourier()
    Logger msg( "testDynamicFourier" );
    msg << Msg::Info << "Running testDynamicFourier..." << Msg::EndReq;
 
-   MultiChannelRawPcmData* waveFile = WaveFile::read( "/Users/marcelra/Dev/Suite_soundArchive/monophDistGuitar.wav" );
-   // MultiChannelRawPcmData* waveFile = WaveFile::read( "/Users/marcelra/Dev/Suite_soundArchive/atc_intro.wav" );
+   MultiChannelRawPcmData* waveFile = WaveFile::read( GlobalParameters::getTestDataDir() + "monophDistGuitar.wav" );
+   // MultiChannelRawPcmData* waveFile = WaveFile::read( GlobalParameters::getTestDataDir() + "atc_intro.wav" );
    RawPcmData& musicDataRef = waveFile->getChannel( 0 );
    RawPcmData* data = &musicDataRef;
    // RawPcmData::Ptr data = generateRandomMusic();
@@ -696,10 +696,10 @@ void TestSuite::testStftAlgorithm()
    // RawPcmData::Ptr data = sinGen.generate( 44100, samplingInfo );
 
    // RawPcmData::Ptr data = generateRandomMusic(); // sinGen.generate( 44100, samplingInfo );
-   MultiChannelRawPcmData* mcData = WaveFile::read( "/Users/marcelra/Dev/Suite_soundArchive/atc_intro.wav" );
-   // MultiChannelRawPcmData* mcData = WaveFile::read( "/home/marcelra/mac/Dev/Suite_soundArchive/atc_intro.wav" );
-   // MultiChannelRawPcmData* mcData = WaveFile::read( "/home/marcelra/mac/Dev/Suite_soundArchive/monophDifficult.wav" );
-   // MultiChannelRawPcmData* mcData = WaveFile::read( "/home/marcelra/mac/Dev/Suite_soundArchive/outcry.wav" );
+   MultiChannelRawPcmData* mcData = WaveFile::read( GlobalParameters::getTestDataDir() + "atc_intro.wav" );
+   // MultiChannelRawPcmData* mcData = WaveFile::read( GlobalParameters::getTestDataDir() + "atc_intro.wav" );
+   // MultiChannelRawPcmData* mcData = WaveFile::read( GlobalParameters::getTestDataDir() + "monophDifficult.wav" );
+   // MultiChannelRawPcmData* mcData = WaveFile::read( GlobalParameters::getTestDataDir() + "outcry.wav" );
    RawPcmData* data = &mcData->getChannel( 0 );
 
    size_t windowSize = 8096;
@@ -903,7 +903,7 @@ void TestSuite::testSpectralReassignment()
    sineGen.setFrequency( freq );
    RawPcmData::Ptr data = sineGen.generate( 44100 );
 
-   // MultiChannelRawPcmData* waveFile = WaveFile::read( "/Users/marcelra/Dev/Suite_soundArchive/atc_intro.wav" );
+   // MultiChannelRawPcmData* waveFile = WaveFile::read( GlobalParameters::getTestDataDir() + "atc_intro.wav" );
    // RawPcmData* data = &waveFile->getChannel( 0 );
 
    WaveAnalysis::SpectralReassignmentTransform specTrans( samplingInfo, fourierSize, fourierSize*3, 2 );

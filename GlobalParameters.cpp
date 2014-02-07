@@ -4,27 +4,6 @@
 // #include <boost/filesystem>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// Constructor
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-GlobalParameters::GlobalParameters() :
-   SingletonBase( "GlobalParameters" )
-{
-   /// nothing
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// getInstance
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-const GlobalParameters& GlobalParameters::getInstance()
-{
-   if ( !s_instance )
-   {
-      s_instance = new GlobalParameters();
-   }
-   return *s_instance;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// getTrunkPath
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 std::string GlobalParameters::getTrunkPath()
@@ -35,7 +14,7 @@ std::string GlobalParameters::getTrunkPath()
 std::string GlobalParameters::getRunDir()
 {
    const boost::filesystem::path& path = boost::filesystem::initial_path();
-   return path.string();
+   return path.string() + "/";
 }
 
 const char* GlobalParameters::getProgramName()
@@ -43,5 +22,15 @@ const char* GlobalParameters::getProgramName()
    return "plingtheory";
 }
 
-GlobalParameters* GlobalParameters::s_instance = 0;
+void GlobalParameters::setTestDataDir( const std::string& dir )
+{
+   s_testDataDir = dir;
+}
 
+const std::string& GlobalParameters::getTestDataDir()
+{
+   return s_testDataDir;
+}
+
+// std::string GlobalParameters::s_testDataDir = "/Users/marcelra/Dev/Suite_soundArchive/";
+std::string GlobalParameters::s_testDataDir = "/home/marcelra/mac/Dev/Suite_soundArchive/";
