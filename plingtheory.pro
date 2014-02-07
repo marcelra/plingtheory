@@ -5,7 +5,6 @@ CONFIG -= app_bundle
 
 SOURCES += main.cpp \
     RawPcmData.cpp \
-    SoundData.cpp \
     SamplingInfo.cpp \
     Logger.cpp \
     ProgramOptions.cpp \
@@ -70,7 +69,6 @@ SOURCES += main.cpp \
 
 HEADERS += \
     RawPcmData.h \
-    SoundData.h \
     SamplingInfo.h \
     Logger.h \
     ProgramOptions.h \

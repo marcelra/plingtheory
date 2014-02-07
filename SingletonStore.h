@@ -1,7 +1,7 @@
 #ifndef SINGLETONSTORE_H
 #define SINGLETONSTORE_H
 
-#include "Logger.h"
+class Logger;
 
 #include <vector>
 
@@ -21,7 +21,7 @@ class SingletonStore
 
       static SingletonStore*        theInstance;
       std::vector< SingletonBase* > singletons;
-      Logger                        logger;
+      Logger*                       logger;
 };
 
 #endif // SINGLETONSTORE_H

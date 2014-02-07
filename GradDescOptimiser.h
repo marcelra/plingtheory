@@ -3,8 +3,6 @@
 
 #include "RealVector.h"
 
-#include "Logger.h"
-
 /// Forward declares
 namespace Math
 {

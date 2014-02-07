@@ -25,6 +25,10 @@ const char* GlobalParameters::getProgramName()
 void GlobalParameters::setTestDataDir( const std::string& dir )
 {
    s_testDataDir = dir;
+   if ( s_testDataDir[ s_testDataDir.size() - 1 ] != '/' )
+   {
+      s_testDataDir += "/";
+   }
 }
 
 const std::string& GlobalParameters::getTestDataDir()

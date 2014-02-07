@@ -25,12 +25,13 @@ DynamicFourier::~DynamicFourier()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ResonanceMatrix DynamicFourier::execute( const RawPcmData& data ) const
 {
+   Logger msg( "DynamicFourier" );
    ResonanceMatrix result( m_testFrequencies.size(), std::vector< double >( data.size() ) );
 
    for ( size_t iFreq = 0; iFreq < m_testFrequencies.size(); ++iFreq )
    {
       double frequency = m_testFrequencies[iFreq];
-      std::cout << "Calculating spectrum for frequency: " << frequency << std::endl;
+      msg << Msg::Info << "Calculating spectrum for frequency: " << frequency << Msg::EndReq;
       const std::vector< Complex >& integrand = getIntegrand( data, frequency );
 
       double period = data.getSamplingInfo().getPeriodInSamples( frequency );

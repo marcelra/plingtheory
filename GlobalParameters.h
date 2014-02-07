@@ -5,6 +5,8 @@
 
 #include <string>
 
+class ProgramOptions;
+
 /**
  * @class GlobalParameters
  * @brief Hack class that contains parameters needed for locating directories etc.
@@ -41,6 +43,8 @@ class GlobalParameters : SingletonBase
 
    private:
       static std::string       s_testDataDir;
+
+   friend const ProgramOptions* initialiseApplication( int argc, char* argv[] );
 
 };
 

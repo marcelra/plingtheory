@@ -1,11 +1,10 @@
 #ifndef WAVEFILE_H
 #define WAVEFILE_H
 
-#include "SoundData.h"
-#include "Logger.h"
-
 #include <string>
 #include <fstream>
+
+class MultiChannelRawPcmData;
 
 /**
  * @class WaveFile
