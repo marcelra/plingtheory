@@ -38,5 +38,10 @@ std::string GlobalParameters::getRunDir()
    return path.string();
 }
 
+const char* GlobalParameters::getProgramName()
+{
+   return "plingtheory";
+}
+
 GlobalParameters* GlobalParameters::s_instance = 0;
 

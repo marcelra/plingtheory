@@ -24,6 +24,11 @@ class GlobalParameters : SingletonBase
        */
       static std::string getRunDir();
 
+      /**
+       * Returns the name of the program
+       */
+      static const char* getProgramName();
+
    private:
       GlobalParameters();
 

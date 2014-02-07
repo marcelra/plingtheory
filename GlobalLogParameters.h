@@ -2,6 +2,7 @@
 #define GLOBALLOGPARAMETERS_H
 
 #include "Msg.h"
+#include "SingletonBase.h"
 
 /**
  * @class GlobalLogParameters
@@ -15,10 +16,21 @@ class GlobalLogParameters
        */
       static const GlobalLogParameters& getInstance();
 
+      ~GlobalLogParameters();
+
       /**
        * Set global threshold
        */
-      void setThreshold( Msg::LogLevel threshold );
+      void setThreshold( Msg::LogLevel m_threshold );
+
+      /**
+       * Set use colors
+       */
+      void setUseColors( bool useColors );
+      /**
+       * Open file stream
+       */
+      void openFileStream( const std::string& fileName );
 
       /**
        * Get global threshold
@@ -36,6 +48,14 @@ class GlobalLogParameters
        * Get the number of spaces between the fields
        */
       size_t getSpacerWidth() const;
+      /**
+       * Get color configuration
+       */
+      bool getUseColors() const;
+      /**
+       * Gets the ostream to write to
+       */
+      std::ostream& getStream() const;
 
    private:
       /**
@@ -43,12 +63,15 @@ class GlobalLogParameters
        */
       GlobalLogParameters();
 
-      static GlobalLogParameters*    theInstance;     //! Singleton instance
+      static GlobalLogParameters*    s_theInstance;     //! Singleton instance
 
-      size_t         nameFieldWidth;      //! Width of the name field
-      size_t         levelFieldWidth;     //! Width of the level field
-      size_t         spacerWidth;         //! Number of spaces between fields
-      Msg::LogLevel  threshold;           //! Global threshold
+      size_t                m_nameFieldWidth;      //! Width of the name field
+      size_t                m_levelFieldWidth;     //! Width of the level field
+      size_t                m_spacerWidth;         //! Number of spaces between fields
+      Msg::LogLevel         m_threshold;           //! Global threshold
+      bool                  m_useColors;           //! Flag whether or not to display colors
+      mutable std::ostream* m_stream;
+      mutable std::fstream* m_fstream;
 };
 
 #endif // GLOBALLOGPARAMETERS_H

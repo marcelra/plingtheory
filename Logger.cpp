@@ -10,7 +10,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 Logger::Logger( const std::string& name ) :
    m_name( name ),
-   m_stream( std::cout ),
+   m_stream( GlobalLogParameters::getInstance().getStream() ),
    m_currentLevel( Msg::Never ),
    m_threshold( GlobalLogParameters::getInstance().getThreshold() )
 {
@@ -139,13 +139,19 @@ Logger& gLog()
 ////////////////////////////////////////////////////////////////////////////////
 /// initGlobalLogger
 ////////////////////////////////////////////////////////////////////////////////
-void initGlobalLogger( Msg::LogLevel threshold )
+void initGlobalLogger( Msg::LogLevel threshold, bool doUseColors, const std::string& fileName )
 {
    if ( !gp_gLog )
    {
+      GlobalLogParameters& globalLogPars = const_cast< GlobalLogParameters& >( GlobalLogParameters::getInstance() );
+      globalLogPars.setThreshold( threshold );
+      globalLogPars.setUseColors( doUseColors );
+      if ( fileName != "" )
+      {
+         globalLogPars.openFileStream( fileName );
+      }
+
       gp_gLog = new Logger( "gLog" );
-      const GlobalLogParameters& globalLogPars = GlobalLogParameters::getInstance();
-      const_cast<GlobalLogParameters*>(&globalLogPars)->setThreshold( threshold );
       gp_gLog->setThreshold( threshold );
    }
 }
