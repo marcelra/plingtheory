@@ -16,7 +16,8 @@ void RootUtilities::initRootApplication()
    /// Check if gApplication is still unitialised
    if ( !gApplication )
    {
-      getLogger() << Msg::Debug << "Starting ROOT application" << Msg::EndReq;
+      RootUtilities& ru = RootUtilities::getInstance();
+      ru.getLogger() << Msg::Debug << "Starting ROOT application" << Msg::EndReq;
 
       /// Initialise root application
       /// This will set gApplication
@@ -28,7 +29,7 @@ void RootUtilities::initRootApplication()
       std::string rootLogonScript = GlobalParameters::getRunDir() + "/" + "rootlogon.C";
       gApplication->ProcessFile( rootLogonScript.c_str() );
 
-      getLogger() << Msg::Debug << "ROOT Application initialised." << Msg::EndReq;
+      ru.getLogger() << Msg::Debug << "ROOT Application initialised." << Msg::EndReq;
    }
    else
    {
@@ -66,7 +67,7 @@ void RootUtilities::closeRootAppIfRunning( int exitCode )
 ////////////////////////////////////////////////////////////////////////////////
 Logger& RootUtilities::getLogger()
 {
-   return RootUtilities::getInstance().m_logger;
+   return *m_logger;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -86,9 +87,9 @@ RootUtilities& RootUtilities::getInstance()
 ////////////////////////////////////////////////////////////////////////////////
 RootUtilities::RootUtilities() :
    SingletonBase( "RootUtilities" ),
-   m_logger( "RootUtilities" )
+   m_logger( new Logger( "RootUtilities" ) )
 {
-   m_logger << Msg::Debug << "RootUtilities initialised." << Msg::EndReq;
+   getLogger() << Msg::Debug << "RootUtilities initialised." << Msg::EndReq;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -96,7 +97,8 @@ RootUtilities::RootUtilities() :
 ////////////////////////////////////////////////////////////////////////////////
 RootUtilities::~RootUtilities()
 {
-   m_logger << Msg::Debug << "RootUtilities destructor" << Msg::EndReq;
+   getLogger() << Msg::Debug << "RootUtilities destructor" << Msg::EndReq;
+   delete m_logger;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -191,29 +193,3 @@ TString RootUtilities::generateUniqueName( const std::string& baseName )
    return tBaseName;
 }
 
-
-////////////////////////////////////////////////////////////////////////////////
-/// testRootUtilities
-////////////////////////////////////////////////////////////////////////////////
-int testRootUtilities()
-{
-   Logger msg( "testRootUtilities" );
-
-   /// Test if root is running
-   if ( !gApplication )
-   {
-      msg << Msg::Error << "ROOT is not running" << Msg::EndReq;
-      return 1;
-   }
-
-   /// Make a graph and display it
-   std::vector< double > yData;
-   for ( size_t i = 0; i < 100; i++ )
-   {
-      yData.push_back(i*i);
-   }
-   TGraph* gr = RootUtilities::createGraph( yData );
-   gr->Draw("AL");
-
-   return 0;
-}

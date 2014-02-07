@@ -2,6 +2,7 @@
 
 #include "IObjectiveFunction.h"
 #include "LineSearchObjective.h"
+#include "Logger.h"
 
 #include <cmath>
 

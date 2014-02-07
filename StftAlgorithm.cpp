@@ -1,7 +1,5 @@
 #include "StftAlgorithm.h"
 
-#include <iostream>
-
 namespace WaveAnalysis
 {
 
@@ -40,7 +38,6 @@ RawStftData::Ptr StftAlgorithm::execute( const RawPcmData& data )
       }
       else
       {
-         std::cout << "Enlarging data set at position " << currentSampleI << std::endl;
          const RealVector& extendedVector = extendDataWithZeros( data, currentSampleI );
          result->addSpectrum( m_transform.transform( &extendedVector[0] ).release(), windowLocation );
       }

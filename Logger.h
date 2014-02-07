@@ -81,7 +81,7 @@ Logger& Logger::operator<<( const Msg::LogCommand& logCommand );
 Logger& gLog();
 
 /// Initialise global logger
-void initGlobalLogger( Msg::LogLevel threshold, bool doUseColors, const std::string& fileName );
+void initGlobalLogger( int threshold, bool doUseColors, const std::string& fileName );
 
 /// Close the global logger
 void closeGlobalLogger();

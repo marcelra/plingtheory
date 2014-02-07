@@ -26,7 +26,7 @@ const GlobalLogParameters& GlobalLogParameters::getInstance()
 /// GlobalLogParameters constructor
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 GlobalLogParameters::GlobalLogParameters() :
-   m_nameFieldWidth( 20 ),
+   m_nameFieldWidth( 30 ),
    m_levelFieldWidth( 12 ),
    m_spacerWidth( 2 ),
    m_threshold( Msg::Verbose ),

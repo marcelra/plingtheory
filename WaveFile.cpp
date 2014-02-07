@@ -1,8 +1,10 @@
 #include "WaveFile.h"
 
+#include "BinaryUtilities.h"
 #include "Exceptions.h"
 #include "GlobalLogParameters.h"
-#include "BinaryUtilities.h"
+#include "Logger.h"
+#include "MultiChannelRawPcmData.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 /// WaveFile::read

@@ -36,10 +36,10 @@ FftwAlgorithm::FftwAlgorithm( size_t nSamples ) :
    m_fourierData = (fftw_complex*) fftw_malloc( sizeof(fftw_complex) * ( getSpectrumDimension() ) );
 
    /// Construct plans
-   msg << Msg::Info << "Constructing forward and backward plans for " << m_nSamples << " samples... " << Msg::EndReq;
+   msg << Msg::Verbose << "Constructing forward and backward plans for " << m_nSamples << " samples... " << Msg::EndReq;
    m_planForward  = fftw_plan_dft_r2c_1d( m_nSamples, m_timeData, m_fourierData, FFTW_ESTIMATE );
    m_planBackward = fftw_plan_dft_c2r_1d( m_nSamples, m_fourierData, m_timeData, FFTW_ESTIMATE );
-   msg << Msg::Info << "Done." << Msg::EndReq;
+   msg << Msg::Verbose << "Done." << Msg::EndReq;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

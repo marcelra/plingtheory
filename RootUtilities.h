@@ -1,7 +1,6 @@
 #ifndef ROOTUTILITIES_H
 #define ROOTUTILITIES_H
 
-#include "Logger.h"
 #include "SingletonBase.h"
 #include "Utils.h"
 
@@ -15,11 +14,13 @@
 #include "TString.h"
 
 /// STL
+#include <cassert>
 #include <map>
 
 /// Forward declares
 class RawPcmData;
 class TApplication;
+class Logger;
 
 class RootUtilities : public SingletonBase
 {
@@ -98,9 +99,9 @@ class RootUtilities : public SingletonBase
 
    private:
       /**
-       * Access logger for static methods via hidden singleton
+       * Access logger
        */
-      static Logger& getLogger();
+      Logger& getLogger();
 
       /**
        * Constructor
@@ -109,7 +110,7 @@ class RootUtilities : public SingletonBase
 
    private:
       static RootUtilities*       m_theInstance;    //! Singleton instance
-      Logger                      m_logger;         //! Logger
+      Logger*                     m_logger;         //! Logger
       std::map< TString, size_t > m_uniqueNameIds;  //! Basename vs. Id
 };
 

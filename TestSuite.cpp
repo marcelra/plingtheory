@@ -45,6 +45,7 @@ void TestSuite::execute()
 #include "SineGenerator.h"
 #include "SquareGenerator.h"
 #include "WaveFile.h"
+#include "MultiChannelRawPcmData.h"
 
 #include "Note.h"
 #include "NoteList.h"
@@ -242,7 +243,7 @@ void TestSuite::testWaveFile()
    WaveFile waveFile;
    try
    {
-      msg << Msg::Info << "Test exception handling. Note that this will give a WARNING and an ERROR." << Msg::EndReq;
+      msg << Msg::Error << "Test exception handling. Note that this will give a WARNING and an ERROR (this is ok)" << Msg::EndReq;
       MultiChannelRawPcmData* dat = waveFile.read( "thisWaveFileDoesNotExist" );
       /// Will not get here!
       assert( dat );
@@ -515,7 +516,7 @@ void TestSuite::testIntegration()
    {
       bool doMonitor = iSpec == 5;
 
-      msg << Msg::Always << "Processing fourier spectrum " << iSpec << Msg::EndReq;
+      // msg << Msg::Always << "Processing fourier spectrum " << iSpec << Msg::EndReq;
       WaveAnalysis::FourierSpectrum spec = stftData->getSpectrum( iSpec );
       std::vector<double> specMag = spec.getMagnitude();
       // for ( size_t iLpFilter = 0; iLpFilter < 0; ++iLpFilter )
@@ -561,7 +562,7 @@ void TestSuite::testIntegration()
          }
          double freq = spec.getFrequency( tone.getBaseFreq() );
          Music::Note note( freq, Music::Duration( 0.125 ) );
-         msg << Msg::Always << note.toString() << Msg::EndReq;
+         // msg << Msg::Always << note.toString() << Msg::EndReq;
          detectedNotes.push_back( note );
          // synth.setFrequency( detectedNotes[iNote].getFrequency() );
          synth.setFrequency( note.getFrequency() );

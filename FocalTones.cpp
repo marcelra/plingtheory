@@ -1,6 +1,7 @@
 #include "FocalTones.h"
 
 #include "AlgorithmExceptions.h"
+#include "Logger.h"
 #include "Peak.h"
 #include "Tone.h"
 #include "Typedefs.h"

@@ -142,12 +142,15 @@ Logger& gLog()
 ////////////////////////////////////////////////////////////////////////////////
 /// initGlobalLogger
 ////////////////////////////////////////////////////////////////////////////////
-void initGlobalLogger( Msg::LogLevel threshold, bool doUseColors, const std::string& fileName )
+void initGlobalLogger( int threshold, bool doUseColors, const std::string& fileName )
 {
    if ( !gp_gLog )
    {
       GlobalLogParameters& globalLogPars = const_cast< GlobalLogParameters& >( GlobalLogParameters::getInstance() );
-      globalLogPars.setThreshold( threshold );
+
+      assert( threshold >= Msg::Always && threshold <= Msg::Verbose );
+      globalLogPars.setThreshold( static_cast< Msg::LogLevel >( threshold ) );
+
       globalLogPars.setUseColors( doUseColors );
       if ( fileName != "" )
       {
@@ -155,7 +158,6 @@ void initGlobalLogger( Msg::LogLevel threshold, bool doUseColors, const std::str
       }
 
       gp_gLog = new Logger( "gLog" );
-      gp_gLog->setThreshold( threshold );
    }
 }
 

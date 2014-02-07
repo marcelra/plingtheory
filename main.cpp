@@ -74,15 +74,17 @@ const ProgramOptions* initialiseApplication( int argc, char* argv[] )
 
          std::cout << "\nUsage: " << GlobalParameters::getProgramName() << " [options] [commands]\n";
          std::cout << "\n";
-         std::cout << "Valid options are:\n";
          ProgramOptions::printOptions( std::cout );
          return 0;
       }
 
       std::cout << "Running " << GlobalParameters::getProgramName() << "..." << std::endl;
 
+      /// Setup global parameters
+      GlobalParameters::setTestDataDir( programOptions->getDataDir() );
+
       /// Setup logger
-      initGlobalLogger( Msg::Verbose, programOptions->doUseColorLogger(), programOptions->getLogFileName() );
+      initGlobalLogger( programOptions->getLogLevel(), programOptions->doUseColorLogger(), programOptions->getLogFileName() );
       Msg::LogLevel threshold = GlobalLogParameters::getInstance().getThreshold();
 
       DBG_MSG( "Global logger initialised; message threshold is " << Msg::strRep( threshold ) );

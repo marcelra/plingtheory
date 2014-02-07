@@ -1,6 +1,7 @@
 #include "ObjectPool.h"
 
 #include "Exceptions.h"
+#include "Logger.h"
 
 #include <iomanip>
 
@@ -9,7 +10,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ObjectPool::ObjectPool() :
    SingletonBase( "ObjectPool" ),
-   m_logger( "ObjectPool" )
+   m_logger( new Logger( "ObjectPool" ) )
 {
    getLogger().setThreshold( Msg::Info );
    getLogger() << Msg::Debug << "Initialising the ObjectPool" << Msg::EndReq;

@@ -2,11 +2,13 @@
 #define OBJECTPOOL_H
 
 #include "Exceptions.h"
-#include "IStorable.h"
 #include "Logger.h"
+#include "IStorable.h"
 #include "SingletonBase.h"
 
 #include <map>
+
+class Logger;
 
 /**
  * @class ObjectPool
@@ -64,7 +66,7 @@ class ObjectPool : SingletonBase
       typedef Store::const_iterator              StoreConstIt;
 
       Store           m_store;
-      mutable Logger  m_logger;
+      mutable Logger* m_logger;
 
       static ObjectPool*      s_instance;
 };
@@ -105,7 +107,7 @@ void ObjectPool::store( const std::string& key, T* object )
 
 inline Logger& ObjectPool::getLogger() const
 {
-   return m_logger;
+   return *m_logger;
 }
 
 #endif // OBJECTPOOL_H

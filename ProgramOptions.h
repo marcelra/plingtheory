@@ -31,6 +31,8 @@ class ProgramOptions
       bool                 doProcessRootEvents() const;
       bool                 doUseColorLogger() const;
       const std::string&   getLogFileName() const;
+      const std::string&   getDataDir() const;
+      int                  getLogLevel() const;
 
    private:
       void parseArguments();
@@ -49,6 +51,7 @@ class ProgramOptions
       bool              m_doUseColorLogger;
       std::string       m_logFileName;
       std::string       m_dataDir;
+      int               m_logLevel;
 };
 
 #endif // PROGRAMOPTIONS_H
