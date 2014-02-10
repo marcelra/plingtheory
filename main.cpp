@@ -78,8 +78,6 @@ const ProgramOptions* initialiseApplication( int argc, char* argv[] )
          return 0;
       }
 
-      std::cout << "Running " << GlobalParameters::getProgramName() << "..." << std::endl;
-
       /// Setup global parameters
       if ( programOptions->getDataDir() != "" )
       {
@@ -105,6 +103,8 @@ const ProgramOptions* initialiseApplication( int argc, char* argv[] )
       /// Report finalisation complete
       gLog() << Msg::Verbose << "Application initialised" << Msg::EndReq;
       DBG_MSG( "Leaving initialiseApplication" );
+
+      gLog() << Msg::Info << "Initialisation complete." << Msg::EndReq;
       return programOptions;
    }
    catch ( BaseException& exc )
@@ -163,6 +163,7 @@ void finaliseApplication()
 int main( int argc, char* argv[] )
 {
    DBG_MSG( "In main..." );
+   std::cout << "Running " << GlobalParameters::getProgramName() << "..." << std::endl;
    try
    {
       try
@@ -194,6 +195,7 @@ int main( int argc, char* argv[] )
          {
             if ( programStatus == PS_OK )
             {
+               std::cout << "Running complete." << std::endl;
                std::cout << "Press CTRL+C to end...";
                std::cout.flush();
                RootUtilities::processRootEvents();
