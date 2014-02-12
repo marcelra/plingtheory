@@ -9,6 +9,9 @@ class TestMath
    private:
       static void testTwoDimExampleObjective();
       static void testGradDescOptimiser();
+
+   private:
+      static void testSampledMovingAverage();
 };
 
 #endif // TESTMATH_H
