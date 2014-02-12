@@ -11,7 +11,6 @@ class DevSuite
       static void devPeakFinder();
       static void devFourierPeakFinder1();
       static void devFourierPeakFinder2();
-      static void devMovAvg();
 };
 
 #endif // DEVSUITE_H
