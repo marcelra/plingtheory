@@ -84,7 +84,8 @@ void TestSuite::runTestMath()
 {
    Logger msg( "runTestMath" );
    msg << Msg::Info << "Running Math tests..." << Msg::EndReq;
-   TestMath::testMath();
+   TestMath::execute();
+   msg << Msg::Info << "Math tests done." << Msg::EndReq;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

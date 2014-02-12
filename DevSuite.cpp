@@ -1,5 +1,6 @@
 #include "DevSuite.h"
 #include "Logger.h"
+#include "TestDataSupply.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// execute
@@ -12,8 +13,6 @@ void DevSuite::execute()
    // devPeakFinder();
    // devFourierPeakFinder1();
    devFourierPeakFinder2();
-   devMovAvg();
-
 }
 
 
@@ -212,52 +211,10 @@ void DevSuite::devFourierPeakFinder1()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "TRandom3.h"
 
-RealVector createDataSet( RealVector peakLocs, RealVector peakSigmas, RealVector peakAmpsAtMax )
-{
-   TRandom3 rand;
-   size_t nSamples = 1000;
-   double noiseAmp = 5;
-   double tilt = 0;
-
-   RealVector dataSet( nSamples );
-
-   double tiltStep = tilt / nSamples;
-   for ( size_t i = 0; i < nSamples; ++i )
-   {
-      // double noise = noiseAmp * rand.Uniform();
-      double noise = rand.Gaus( 0, noiseAmp );
-      dataSet[i] = noise + tiltStep * i;
-   }
-
-   size_t nPeaks = peakLocs.size();
-
-   for ( size_t iPeak = 0; iPeak < nPeaks; ++iPeak )
-   {
-      double norm = peakAmpsAtMax[iPeak];
-      double alpha = 1 / ( peakSigmas[iPeak] * peakSigmas[iPeak] * 2 );
-      for ( size_t iSample = 0; iSample < nSamples; ++iSample )
-      {
-         double deltaX = iSample - peakLocs[iPeak];
-         double gaussVal = norm * exp( -deltaX * deltaX * alpha );
-         dataSet[iSample] += gaussVal;
-      }
-   }
-   return dataSet;
-}
 
 void DevSuite::devPeakFinder()
 {
-   const double peakLocArr[] = { 100, 300, 600, 750 };
-   const double peakSigmaArr[] = { 10, 2, 10, 5};
-   const double peakAmpArr[] = { -10, -5, 10, -20 };
-   size_t nPeaks = sizeof( peakLocArr ) / sizeof( double );
-   nPeaks = 0;
-
-   RealVector peakLocs( &peakLocArr[0], &peakLocArr[0] + nPeaks );
-   RealVector peakSigmas( &peakSigmaArr[0], &peakSigmaArr[0] + nPeaks );
-   RealVector peakAmpsAtMax( &peakAmpArr[0], &peakAmpArr[0] + nPeaks );
-
-   const RealVector& dataSet = createDataSet( peakLocs, peakSigmas, peakAmpsAtMax );
+   const RealVector& dataSet = TestDataSupply::createNoiseAndPeaks();
 
    RealVector xArr;
    for ( size_t i = 0; i < dataSet.size(); ++i )
@@ -353,35 +310,5 @@ void DevSuite::devFourierPeakFinder2()
    gr->SetMarkerSize( 0.5 );
 
    // const RealVector& vMovAvg =
-}
-
-void DevSuite::devMovAvg()
-{
-   const double peakLocArr[] = { 100, 300, 600, 750 };
-   const double peakSigmaArr[] = { 10, 2, 10, 5};
-   const double peakAmpArr[] = { -10, -5, 10, -20 };
-   size_t nPeaks = sizeof( peakLocArr ) / sizeof( double );
-
-   RealVector peakLocs( &peakLocArr[0], &peakLocArr[0] + nPeaks );
-   RealVector peakSigmas( &peakSigmaArr[0], &peakSigmaArr[0] + nPeaks );
-   RealVector peakAmpsAtMax( &peakAmpArr[0], &peakAmpArr[0] + nPeaks );
-
-   const RealVector& dataSet = createDataSet( peakLocs, peakSigmas, peakAmpsAtMax );
-
-   std::vector< double > movAvgWeights;
-   double lambda = 20;
-   for ( int i = -20; i <= 20; ++i )
-   {
-      movAvgWeights.push_back( 1 / lambda * exp( - i*i / lambda ) );
-   }
-   Math::SampledMovingAverage movAvgCalc( Math::SampledMovingAverage::createGaussianWeights( 41, 20 ) );
-   RealVector movAvg = movAvgCalc.calculate( dataSet );
-
-   TGraph* grOriginal = RootUtilities::createGraph( dataSet );
-   TGraph* grMovAvg   = RootUtilities::createGraph( movAvg );
-
-   grOriginal->Draw( "AL" );
-   grMovAvg->Draw( "LSAME" );
-   grMovAvg->SetLineColor( kBlue );
 }
 

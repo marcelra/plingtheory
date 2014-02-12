@@ -4,7 +4,7 @@
 class TestMath
 {
    public:
-      static void testMath();
+      static void execute();
 
    private:
       static void testTwoDimExampleObjective();

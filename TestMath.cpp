@@ -1,16 +1,23 @@
 #include "TestMath.h"
 
 #include "Logger.h"
+#include "RootUtilities.h"
+#include "TestDataSupply.h"
 
 #include "GradDescOptimiser.h"
+#include "MovingAverage.h"
 #include "TwoDimExampleObjective.h"
+
+#include "TGraph.h"
+
+#include <cmath>
 
 using namespace Math;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// testMath
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void TestMath::testMath()
+void TestMath::execute()
 {
    testTwoDimExampleObjective();
    testGradDescOptimiser();
@@ -61,7 +68,31 @@ void TestMath::testGradDescOptimiser()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void TestMath::testSampledMovingAverage()
 {
+   Logger msg( "testSampledMovingAverage" );
+   msg << Msg::Info << "In testSampledMovingAverage..." << Msg::EndReq;
 
+   const RealVector& dataSet = TestDataSupply::createNoiseAndPeaks();
+
+   std::vector< double > movAvgWeights;
+   double lambda = 20;
+   for ( int i = -20; i <= 20; ++i )
+   {
+      movAvgWeights.push_back( 1 / lambda * exp( - i*i / lambda ) );
+   }
+   Math::SampledMovingAverage movAvgCalc( Math::SampledMovingAverage::createGaussianWeights( 41, 20 ) );
+   RealVector movAvg = movAvgCalc.calculate( dataSet );
+
+   TGraph* grOriginal = RootUtilities::createGraph( dataSet );
+   TGraph* grMovAvg   = RootUtilities::createGraph( movAvg );
+
+   grOriginal->Draw( "AL" );
+   grMovAvg->Draw( "LSAME" );
+   grMovAvg->SetLineColor( kBlue );
+
+   for ( size_t i = 0; i < movAvg.size(); ++i )
+   {
+      msg << Msg::Info << movAvg[i] << Msg::EndReq;
+   }
 }
 
 
