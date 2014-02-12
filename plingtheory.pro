@@ -65,7 +65,8 @@ SOURCES += main.cpp \
     DevSuite.cpp \
     SpectralReassignmentTransform.cpp \
     SRSpectrum.cpp \
-    DevSuite.parked.cpp
+    DevSuite.parked.cpp \
+    MovingAverage.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -131,7 +132,8 @@ HEADERS += \
     RawStftData.h \
     DevSuite.h \
     SpectralReassignmentTransform.h \
-    SRSpectrum.h
+    SRSpectrum.h \
+    MovingAverage.h
 
 OTHER_FILES += \
     Todos.txt

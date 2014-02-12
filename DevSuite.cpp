@@ -9,13 +9,21 @@ void DevSuite::execute()
    Logger msg( "DevSuite" );
    msg << Msg::Info << "Running development code..." << Msg::EndReq;
    // devSidelobeSubtraction(); /// parked
-   devPeakFinder();
+   // devPeakFinder();
+   // devFourierPeakFinder1();
+   devFourierPeakFinder2();
+   devMovAvg();
+
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Include section
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#include <set>
+#include "MovingAverage.h"
+#include "TLine.h"
 #include "WaveFile.h"
 #include "MultiChannelRawPcmData.h"
 #include "StftGraph.h"
@@ -33,6 +41,175 @@ void DevSuite::execute()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "DevSuite.parked.cpp"
 
+void sortVectors( RealVector& freqVec, RealVector& magVec )
+{
+   std::map< double, int > sortIndices;
+   for ( size_t i = 0; i < freqVec.size(); ++i )
+   {
+      sortIndices[ freqVec[i] ] = i;
+   }
+
+   RealVector magVecNew( magVec.size() );
+   size_t i = 0;
+   for ( std::map< double, int >::const_iterator it = sortIndices.begin(); it != sortIndices.end(); ++it, ++i )
+   {
+      freqVec[ i ] = it->first;
+      magVecNew[ i ] = magVec[ it->second ];
+   }
+   magVec = magVecNew;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// devFourierPeakFinder
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void DevSuite::devFourierPeakFinder1()
+{
+   SamplingInfo samplingInfo;
+
+   Synthesizer::SquareGenerator square( samplingInfo );
+   square.setFrequency( 440 );
+   RawPcmData::Ptr data = square.generate( 44100 );
+   square.setFrequency( 900 );
+   RawPcmData::Ptr data2 = square.generate( 44100 );
+   // data->mixAdd( *data2 );
+
+   size_t fourierSize = 1024;
+   WaveAnalysis::SpectralReassignmentTransform transform( samplingInfo, fourierSize, 0, 2 );
+   WaveAnalysis::RawStftData::Ptr stftData = transform.execute( *data );
+
+   WaveAnalysis::SRSpectrum& spec = static_cast< WaveAnalysis::SRSpectrum& >( stftData->getSpectrum( 0 ) );
+   RealVector freqVec = spec.getFrequencies();
+   RealVector magVec = spec.getMagnitude();
+
+   sortVectors( freqVec, magVec );
+
+   new TCanvas();
+   TGraph* gr = RootUtilities::createGraph( freqVec, magVec );
+   gr->Draw( "AP" );
+   gr->SetMarkerStyle( 21 );
+   gr->SetMarkerSize( 0.5 );
+
+   size_t maxIndex;
+   size_t nIter = 0;
+   size_t maxIter = 100;
+
+   size_t nNbSearchRad = 5;
+   RealVector peaks;
+   RealVector peakMass;
+
+   while ( nIter < maxIter )
+   {
+      std::cout << "====== ITERATION " << nIter << " =====" << std::endl;
+      double maxVal = Utils::getMaxValueAndIndex( magVec, maxIndex );
+
+      std::cout << "Frequency @ max = " << freqVec[maxIndex] << std::endl;
+
+      RealVector distAddCand;
+      RealVector magAddCand;
+
+      size_t iMin = std::max( 0, static_cast< int >( maxIndex - nNbSearchRad ) );
+      size_t iMax = std::min( magVec.size() - 1, maxIndex + nNbSearchRad );
+
+      RealVector neighbourIndices;
+
+      for ( size_t i = iMin; i <= iMax; ++i )
+      {
+         if ( i != maxIndex )
+         {
+            distAddCand.push_back( freqVec[i] - freqVec[maxIndex] );
+            magAddCand.push_back( magVec[i] );
+            neighbourIndices.push_back( i );
+            std::cout << "relIndex = " << static_cast< int >( i - maxIndex ) << ": dist = " << distAddCand.back() << ", mag = " << magAddCand.back() << std::endl;
+         }
+      }
+
+      std::set< size_t > pointsAdded;
+      pointsAdded.insert( maxIndex );
+
+      double volume = 0;
+      double mass = maxVal;
+
+      size_t iDensIter = 0;
+      bool densHasImproved = true;
+      double density = 0;
+      while ( densHasImproved )
+      {
+         double highestNewDens = 0;
+         int iPointToAdd = -1;
+         RealVector::iterator itDist = distAddCand.begin();
+         RealVector::iterator itMag = magAddCand.begin();
+         while ( itDist != distAddCand.end() )
+         {
+            double newMass = mass + *itMag;
+            double newVol = volume + fabs( *itDist );
+            double newDens = newMass / newVol;
+            std::cout << "*itDist = " << *itDist << std::endl;
+            std::cout << "newDens candidate = " << newDens << std::endl;
+            if ( newDens > highestNewDens )
+            {
+               highestNewDens = newDens;
+               iPointToAdd = itDist - distAddCand.begin();
+            }
+            ++itDist;
+            ++itMag;
+         }
+
+         if ( iPointToAdd == -1 )
+         {
+            std::cout << "All points are assigned => break" << std::endl;
+            break;
+         }
+
+         if ( highestNewDens > density || iDensIter < 2 )
+         {
+            density = highestNewDens;
+            std::cout << "New dens = " << density << std::endl;
+            volume += distAddCand[ iPointToAdd ];
+            mass += magAddCand[ iPointToAdd ];
+            pointsAdded.insert( *( neighbourIndices.begin() + iPointToAdd ) );
+
+            distAddCand.erase( distAddCand.begin() + iPointToAdd );
+            magAddCand.erase( magAddCand.begin() + iPointToAdd );
+            neighbourIndices.erase( neighbourIndices.begin() + iPointToAdd );
+         }
+         else
+         {
+            densHasImproved = false;
+            std::cout << "Density did not improve" << std::endl;
+         }
+
+         ++iDensIter;
+      } /// inner while loop
+
+      peaks.push_back( freqVec[maxIndex] );
+      peakMass.push_back( mass );
+
+      for ( std::set< size_t >::reverse_iterator it = pointsAdded.rbegin(); it != pointsAdded.rend(); ++it )
+      {
+         std::cout << "Removing point " << *it << std::endl;
+         magVec.erase( magVec.begin() + *it );
+         freqVec.erase( freqVec.begin() + *it );
+      }
+
+      ++nIter;
+   }
+
+   TGraph* grRemoved = RootUtilities::createGraph( freqVec, magVec );
+   grRemoved->SetMarkerSize( 1 );
+   grRemoved->SetMarkerColor( kRed );
+   grRemoved->Draw( "PSAME" );
+
+   for ( size_t iPeak = 0; iPeak < peaks.size(); ++iPeak )
+   {
+      TLine* line = new TLine( peaks[iPeak], 0, peaks[iPeak], peakMass[iPeak] );
+      line->Draw();
+   }
+
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// Peakfinder development
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "TRandom3.h"
 
 RealVector createDataSet( RealVector peakLocs, RealVector peakSigmas, RealVector peakAmpsAtMax )
@@ -74,7 +251,7 @@ void DevSuite::devPeakFinder()
    const double peakSigmaArr[] = { 10, 2, 10, 5};
    const double peakAmpArr[] = { -10, -5, 10, -20 };
    size_t nPeaks = sizeof( peakLocArr ) / sizeof( double );
-   // nPeaks = 0;
+   nPeaks = 0;
 
    RealVector peakLocs( &peakLocArr[0], &peakLocArr[0] + nPeaks );
    RealVector peakSigmas( &peakSigmaArr[0], &peakSigmaArr[0] + nPeaks );
@@ -143,8 +320,68 @@ void DevSuite::devPeakFinder()
 
    new TCanvas();
    RootUtilities::createGraph( xArr, localLhCopy )->Draw( "AL" );
-
-
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// devFourierPeakFinder2
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void DevSuite::devFourierPeakFinder2()
+{
+   SamplingInfo samplingInfo;
+
+   Synthesizer::SquareGenerator square( samplingInfo );
+   square.setFrequency( 440 );
+   RawPcmData::Ptr data = square.generate( 44100 );
+   square.setFrequency( 900 );
+   RawPcmData::Ptr data2 = square.generate( 44100 );
+   // data->mixAdd( *data2 );
+
+   size_t fourierSize = 1024;
+   WaveAnalysis::SpectralReassignmentTransform transform( samplingInfo, fourierSize, 0, 2 );
+   WaveAnalysis::RawStftData::Ptr stftData = transform.execute( *data );
+
+   WaveAnalysis::SRSpectrum& spec = static_cast< WaveAnalysis::SRSpectrum& >( stftData->getSpectrum( 0 ) );
+   RealVector freqVec = spec.getFrequencies();
+   RealVector magVec = spec.getMagnitude();
+
+   sortVectors( freqVec, magVec );
+
+   new TCanvas();
+   TGraph* gr = RootUtilities::createGraph( freqVec, magVec );
+   gr->Draw( "AP" );
+   gr->SetMarkerStyle( 21 );
+   gr->SetMarkerSize( 0.5 );
+
+   // const RealVector& vMovAvg =
+}
+
+void DevSuite::devMovAvg()
+{
+   const double peakLocArr[] = { 100, 300, 600, 750 };
+   const double peakSigmaArr[] = { 10, 2, 10, 5};
+   const double peakAmpArr[] = { -10, -5, 10, -20 };
+   size_t nPeaks = sizeof( peakLocArr ) / sizeof( double );
+
+   RealVector peakLocs( &peakLocArr[0], &peakLocArr[0] + nPeaks );
+   RealVector peakSigmas( &peakSigmaArr[0], &peakSigmaArr[0] + nPeaks );
+   RealVector peakAmpsAtMax( &peakAmpArr[0], &peakAmpArr[0] + nPeaks );
+
+   const RealVector& dataSet = createDataSet( peakLocs, peakSigmas, peakAmpsAtMax );
+
+   std::vector< double > movAvgWeights;
+   double lambda = 20;
+   for ( int i = -20; i <= 20; ++i )
+   {
+      movAvgWeights.push_back( 1 / lambda * exp( - i*i / lambda ) );
+   }
+   Math::SampledMovingAverage movAvgCalc( Math::SampledMovingAverage::createGaussianWeights( 41, 20 ) );
+   RealVector movAvg = movAvgCalc.calculate( dataSet );
+
+   TGraph* grOriginal = RootUtilities::createGraph( dataSet );
+   TGraph* grMovAvg   = RootUtilities::createGraph( movAvg );
+
+   grOriginal->Draw( "AL" );
+   grMovAvg->Draw( "LSAME" );
+   grMovAvg->SetLineColor( kBlue );
+}
 
