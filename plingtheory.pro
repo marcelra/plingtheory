@@ -67,7 +67,9 @@ SOURCES += main.cpp \
     SRSpectrum.cpp \
     DevSuite.parked.cpp \
     MovingAverage.cpp \
-    TestDataSupply.cpp
+    TestDataSupply.cpp \
+    TwoTuple.cpp \
+    INTuple.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -135,7 +137,9 @@ HEADERS += \
     SpectralReassignmentTransform.h \
     SRSpectrum.h \
     MovingAverage.h \
-    TestDataSupply.h
+    TestDataSupply.h \
+    TwoTuple.h \
+    INTuple.h
 
 OTHER_FILES += \
     Todos.txt
