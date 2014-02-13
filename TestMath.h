@@ -12,6 +12,7 @@ class TestMath
 
    private:
       static void testSampledMovingAverage();
+
 };
 
 #endif // TESTMATH_H

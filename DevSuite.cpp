@@ -12,7 +12,8 @@ void DevSuite::execute()
    // devSidelobeSubtraction(); /// parked
    // devPeakFinder();
    // devFourierPeakFinder1();
-   devFourierPeakFinder2();
+   // devFourierPeakFinder2();
+   devTwoTuple();
 }
 
 
@@ -310,5 +311,36 @@ void DevSuite::devFourierPeakFinder2()
    gr->SetMarkerSize( 0.5 );
 
    // const RealVector& vMovAvg =
+}
+
+void DevSuite::devTwoTuple()
+{
+   Logger msg( "devTwoTuple" );
+   msg << Msg::Info << "In devTwoTuple..." << Msg::EndReq;
+
+   SamplingInfo samplingInfo;
+
+   Synthesizer::SquareGenerator square( samplingInfo );
+   square.setFrequency( 440 );
+   RawPcmData::Ptr data = square.generate( 44100 );
+   square.setFrequency( 900 );
+   RawPcmData::Ptr data2 = square.generate( 44100 );
+   // data->mixAdd( *data2 );
+
+   size_t fourierSize = 1024;
+   WaveAnalysis::SpectralReassignmentTransform transform( samplingInfo, fourierSize, 0, 2 );
+   WaveAnalysis::RawStftData::Ptr stftData = transform.execute( *data );
+
+   WaveAnalysis::SRSpectrum& spec = static_cast< WaveAnalysis::SRSpectrum& >( stftData->getSpectrum( 0 ) );
+   const RealVector& freqVec = spec.getFrequencies();
+   const RealVector& magVec = spec.getMagnitude();
+
+   Math::TwoTuple tuple( freqVec, magVec );
+   tuple.sortVariable( 0 );
+
+   for ( size_t i = 0; i < tuple.getNumElements(); ++i )
+   {
+      msg << Msg::Verbose << tuple.getX()[i] << ", " << tuple.getY()[i] << Msg::EndReq;
+   }
 }
 
