@@ -22,7 +22,8 @@ void DevSuite::execute()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <set>
-#include "MovingAverage.h"
+#include "TwoTuple.h"
+#include "SampledMovingAverage.h"
 #include "TLine.h"
 #include "WaveFile.h"
 #include "MultiChannelRawPcmData.h"
@@ -336,11 +337,14 @@ void DevSuite::devTwoTuple()
    const RealVector& magVec = spec.getMagnitude();
 
    Math::TwoTuple tuple( freqVec, magVec );
-   tuple.sortVariable( 0 );
+   Math::TwoTuple::Ptr sortedTuple( dynamic_cast< Math::TwoTuple* >( tuple.sortVariable( 0 ).release() ) );
 
-   for ( size_t i = 0; i < tuple.getNumElements(); ++i )
+   for ( size_t i = 0; i < sortedTuple->getNumElements(); ++i )
    {
-      msg << Msg::Verbose << tuple.getX()[i] << ", " << tuple.getY()[i] << Msg::EndReq;
+      msg << Msg::Verbose << sortedTuple->getX()[i] << ", " << sortedTuple->getY()[i] << Msg::EndReq;
    }
+
+   TGraph* gr = RootUtilities::createGraph( sortedTuple->getX(), sortedTuple->getY() );
+   gr->Draw( "AL" );
 }
 

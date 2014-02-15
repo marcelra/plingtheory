@@ -1,4 +1,4 @@
-#include "MovingAverage.h"
+#include "SampledMovingAverage.h"
 
 #include <cassert>
 #include <cmath>
@@ -93,27 +93,6 @@ RealVector SampledMovingAverage::createGaussianWeights( size_t nSamples, double 
       result[j] = exp( - i*i / lambda );
    }
    return result;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// MovingAverage
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-MovingAverage::MovingAverage( double width ) :
-   m_width( width )
-{}
-
-MovingAverage::~MovingAverage()
-{}
-
-TwoTuple MovingAverage::calculate( const TwoTuple& data ) const
-{
-   TwoTuple result( data.getNumElements() );
-
-}
-
-double MovingAverage::weightFunc( double x ) const
-{
-   return exp( - x*x / ( 2.0*m_width*m_width ) );
 }
 
 } /// namespace Math
