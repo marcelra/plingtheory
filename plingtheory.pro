@@ -66,10 +66,11 @@ SOURCES += main.cpp \
     SpectralReassignmentTransform.cpp \
     SRSpectrum.cpp \
     DevSuite.parked.cpp \
-    MovingAverage.cpp \
     TestDataSupply.cpp \
     TwoTuple.cpp \
-    INTuple.cpp
+    INTuple.cpp \
+    SampledMovingAverage.cpp \
+    WeightFunction.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -136,10 +137,11 @@ HEADERS += \
     DevSuite.h \
     SpectralReassignmentTransform.h \
     SRSpectrum.h \
-    MovingAverage.h \
     TestDataSupply.h \
     TwoTuple.h \
-    INTuple.h
+    INTuple.h \
+    SampledMovingAverage.h \
+    WeightFunction.h
 
 OTHER_FILES += \
     Todos.txt

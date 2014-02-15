@@ -5,7 +5,7 @@
 #include "TestDataSupply.h"
 
 #include "GradDescOptimiser.h"
-#include "MovingAverage.h"
+#include "SampledMovingAverage.h"
 #include "TwoDimExampleObjective.h"
 
 #include "TGraph.h"

@@ -1,9 +1,7 @@
-#ifndef MOVINGAVERAGE_H
-#define MOVINGAVERAGE_H
+#ifndef SAMPLEDMOVINGAVERAGE_H
+#define SAMPLEDMOVINGAVERAGE_H
 
 #include "RealVector.h"
-
-#include "TwoTuple.h"
 
 namespace Math
 {
@@ -33,7 +31,7 @@ class SampledMovingAverage
       /**
        * Helper function that creates Gaussian weights. @param nSamples should be odd and the centre of the Gaussian is located at the middle sample.
        */
-      static RealVector createGaussianWeights( size_t nSamples, double sigma );
+      static RealVector createGaussianFilter( size_t nSamples, double sigma );
 
    private:
       /**
@@ -48,24 +46,6 @@ class SampledMovingAverage
    private:
       RealVector     m_weights;
 };
-
-class MovingAverage
-{
-   public:
-      MovingAverage( double width );
-      virtual ~MovingAverage();
-
-      TwoTuple calculate( const TwoTuple& data ) const;
-
-   private:
-      virtual double weightFunc( double x ) const;
-
-   private:
-      double         m_width;
-};
-
-
-
 
 } /// namespace Math
 

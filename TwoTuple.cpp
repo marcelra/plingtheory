@@ -38,6 +38,11 @@ TwoTuple& TwoTuple::operator=( const TwoTuple& other )
    return *this;
 }
 
+INTuple::Ptr TwoTuple::clone() const
+{
+   return INTuple::Ptr( new TwoTuple( *this ) );
+}
+
 TwoTuple::~TwoTuple()
 {}
 
