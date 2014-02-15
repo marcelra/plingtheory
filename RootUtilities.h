@@ -97,6 +97,11 @@ class RootUtilities : public SingletonBase
        */
       TString generateUniqueName( const std::string& baseName );
 
+      /**
+       * Save all root objects to root file
+       */
+      void saveAllRootObjectsToFile( const std::string& fileName );
+
    private:
       /**
        * Access logger

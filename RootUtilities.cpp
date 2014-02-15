@@ -5,8 +5,15 @@
 #include "RawPcmData.h"
 
 #include "TApplication.h"
+#include "TFile.h"
 #include "TROOT.h"
 #include "TStyle.h"
+
+/// unsorted
+#include "TBrowser.h"
+#include "TCollection.h"
+#include "TSeqCollection.h"
+#include "TKey.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 /// initRootApplication
@@ -138,7 +145,42 @@ TLegend* RootUtilities::createDefaultLegend( double x1, double y1, double x2, do
    return result;
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// saveAllRootObjectsToFile
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void RootUtilities::saveAllRootObjectsToFile( const std::string& fileName )
+{
+   TDirectory* currentDir = gDirectory;
 
+   TH1F* h = new TH1F( "h", "h", 1, -1, 1 );
+   h->Fill( 0 );
+
+   currentDir->ls();
+
+   TFile* f = new TFile( fileName.c_str(), "RECREATE" );
+   if ( !f->IsOpen() )
+   {
+      delete f;
+      throw ExceptionFileCannotOpen( fileName );
+   }
+
+   getLogger() << Msg::Info << "Saving all ROOT objects to file: " << fileName << Msg::EndReq;
+   TSeqCollection* canvasColl = gROOT->GetListOfCanvases();
+   for ( size_t i = 0; i < static_cast< size_t >( canvasColl->GetSize() ); ++i )
+   {
+      TCanvas* canvas = dynamic_cast< TCanvas* >( canvasColl->At( i ) );
+      getLogger() << Msg::Info << "Writing canvas: " << canvas->GetName() << Msg::EndReq;
+      canvas->Write();
+   }
+
+   f->ls();
+   f->Write();
+   f->Close();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// generateUniqueName
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TString RootUtilities::generateUniqueName( const std::string& baseName )
 {
    TString tBaseName = baseName;
@@ -192,4 +234,3 @@ TString RootUtilities::generateUniqueName( const std::string& baseName )
    tBaseName += maxId;
    return tBaseName;
 }
-
