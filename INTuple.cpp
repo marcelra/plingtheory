@@ -25,13 +25,13 @@ INTuple::Ptr INTuple::sortVariable( size_t variableIndex ) const
    size_t sortedIndex = 0;
    for ( std::map< double, int >::const_iterator it = sortedVarVsRowIndex.begin(); it != sortedVarVsRowIndex.end(); ++it, ++sortedIndex )
    {
-      result->setRow( sortedIndex, getRow( it->second ) );
+      result->setTuple( sortedIndex, getTuple( it->second ) );
    }
 
    return result;
 }
 
-RealVector INTuple::getRow( size_t rowIndex ) const
+RealVector INTuple::getTuple( size_t rowIndex ) const
 {
    RealVector result( getNumVariables() );
    for ( size_t iVar = 0; iVar < getNumVariables(); ++iVar )
@@ -41,7 +41,7 @@ RealVector INTuple::getRow( size_t rowIndex ) const
    return result;
 }
 
-void INTuple::setRow( size_t rowIndex, const RealVector& row )
+void INTuple::setTuple( size_t rowIndex, const RealVector& row )
 {
    assert( row.size() == getNumVariables() );
    for ( size_t iVar = 0; iVar < row.size(); ++iVar )
