@@ -22,6 +22,7 @@ void DevSuite::execute()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <set>
+#include "SortCache.h"
 #include "TwoTuple.h"
 #include "SampledMovingAverage.h"
 #include "TLine.h"
@@ -337,14 +338,17 @@ void DevSuite::devTwoTuple()
    const RealVector& magVec = spec.getMagnitude();
 
    Math::TwoTuple tuple( freqVec, magVec );
-   Math::TwoTuple::Ptr sortedTuple( dynamic_cast< Math::TwoTuple* >( tuple.sortVariable( 0 ).release() ) );
+   SortCache sortX( tuple.getX() );
 
-   for ( size_t i = 0; i < sortedTuple->getNumElements(); ++i )
+   const RealVector& xSorted = sortX.applyTo( tuple.getX() );
+   const RealVector& ySorted = sortX.applyTo( tuple.getY() );
+
+   for ( size_t i = 0; i < tuple.getNumElements(); ++i )
    {
-      msg << Msg::Verbose << sortedTuple->getX()[i] << ", " << sortedTuple->getY()[i] << Msg::EndReq;
+      msg << Msg::Verbose << xSorted[ i ] << ", " << ySorted[ i ] << Msg::EndReq;
    }
 
-   TGraph* gr = RootUtilities::createGraph( sortedTuple->getX(), sortedTuple->getY() );
+   TGraph* gr = RootUtilities::createGraph( xSorted, ySorted );
    gr->Draw( "AL" );
 }
 

@@ -25,8 +25,23 @@ class SortCache
        */
       size_t getSortedIndex( size_t index ) const;
 
+      /**
+       *
+       */
+      RealVector applyTo( const RealVector& vector ) const;
+
    private:
       std::vector< size_t >   m_translation;
 };
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// Inline methods
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+inline size_t SortCache::getSortedIndex( size_t index ) const
+{
+   return m_translation[ index ];
+}
 
 #endif // SORTCACHE_H

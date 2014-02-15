@@ -1,6 +1,7 @@
 #include "SortCache.h"
 
 #include <map>
+#include <cassert>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Constructor
@@ -27,10 +28,14 @@ SortCache::SortCache( const RealVector& values ) :
 SortCache::~SortCache()
 {}
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// getSortedIndex
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-size_t SortCache::getSortedIndex( size_t index ) const
+RealVector SortCache::applyTo( const RealVector& vector ) const
 {
-   return m_translation[ index ];
+   assert( vector.size() == m_translation.size() );
+   RealVector result( vector.size() );
+   for ( size_t i = 0; i < result.size(); ++i )
+   {
+      result[i] = vector[ getSortedIndex( i ) ];
+   }
+   return result;
 }
+
