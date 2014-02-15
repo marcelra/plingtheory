@@ -79,7 +79,7 @@ void TestMath::testSampledMovingAverage()
    {
       movAvgWeights.push_back( 1 / lambda * exp( - i*i / lambda ) );
    }
-   Math::SampledMovingAverage movAvgCalc( Math::SampledMovingAverage::createGaussianWeights( 41, 20 ) );
+   Math::SampledMovingAverage movAvgCalc( Math::SampledMovingAverage::createGaussianFilter( 41, 20 ) );
    RealVector movAvg = movAvgCalc.calculate( dataSet );
 
    TGraph* grOriginal = RootUtilities::createGraph( dataSet );
