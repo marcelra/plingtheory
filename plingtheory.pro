@@ -16,7 +16,6 @@ SOURCES += main.cpp \
     SingletonStore.cpp \
     SingletonBase.cpp \
     RootUtilities.cpp \
-    ConsoleSoundPlayback.cpp \
     EffectTrianglizer.cpp \
     TestSuite.cpp \
     RollingBufferSawtoothTransform.cpp \
@@ -86,7 +85,6 @@ HEADERS += \
     SingletonStore.h \
     SingletonBase.h \
     RootUtilities.h \
-    ConsoleSoundPlayback.h \
     EffectTrianglizer.h \
     TestSuite.h \
     RollingBufferSawtoothTransform.h \
