@@ -56,7 +56,6 @@ SOURCES += main.cpp \
     NoiseGenerator.cpp \
     TriangleGenerator.cpp \
     SawtoothGenerator.cpp \
-    IFourierFilter.cpp \
     FourierSpectrum.cpp \
     FourierTransform.cpp \
     FourierConfig.cpp \
@@ -128,7 +127,6 @@ HEADERS += \
     NoiseGenerator.h \
     TriangleGenerator.h \
     SawtoothGenerator.h \
-    IFourierFilter.h \
     FourierSpectrum.h \
     FourierTransform.h \
     FourierConfig.h \

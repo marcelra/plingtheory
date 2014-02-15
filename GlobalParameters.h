@@ -44,6 +44,9 @@ class GlobalParameters : SingletonBase
    private:
       static std::string       s_testDataDir;
 
+   /**
+    * Friend method
+    */
    friend const ProgramOptions* initialiseApplication( int argc, char* argv[] );
 
 };
