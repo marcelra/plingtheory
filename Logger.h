@@ -86,8 +86,4 @@ void initGlobalLogger( int threshold, bool doUseColors, const std::string& fileN
 /// Close the global logger
 void closeGlobalLogger();
 
-/// Test method
-int testLogger();
-
-
 #endif // LOGGER_H
