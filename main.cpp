@@ -128,7 +128,7 @@ void finaliseApplication()
       /// Display error if exit code is not equal to zero
       if (  programStatus != PS_OK )
       {
-         gLog() << Msg::Error << "Application exited with code " << programStatus << Msg::EndReq;
+         gLog() << Msg::Error << "Application exiting with code " << programStatus << Msg::EndReq;
       }
 
       gLog() << Msg::Info << "Finalising..." << Msg::EndReq;
@@ -147,7 +147,7 @@ void finaliseApplication()
 
       /// Exit
       DBG_MSG( "Leaving finaliseApplication" );
-      DBG_MSG( "Leaving " << GlobalParameters::getProgramName() << "( exit code " << programStatus << ")" );
+      DBG_MSG( "Leaving " << GlobalParameters::getProgramName() << "(exit code " << programStatus << ")" );
    }
    catch ( BaseException& exc )
    {
@@ -204,7 +204,7 @@ int main( int argc, char* argv[] )
       }
       catch ( const StopExecutionException& )
       {
-         gLog() << Msg::Info << "Trying to shut down gracefully..." << Msg::EndReq;
+         gLog() << Msg::Warning << "Trying to shut down gracefully..." << Msg::EndReq;
       }
       finaliseApplication();
       return programStatus;
