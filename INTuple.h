@@ -58,9 +58,6 @@ class INTuple
        * Set a tuple.
        */
       virtual void setTuple( size_t rowIndex, const RealVector& rowValues );
-
-   public:
-      virtual INTuple::Ptr sortVariable( size_t variableIndex ) const;
 };
 
 } /// namespace Math
