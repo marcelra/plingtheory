@@ -177,7 +177,7 @@ void WaveFile::write( const std::string& fileName, const MultiChannelRawPcmData&
    fStream.write( hdrBuffer, 44 );
 
    /// Clean up buffer
-   delete hdrBuffer;
+   delete[] hdrBuffer;
 
    /// Define PCM write-out buffer
    size_t nSamplesBuf = 4096;

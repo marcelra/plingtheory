@@ -2,7 +2,6 @@
 #define RAWPCMDATA_H
 
 #include "Exceptions.h"
-#include "Logger.h"
 #include "RealVector.h"
 #include "SamplingInfo.h"
 

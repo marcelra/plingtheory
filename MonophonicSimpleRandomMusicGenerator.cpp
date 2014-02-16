@@ -1,6 +1,7 @@
 #include "MonophonicSimpleRandomMusicGenerator.h"
 
 #include "IGenerator.h"
+#include "Logger.h"
 #include "RootUtilities.h"
 #include "SineGenerator.h"
 
