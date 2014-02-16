@@ -23,6 +23,7 @@ class ProgramOptions
    public:
       bool doRunTests() const;
       bool doRunDevelopmentCode() const;
+      bool doCompareRootFiles() const;
 
    /**
     * Options
@@ -32,10 +33,14 @@ class ProgramOptions
       bool                 doUseColorLogger() const;
       const std::string&   getLogFileName() const;
       const std::string&   getDataDir() const;
+      const std::string&   getRootFileNameCompareOld() const;
+      const std::string&   getRootFileNameCompareNew() const;
+      const std::string&   getRootFileOutput() const;
       int                  getLogLevel() const;
 
    private:
       void parseArguments();
+      StringList::const_iterator safeAdvanceIter( StringList::const_iterator, const StringList& list, const std::string& currentOption ) const;
 
    private:
       static ProgramOptions*   s_instance;
@@ -45,12 +50,17 @@ class ProgramOptions
    private:
       bool              m_doRunTests;
       bool              m_doRunDevelopmentCode;
+      bool              m_doCompareRootFiles;
 
    private:
       bool              m_doProcessRootEvents;
       bool              m_doUseColorLogger;
+      bool              m_doSaveRootObjects;
+      std::string       m_rootFileNameOld;
+      std::string       m_rootFileNameNew;
       std::string       m_logFileName;
       std::string       m_dataDir;
+      std::string       m_rootFileOutput;
       int               m_logLevel;
 };
 

@@ -13,10 +13,14 @@ ProgramOptions::ProgramOptions( int argc, char* argv[] ) :
    m_hasErrors( false ),
    m_doRunTests( false ),
    m_doRunDevelopmentCode( false ),
+   m_doCompareRootFiles( false ),
    m_doProcessRootEvents( true ),
    m_doUseColorLogger( true ),
+   m_rootFileNameOld( "" ),
+   m_rootFileNameNew( "" ),
    m_logFileName( "" ),
    m_dataDir( "" ),
+   m_rootFileOutput( "" ),
    m_logLevel( 4 )
 {
    assert( !s_instance );
@@ -47,7 +51,7 @@ const ProgramOptions& ProgramOptions::getInstance()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void ProgramOptions::parseArguments()
 {
-   for ( StringList::iterator it = m_argList.begin(); it != m_argList.end(); )
+   for ( StringList::const_iterator it = m_argList.begin(); it != m_argList.end(); )
    {
       std::string opt = *it;
       /// Arguments
@@ -59,18 +63,31 @@ void ProgramOptions::parseArguments()
       {
          m_doRunTests = true;
       }
-      /// Long options
+      else if ( opt == "compare" )
+      {
+         it = safeAdvanceIter( it, m_argList, "compare" );
+         m_rootFileNameOld = *it;
+         it = safeAdvanceIter( it, m_argList, "compare" );
+         m_rootFileNameNew = *it;
+         m_doCompareRootFiles = true;
+      }
+      /// Short options
       else if ( opt == "-b" )
       {
          m_doProcessRootEvents = false;
       }
-      /// Short options
+      else if ( opt == "-r" )
+      {
+         it = safeAdvanceIter( it, m_argList, "-r" );
+         m_rootFileOutput = *it;
+      }
       else if ( opt == "-o" )
       {
          m_doUseColorLogger = false;
          ++it;
          m_logFileName = *it;
       }
+      /// Long options
       else if ( opt.find( "--datadir" ) == 0 )
       {
          std::string dir;
@@ -132,11 +149,13 @@ void ProgramOptions::printOptions( std::ostream& os )
    os << "Commands:\n";
    os << "develop             : Run development code.\n";
    os << "testall             : Run all tests.\n";
+   os << "compare <old> <new> : Compare root-files.\n";
    os << "\n";
    os << "Options:\n";
    os << "-b                  : Do not enter the root event loop.\n";
    os << "                      This causes the application to terminate directly (i.e. without showing graphs etc.).\n";
    os << "-o <filename>       : Write all log data to file with name <filename>.\n";
+   os << "-r <filename>       : Save all root objects to file with name <filename>.\n";
    os << "-v <level>          : Verbosity level of logger. Range [0,6]: 0 is least verbose, 6 is maximally verbose.\n";
    os << "--datadir=<datadir> : Directory in which to look for files that are used by test functions.\n";
    os.flush();
@@ -164,6 +183,14 @@ bool ProgramOptions::doRunDevelopmentCode() const
 bool ProgramOptions::doProcessRootEvents() const
 {
    return m_doProcessRootEvents;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// doCompareRootFiles
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+bool ProgramOptions::doCompareRootFiles() const
+{
+   return m_doCompareRootFiles;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -198,4 +225,43 @@ int ProgramOptions::getLogLevel() const
    return m_logLevel;
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// getRootFileOutput
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+const std::string& ProgramOptions::getRootFileOutput() const
+{
+   return m_rootFileOutput;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// getRootFileCompareOld
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+const std::string& ProgramOptions::getRootFileNameCompareOld() const
+{
+   return m_rootFileNameOld;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// getRootFileCompareNew
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+const std::string& ProgramOptions::getRootFileNameCompareNew() const
+{
+   return m_rootFileNameNew;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// safeAdvanceIter
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+StringList::const_iterator ProgramOptions::safeAdvanceIter( StringList::const_iterator it, const StringList& list, const std::string& currentOption ) const
+{
+   if ( ++it == list.end() )
+   {
+      throw ExceptionOptionArgumentParsing( currentOption );
+   }
+   return it;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// Singleton instance
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ProgramOptions* ProgramOptions::s_instance = 0;

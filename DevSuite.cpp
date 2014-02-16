@@ -14,7 +14,6 @@ void DevSuite::execute()
    // devFourierPeakFinder1();
    // devFourierPeakFinder2();
    devTwoTuple();
-   devRootSaveAll();
 }
 
 
@@ -324,11 +323,12 @@ void DevSuite::devTwoTuple()
    SamplingInfo samplingInfo;
 
    Synthesizer::SquareGenerator square( samplingInfo );
+   square.setAmplitude( 1 );
    square.setFrequency( 440 );
    RawPcmData::Ptr data = square.generate( 44100 );
    square.setFrequency( 900 );
    RawPcmData::Ptr data2 = square.generate( 44100 );
-   // data->mixAdd( *data2 );
+   data->mixAdd( *data2 );
 
    size_t fourierSize = 1024;
    WaveAnalysis::SpectralReassignmentTransform transform( samplingInfo, fourierSize, 0, 2 );
@@ -353,10 +353,3 @@ void DevSuite::devTwoTuple()
    gr->Draw( "AL" );
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// devRootSaveAll
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void DevSuite::devRootSaveAll()
-{
-   RootUtilities::getInstance().saveAllRootObjectsToFile( "develop.root" );
-}

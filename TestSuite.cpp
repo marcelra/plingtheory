@@ -33,8 +33,6 @@ void TestSuite::execute()
    testNoiseGenerator();
    testTriangleGenerator();
    testSawtoothGenerator();
-
-   RootUtilities::getInstance().saveAllRootObjectsToFile( "develop.root" );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
