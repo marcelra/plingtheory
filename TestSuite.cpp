@@ -2,7 +2,7 @@
 
 #include "Exceptions.h"
 #include "GlobalParameters.h"
-
+#include "RootUtilities.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 /// runCurrentDevelopmentTest
@@ -33,6 +33,8 @@ void TestSuite::execute()
    testNoiseGenerator();
    testTriangleGenerator();
    testSawtoothGenerator();
+
+   RootUtilities::getInstance().saveAllRootObjectsToFile( "develop.root" );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -41,7 +43,6 @@ void TestSuite::execute()
 #include "EffectTrianglizer.h"
 #include "MonophonicSimpleRandomMusicGenerator.h"
 #include "RollingBufferSawtoothTransform.h"
-#include "RootUtilities.h"
 #include "SineGenerator.h"
 #include "SquareGenerator.h"
 #include "WaveFile.h"

@@ -1,6 +1,7 @@
 #ifndef MULTICHANNELRAWPCMDATA_H
 #define MULTICHANNELRAWPCMDATA_H
 
+#include "Logger.h"
 #include "RawPcmData.h"
 
 /**

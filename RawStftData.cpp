@@ -80,6 +80,7 @@ RawStftData::WindowLocation RawStftData::getWindowLocationNoOverlap( size_t spec
    }
    if ( centreRight > winLocCentre.getLastSample() )
    {
+      /// TODO: see memcheck comment in StftAlgorithm. Check if this should be -1.
       resultRight = winLocCentre.getLastSample();
    }
 

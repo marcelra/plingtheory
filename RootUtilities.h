@@ -91,7 +91,7 @@ class RootUtilities : public SingletonBase
       static TLegend* createDefaultLegend( double x1 = 0.5, double y1 = 0.7, double x2 = 0.7, double y2 = 0.9 );
 
       /**
-       * Generates an unique name
+       * Generates a unique name
        * Name will have the following formatting: <baseName>_0
        * When no basename is given, it will be set to "auto"
        */
@@ -109,6 +109,11 @@ class RootUtilities : public SingletonBase
       Logger& getLogger();
 
       /**
+       * Register a new graph
+       */
+      void registerGraph( TGraph* graph );
+
+      /**
        * Constructor
        */
       RootUtilities();
@@ -117,6 +122,7 @@ class RootUtilities : public SingletonBase
       static RootUtilities*       m_theInstance;    //! Singleton instance
       Logger*                     m_logger;         //! Logger
       std::map< TString, size_t > m_uniqueNameIds;  //! Basename vs. Id
+      std::vector< TGraph* >      m_graphList;      //! List with graphs
 };
 
 
@@ -152,8 +158,9 @@ TGraph* RootUtilities::createGraph( const std::vector< T >& xData, const std::ve
 
    TGraph* result = new TGraph( nPoints, xArr, yArr );
    dressGraph( result );
-   delete xArr;
-   delete yArr;
+   RootUtilities::getInstance().registerGraph( result );
+   delete[] xArr;
+   delete[] yArr;
    return result;
 }
 
@@ -181,10 +188,11 @@ TGraphErrors* RootUtilities::createGraphErrors( const std::vector< T >& xData, c
 
    TGraphErrors* result = new TGraphErrors( nPoints, xArr, yArr, xErr, yErr );
    dressGraph( result );
-   delete xArr;
-   delete yArr;
-   delete xErr;
-   delete yErr;
+   RootUtilities::getInstance().registerGraph( result );
+   delete[] xArr;
+   delete[] yArr;
+   delete[] xErr;
+   delete[] yErr;
    return result;
 }
 

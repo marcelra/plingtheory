@@ -1,6 +1,10 @@
 #include "DynamicFourier.h"
 
 #include <iostream>
+#include <cmath>
+
+#include "Logger.h"
+#include "RawPcmData.h"
 
 namespace WaveAnalysis
 {
@@ -67,12 +71,12 @@ ResonanceMatrix DynamicFourier::execute( const RawPcmData& data ) const
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 std::vector< DynamicFourier::Complex > DynamicFourier::getIntegrand( const RawPcmData& data, double frequency ) const
 {
-   double phaseAdvance = data.getSamplingInfo().getPhaseStepPerSample( frequency );
+   const double phaseAdvance = data.getSamplingInfo().getPhaseStepPerSample( frequency );
    double phase = 0;
 
    std::vector< Complex > result( data.size() );
 
-   for ( size_t iSample = 0; iSample < data.size(); ++iSample )
+   for ( size_t iSample = 0; iSample < data.size(); ++iSample)
    {
       result[iSample].real() = data[iSample]*cos( phase )*frequency;
       result[iSample].imag() = data[iSample]*sin( phase )*frequency;

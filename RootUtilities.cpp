@@ -2,6 +2,7 @@
 
 #include "Exceptions.h"
 #include "GlobalParameters.h"
+#include "Logger.h"
 #include "RawPcmData.h"
 
 #include "TApplication.h"
@@ -105,6 +106,12 @@ RootUtilities::RootUtilities() :
 RootUtilities::~RootUtilities()
 {
    getLogger() << Msg::Debug << "RootUtilities destructor" << Msg::EndReq;
+
+   for ( size_t iGraph = 0; iGraph < m_graphList.size(); ++iGraph )
+   {
+      delete m_graphList[ iGraph ];
+   }
+
    delete m_logger;
 }
 
@@ -150,12 +157,12 @@ TLegend* RootUtilities::createDefaultLegend( double x1, double y1, double x2, do
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void RootUtilities::saveAllRootObjectsToFile( const std::string& fileName )
 {
-   TDirectory* currentDir = gDirectory;
+   // TDirectory* currentDir = gDirectory;
 
-   TH1F* h = new TH1F( "h", "h", 1, -1, 1 );
-   h->Fill( 0 );
+   // TH1F* h = new TH1F( "h", "h", 1, -1, 1 );
+   // h->Fill( 0 );
 
-   currentDir->ls();
+   // currentDir->ls();
 
    TFile* f = new TFile( fileName.c_str(), "RECREATE" );
    if ( !f->IsOpen() )
@@ -165,17 +172,17 @@ void RootUtilities::saveAllRootObjectsToFile( const std::string& fileName )
    }
 
    getLogger() << Msg::Info << "Saving all ROOT objects to file: " << fileName << Msg::EndReq;
-   TSeqCollection* canvasColl = gROOT->GetListOfCanvases();
-   for ( size_t i = 0; i < static_cast< size_t >( canvasColl->GetSize() ); ++i )
+
+   for ( size_t iGraph = 0; iGraph < m_graphList.size(); ++iGraph )
    {
-      TCanvas* canvas = dynamic_cast< TCanvas* >( canvasColl->At( i ) );
-      getLogger() << Msg::Info << "Writing canvas: " << canvas->GetName() << Msg::EndReq;
-      canvas->Write();
+      TString graphName = generateUniqueName( "graph" );
+      TGraph* graph = dynamic_cast< TGraph* >( m_graphList[ iGraph ] );
+      graph->Write( graphName );
    }
 
-   f->ls();
    f->Write();
    f->Close();
+   delete f;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -233,4 +240,12 @@ TString RootUtilities::generateUniqueName( const std::string& baseName )
    tBaseName += "_";
    tBaseName += maxId;
    return tBaseName;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// registerGraph
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void RootUtilities::registerGraph( TGraph* graph )
+{
+   m_graphList.push_back( graph );
 }

@@ -1,7 +1,7 @@
 #ifndef DYNAMICFOURIER_H
 #define DYNAMICFOURIER_H
 
-#include "RawPcmData.h"
+class RawPcmData;
 
 #include <vector>
 #include <complex>

@@ -64,6 +64,7 @@ RawPcmData::Ptr StftAlgorithm::reverseExecute( const RawStftData& stftData )
       RealVectorPtr vec = m_transform.transform( stftData.getSpectrum( iSpec ) );
       const RawStftData::WindowLocation& winLocNoOverlap = stftData.getWindowLocationNoOverlap( iSpec );
       size_t vecIndex = stftData.getWindowLocationNoOverlap( iSpec ).getFirstSample() - stftData.getWindowLocation( iSpec ).getFirstSample();
+      /// TODO: memcheck indicates invalid write (probably <= goes wrong for last batch)
       for ( size_t iSample = winLocNoOverlap.getFirstSample(); iSample <= winLocNoOverlap.getLastSample(); ++iSample, ++vecIndex )
       {
          (*result)[ iSample ] = (*vec)[ vecIndex ];
