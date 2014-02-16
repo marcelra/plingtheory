@@ -137,6 +137,10 @@ TGraph* RootUtilities::createGraph( const RawPcmData& rawPcmData )
 void RootUtilities::dressGraph( TGraph* graph )
 {
    graph->SetLineWidth( 2 );
+   RootUtilities& ru = RootUtilities::getInstance();
+   TString graphName = ru.generateUniqueName( "graph" );
+   graph->SetName( graphName );
+   ru.getLogger() << Msg::Info << "Created graph with name " << graphName << Msg::EndReq;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -170,7 +174,6 @@ void RootUtilities::saveAllRootObjectsToFile( const std::string& fileName )
    {
       TString graphName = generateUniqueName( "graph" );
       TGraph* graph = dynamic_cast< TGraph* >( m_graphList[ iGraph ] );
-      graph->SetName( graphName );
       graph->Write( graphName );
    }
 
