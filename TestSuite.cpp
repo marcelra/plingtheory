@@ -773,8 +773,11 @@ void TestSuite::testEnvelope()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void TestSuite::testNoiseGenerator()
 {
+   Logger msg( "testNoiseGenerator" );
+   msg << Msg::Info << "Running testNoiseGenerator..." << Msg::EndReq;
+
    SamplingInfo samplingInfo( 44100 );
-   Synthesizer::NoiseGenerator noiseGen( samplingInfo );
+   Synthesizer::NoiseGenerator noiseGen( samplingInfo, 1 );
    noiseGen.setAmplitude( 1 );
    RawPcmData::Ptr data = noiseGen.generate( 44100 );
 
