@@ -157,13 +157,6 @@ TLegend* RootUtilities::createDefaultLegend( double x1, double y1, double x2, do
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void RootUtilities::saveAllRootObjectsToFile( const std::string& fileName )
 {
-   // TDirectory* currentDir = gDirectory;
-
-   // TH1F* h = new TH1F( "h", "h", 1, -1, 1 );
-   // h->Fill( 0 );
-
-   // currentDir->ls();
-
    TFile* f = new TFile( fileName.c_str(), "RECREATE" );
    if ( !f->IsOpen() )
    {
@@ -177,6 +170,7 @@ void RootUtilities::saveAllRootObjectsToFile( const std::string& fileName )
    {
       TString graphName = generateUniqueName( "graph" );
       TGraph* graph = dynamic_cast< TGraph* >( m_graphList[ iGraph ] );
+      graph->SetName( graphName );
       graph->Write( graphName );
    }
 
