@@ -12,7 +12,6 @@ class DevSuite
       static void devFourierPeakFinder1();
       static void devFourierPeakFinder2();
 
-      static void devRootSaveAll();
       static void devTwoTuple();
 };
 

@@ -5,6 +5,7 @@
 #include "GlobalParameters.h"
 #include "Logger.h"
 #include "ProgramOptions.h"
+#include "RootFileCompare.h"
 #include "RootUtilities.h"
 #include "SingletonStore.h"
 #include "TestSuite.h"
@@ -28,6 +29,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void runTests( const ProgramOptions* programOptions );
 void runDevelopmentCode( const ProgramOptions* programOptions );
+void saveRootFileOutput( const ProgramOptions* programOptions );
+void compareRootFiles( const ProgramOptions* programOptions );
 void finaliseApplication();
 void printUsageAndExit();
 
@@ -186,6 +189,14 @@ int main( int argc, char* argv[] )
          {
             runDevelopmentCode( programOptions );
          }
+         if ( programOptions->getRootFileOutput() != "" )
+         {
+            saveRootFileOutput( programOptions );
+         }
+         if ( programOptions->doCompareRootFiles() )
+         {
+            compareRootFiles( programOptions );
+         }
 
          /// Finalisation
          bool doProcessRootEvents = programOptions->doProcessRootEvents();
@@ -269,4 +280,48 @@ void runDevelopmentCode( const ProgramOptions* programOptions )
       throw StopExecutionException();
    }
    gLog() << Msg::Info << "Running development code done." << Msg::EndReq;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// saveRootFileOutput
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void saveRootFileOutput( const ProgramOptions* programOptions )
+{
+   assert( programOptions );
+   try
+   {
+      RootUtilities::getInstance().saveAllRootObjectsToFile( programOptions->getRootFileOutput() );
+   }
+   catch ( const BaseException& exc )
+   {
+      gLog() << Msg::Fatal << "Error while saving root output file!" << Msg::EndReq;
+      gLog() << Msg::Error << exc << Msg::EndReq;
+      programStatus = PS_UNRECOVERABLE_INTERNAL_EXCEPTION;
+      throw StopExecutionException();
+   }
+   gLog() << Msg::Info << "Results successfully save to file." << Msg::EndReq;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// compareRootFiles
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void compareRootFiles( const ProgramOptions* programOptions )
+{
+   assert( programOptions );
+   try
+   {
+      gLog() << Msg::Info << "Comparing root files: " << Msg::EndReq;
+      gLog() << Msg::Info << "* Old = " << programOptions->getRootFileNameCompareOld() << Msg::EndReq;
+      gLog() << Msg::Info << "* New = " << programOptions->getRootFileNameCompareNew() << Msg::EndReq;
+      RootFileCompare comparison( programOptions->getRootFileNameCompareOld(), programOptions->getRootFileNameCompareNew() );
+      comparison.compareAll();
+   }
+   catch ( BaseException& exc )
+   {
+      gLog() << Msg::Fatal << "Error while comparing ROOT files!" << Msg::EndReq;
+      gLog() << Msg::Error << exc << Msg::EndReq;
+      programStatus = PS_UNRECOVERABLE_INTERNAL_EXCEPTION;
+      throw StopExecutionException();
+   }
+   gLog() << Msg::Info << "Comparing ROOT-files complete." << Msg::EndReq;
 }

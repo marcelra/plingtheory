@@ -73,6 +73,7 @@ class RootUtilities : public SingletonBase
        * Create a graph from RawPcmData
        */
       static TGraph* createGraph( const RawPcmData& data );
+
       /**
        * Create histogram
        * The data determines the histogram x-axis range

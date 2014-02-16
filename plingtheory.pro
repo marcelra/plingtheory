@@ -69,7 +69,8 @@ SOURCES += main.cpp \
     INTuple.cpp \
     SampledMovingAverage.cpp \
     WeightFunction.cpp \
-    SortCache.cpp
+    SortCache.cpp \
+    RootFileCompare.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -139,7 +140,8 @@ HEADERS += \
     INTuple.h \
     SampledMovingAverage.h \
     WeightFunction.h \
-    SortCache.h
+    SortCache.h \
+    RootFileCompare.h
 
 OTHER_FILES += \
     Todos.txt
