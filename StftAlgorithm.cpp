@@ -1,5 +1,7 @@
 #include "StftAlgorithm.h"
 
+#include "Logger.h"
+
 namespace WaveAnalysis
 {
 
@@ -18,6 +20,8 @@ StftAlgorithm::StftAlgorithm( const SamplingInfo& samplingInfo, size_t windowSiz
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 RawStftData::Ptr StftAlgorithm::execute( const RawPcmData& data )
 {
+   Logger msg( "StftAlgorithm" );
+   msg << Msg::Verbose << "In execute" << Msg::EndReq;
    assert( m_transform.getConfig().getSamplingInfo() == data.getSamplingInfo() );
    assert( getHopShift() > 1 );
 

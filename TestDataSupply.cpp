@@ -1,8 +1,11 @@
 #include "TestDataSupply.h"
 
+#include "GlobalParameters.h"
 #include "IGenerator.h"
+#include "MultiChannelRawPcmData.h"
 #include "NoteList.h"
 #include "SquareGenerator.h"
+#include "WaveFile.h"
 
 #include "TRandom3.h"
 
@@ -96,5 +99,28 @@ RawPcmData::Ptr TestDataSupply::generateChord( Synthesizer::IGenerator& generato
 
    }
    return RawPcmData::Ptr( result );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// getCurrentTestData
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+RawPcmData::Ptr TestDataSupply::getCurrentTestSample()
+{
+   // return generateSoundData();
+   return readSoundData();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// readSoundData
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+RawPcmData::Ptr TestDataSupply::readSoundData()
+{
+   // std::string fileName = "atc_intro.wav";
+   // std::string fileName = "Cscale.wav";
+   // std::string fileName = "monophDistGuitar.wav";
+   std::string fileName = "monophDifficult.wav";
+
+   MultiChannelRawPcmData* data = WaveFile::read( GlobalParameters::getTestDataDir() + fileName );
+   return RawPcmData::Ptr( new RawPcmData( data->getChannel( 0 ) ) );
 }
 
