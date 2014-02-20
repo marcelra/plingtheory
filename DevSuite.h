@@ -13,6 +13,7 @@ class DevSuite
       static void devFourierPeakFinder2();
 
       static void devTwoTuple();
+      static void devRebinSRSpec();
 };
 
 #endif // DEVSUITE_H

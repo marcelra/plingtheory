@@ -51,13 +51,17 @@ class INTuple
       virtual RealVector& getVariable( size_t variableIndex ) = 0;
 
       /**
-       * Get a tuple.
+       * Get a tuple (row).
        */
       virtual RealVector getTuple( size_t rowIndex ) const;
       /**
-       * Set a tuple.
+       * Set a tuple (row).
        */
       virtual void setTuple( size_t rowIndex, const RealVector& rowValues );
+      /**
+       * Add a tuple (row).
+       */
+      virtual void addTuple( const RealVector& values ) = 0;
 };
 
 } /// namespace Math

@@ -2,6 +2,7 @@
 #define SRSPECTRUM_H
 
 #include "FourierSpectrum.h"
+#include "RegularAccumArray.h"
 
 namespace WaveAnalysis
 {
@@ -32,6 +33,9 @@ class SRSpectrum : public FourierSpectrum
        * Get time corrections.
        */
       const RealVector& getTimeCorrections() const;
+
+   public:
+      Math::RegularAccumArray rebinToFourierLattice() const;
 
    private:
       RealVector        m_correctedFrequencies;

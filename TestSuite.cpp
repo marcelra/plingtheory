@@ -936,6 +936,6 @@ void TestSuite::testSpectralReassignment()
    gr->SetLineColor( kRed );
    gr->Draw( "LSAME" );
 
-   Visualisation::StftGraph graph( *trans );
-   graph.create();
+   // Visualisation::StftGraph graph( *trans );
+   // graph.create();
 }

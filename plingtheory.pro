@@ -70,7 +70,9 @@ SOURCES += main.cpp \
     SampledMovingAverage.cpp \
     WeightFunction.cpp \
     SortCache.cpp \
-    RootFileCompare.cpp
+    RootFileCompare.cpp \
+    IAccumArray.cpp \
+    RegularAccumArray.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -141,7 +143,9 @@ HEADERS += \
     SampledMovingAverage.h \
     WeightFunction.h \
     SortCache.h \
-    RootFileCompare.h
+    RootFileCompare.h \
+    IAccumArray.h \
+    RegularAccumArray.h
 
 OTHER_FILES += \
     Todos.txt

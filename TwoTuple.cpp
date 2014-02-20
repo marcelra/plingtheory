@@ -87,4 +87,17 @@ RealVector& TwoTuple::getY()
    return m_y;
 }
 
+void TwoTuple::add( double x, double y )
+{
+   m_x.push_back( x );
+   m_y.push_back( y );
+}
+
+void TwoTuple::addTuple( const RealVector& row )
+{
+   assert( row.size() == 2 );
+   m_x.push_back( row[0] );
+   m_y.push_back( row[1] );
+}
+
 } /// namespace Math
