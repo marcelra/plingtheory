@@ -13,7 +13,8 @@ void DevSuite::execute()
    // devPeakFinder();
    // devFourierPeakFinder1();
    // devFourierPeakFinder2();
-   devTwoTuple();
+   // devTwoTuple();
+   devRebinSRSpec();
 }
 
 
@@ -22,6 +23,7 @@ void DevSuite::execute()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <set>
+#include "RegularAccumArray.h"
 #include "SortCache.h"
 #include "TwoTuple.h"
 #include "SampledMovingAverage.h"
@@ -315,6 +317,9 @@ void DevSuite::devFourierPeakFinder2()
    // const RealVector& vMovAvg =
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// devTwoTuple
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void DevSuite::devTwoTuple()
 {
    Logger msg( "devTwoTuple" );
@@ -352,4 +357,49 @@ void DevSuite::devTwoTuple()
    TGraph* gr = RootUtilities::createGraph( xSorted, ySorted );
    gr->Draw( "AL" );
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// devRebinSRSpec
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void DevSuite::devRebinSRSpec()
+{
+   Logger msg( "devRebinSRSpec" );
+   msg << Msg::Info << "In devRebinSRSpec..." << Msg::EndReq;
+
+   RawPcmData::Ptr data = TestDataSupply::generateSoundData();
+
+   size_t fourierSize = 4096;
+   WaveAnalysis::SpectralReassignmentTransform transform( data->getSamplingInfo(), fourierSize, 0, 2 );
+   WaveAnalysis::RawStftData::Ptr stftData = transform.execute( *data );
+
+   WaveAnalysis::SRSpectrum& spec = static_cast< WaveAnalysis::SRSpectrum& >( stftData->getSpectrum( 0 ) );
+
+   const Math::RegularAccumArray& accArr = spec.rebinToFourierLattice();
+
+   TH1F* hAccArr = new TH1F( "hAccArr", "hAccArr", accArr.getNumBins(), accArr.getMinX(), accArr.getMaxX() );
+   for ( size_t iBin = 0; iBin < accArr.getNumBins(); ++iBin )
+   {
+      double val = accArr.getBinContent( iBin );
+      hAccArr->SetBinContent( iBin + 1, val );
+   }
+
+   SortCache sortX( spec.getFrequencies() );
+
+   new TCanvas();
+   hAccArr->Draw();
+   TGraph* grUnbinned = RootUtilities::createGraph( sortX.applyTo( spec.getFrequencies() ), sortX.applyTo( spec.getMagnitude() ) );
+   grUnbinned->SetLineColor( kRed + 2 );
+   grUnbinned->SetMarkerColor( kRed + 2 );
+   grUnbinned->Draw( "PSAME" );
+
+   WaveAnalysis::StftAlgorithm normalTransAlg( data->getSamplingInfo(), fourierSize, WaveAnalysis::HanningWindowFuncDef(), 0, 2 );
+   WaveAnalysis::RawStftData::Ptr normalTrans = normalTransAlg.execute( *data );
+   const WaveAnalysis::FourierSpectrum& normalSpec = normalTrans->getSpectrum( 0 );
+   TGraph* grNormal = RootUtilities::createGraph( normalSpec.getFrequencies(), normalSpec.getMagnitude() );
+   grNormal->Draw( "LSAME" );
+   grNormal->SetLineColor( kBlue );
+
+   /// TODO: Graph of rebinned SR spectrum TH2F
+}
+
 

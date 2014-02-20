@@ -1,5 +1,9 @@
 #include "TestDataSupply.h"
 
+#include "IGenerator.h"
+#include "NoteList.h"
+#include "SquareGenerator.h"
+
 #include "TRandom3.h"
 
 #include <cmath>
@@ -56,3 +60,41 @@ RealVector TestDataSupply::createNoiseAndPeaks( RealVector peakLocs, RealVector 
    }
    return dataSet;
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// generateSoundData
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+RawPcmData::Ptr TestDataSupply::generateSoundData()
+{
+   SamplingInfo samplingInfo( 44100 );
+   Synthesizer::SquareGenerator square( samplingInfo );
+
+   Music::NoteList noteList;
+   noteList.push_back( Music::Note( Music::Note::C, 3 ) );
+   noteList.push_back( Music::Note( Music::Note::E, 3 ) );
+   noteList.push_back( Music::Note( Music::Note::G, 3 ) );
+
+   return generateChord( square, 44100, noteList );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// generateChord
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+RawPcmData::Ptr TestDataSupply::generateChord( Synthesizer::IGenerator& generator, size_t numSamples, const std::vector< Music::Note >& notes )
+{
+   SamplingInfo samplingInfo( 44100 );
+
+   RawPcmData* result = new RawPcmData( samplingInfo, numSamples, 0 );
+   for ( size_t iNote = 0; iNote < notes.size(); ++iNote )
+   {
+      generator.setAmplitude( 0.5 );
+      generator.setPhase( 0 );
+      generator.setFrequency( notes[iNote].getFrequency() );
+      generator.resetEnvelopePhase();
+      RawPcmData::Ptr noteData = generator.generate( numSamples );
+      result->mixAdd( *noteData );
+
+   }
+   return RawPcmData::Ptr( result );
+}
+

@@ -34,6 +34,9 @@ class TwoTuple : public INTuple
       RealVector& getX();
       RealVector& getY();
 
+      void add( double x, double y );
+      void addTuple( const RealVector& row );
+
    private:
       RealVector        m_x;
       RealVector        m_y;
