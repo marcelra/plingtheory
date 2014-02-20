@@ -1,10 +1,7 @@
-#ifndef STFTGRAPH_H
-#define STFTGRAPH_H
-
-#include "RealVector.h"
+#ifndef REBINNEDSRGRAPH_H
+#define REBINNEDSRGRAPH_H
 
 #include <cstddef>
-#include <map>
 
 class TCanvas;
 class TH2F;
@@ -17,12 +14,11 @@ namespace WaveAnalysis
 namespace Visualisation
 {
 
-/// TODO: document
-class StftGraph
+class RebinnedSRGraph
 {
    public:
-      StftGraph( const WaveAnalysis::RawStftData& fftwData, size_t nBinsX = 0, size_t nBinsY = 0 );
-      virtual ~StftGraph();
+      RebinnedSRGraph( const WaveAnalysis::RawStftData& stftData, size_t nBinsX = 0, size_t nBinsY = 0 );
+      virtual ~RebinnedSRGraph();
 
       TCanvas* create();
 
@@ -42,10 +38,10 @@ class StftGraph
       size_t    m_nBinsY;
 
    private:
-      StftGraph( const StftGraph& other );
-      StftGraph& operator=( const StftGraph& other );
+      RebinnedSRGraph( const RebinnedSRGraph& other );
+      RebinnedSRGraph& operator=( const RebinnedSRGraph& other );
 };
 
 } /// namespace Visualisation
 
-#endif // STFTGRAPH_H
+#endif // REBINSRGRAPH_H

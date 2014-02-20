@@ -72,7 +72,8 @@ SOURCES += main.cpp \
     SortCache.cpp \
     RootFileCompare.cpp \
     IAccumArray.cpp \
-    RegularAccumArray.cpp
+    RegularAccumArray.cpp \
+    RebinnedSRGraph.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -145,7 +146,8 @@ HEADERS += \
     SortCache.h \
     RootFileCompare.h \
     IAccumArray.h \
-    RegularAccumArray.h
+    RegularAccumArray.h \
+    RebinnedSRGraph.h
 
 OTHER_FILES += \
     Todos.txt

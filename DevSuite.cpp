@@ -23,6 +23,7 @@ void DevSuite::execute()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <set>
+#include "RebinnedSRGraph.h"
 #include "RegularAccumArray.h"
 #include "SortCache.h"
 #include "TwoTuple.h"
@@ -366,13 +367,13 @@ void DevSuite::devRebinSRSpec()
    Logger msg( "devRebinSRSpec" );
    msg << Msg::Info << "In devRebinSRSpec..." << Msg::EndReq;
 
-   RawPcmData::Ptr data = TestDataSupply::generateSoundData();
+   RawPcmData::Ptr data = TestDataSupply::getCurrentTestSample();
 
    size_t fourierSize = 4096;
-   WaveAnalysis::SpectralReassignmentTransform transform( data->getSamplingInfo(), fourierSize, 0, 2 );
+   WaveAnalysis::SpectralReassignmentTransform transform( data->getSamplingInfo(), fourierSize, fourierSize*7, 4 );
    WaveAnalysis::RawStftData::Ptr stftData = transform.execute( *data );
 
-   WaveAnalysis::SRSpectrum& spec = static_cast< WaveAnalysis::SRSpectrum& >( stftData->getSpectrum( 0 ) );
+   WaveAnalysis::SRSpectrum& spec = static_cast< WaveAnalysis::SRSpectrum& >( stftData->getSpectrum( 5 ) );
 
    const Math::RegularAccumArray& accArr = spec.rebinToFourierLattice();
 
@@ -387,19 +388,20 @@ void DevSuite::devRebinSRSpec()
 
    new TCanvas();
    hAccArr->Draw();
-   TGraph* grUnbinned = RootUtilities::createGraph( sortX.applyTo( spec.getFrequencies() ), sortX.applyTo( spec.getMagnitude() ) );
-   grUnbinned->SetLineColor( kRed + 2 );
-   grUnbinned->SetMarkerColor( kRed + 2 );
-   grUnbinned->Draw( "PSAME" );
+   // TGraph* grUnbinned = RootUtilities::createGraph( sortX.applyTo( spec.getFrequencies() ), sortX.applyTo( spec.getMagnitude() ) );
+   // grUnbinned->SetLineColor( kRed + 2 );
+   // grUnbinned->SetMarkerColor( kRed + 2 );
+   // grUnbinned->Draw( "PSAME" );
 
    WaveAnalysis::StftAlgorithm normalTransAlg( data->getSamplingInfo(), fourierSize, WaveAnalysis::HanningWindowFuncDef(), 0, 2 );
    WaveAnalysis::RawStftData::Ptr normalTrans = normalTransAlg.execute( *data );
-   const WaveAnalysis::FourierSpectrum& normalSpec = normalTrans->getSpectrum( 0 );
-   TGraph* grNormal = RootUtilities::createGraph( normalSpec.getFrequencies(), normalSpec.getMagnitude() );
-   grNormal->Draw( "LSAME" );
-   grNormal->SetLineColor( kBlue );
+   const WaveAnalysis::FourierSpectrum& normalSpec = normalTrans->getSpectrum( 5 );
+   // TGraph* grNormal = RootUtilities::createGraph( normalSpec.getFrequencies(), normalSpec.getMagnitude() );
+   // grNormal->Draw( "LSAME" );
+   // grNormal->SetLineColor( kBlue );
 
-   /// TODO: Graph of rebinned SR spectrum TH2F
+   // Visualisation::RebinnedSRGraph rebinnedGraph( *stftData, stftData->getNumSpectra(), 0 );
+   // rebinnedGraph.create();
 }
 
 
