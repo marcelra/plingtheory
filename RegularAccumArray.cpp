@@ -1,5 +1,7 @@
 #include "RegularAccumArray.h"
 
+#include "RootUtilities.h"
+
 namespace Math
 {
 
@@ -95,6 +97,20 @@ void RegularAccumArray::add( double x, double value )
       size_t binIndex = findBin( x );
       m_bins[ binIndex ].add( x, value );
    }
+}
+
+TH1F* RegularAccumArray::createHistogram() const
+{
+   const TString& name = RootUtilities::getInstance().generateUniqueName( "regularAccumArray" );
+
+   TH1F* hist = new TH1F( name, name, getNumBins(), getMinX(), getMaxX() );
+   for ( size_t iBin = 0; iBin < getNumBins(); ++iBin )
+   {
+      double val = getBinContent( iBin );
+      hist->SetBinContent( iBin + 1, val );
+   }
+
+   return hist;
 }
 
 } /// namespace Math

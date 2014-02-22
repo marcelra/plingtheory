@@ -23,6 +23,7 @@ void DevSuite::execute()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <set>
+#include "GroundtoneHypothesisBuilder.h"
 #include "RebinnedSRGraph.h"
 #include "RegularAccumArray.h"
 #include "SortCache.h"
@@ -369,22 +370,19 @@ void DevSuite::devRebinSRSpec()
 
    RawPcmData::Ptr data = TestDataSupply::getCurrentTestSample();
 
+   size_t monitorIndex = 5;
+
    size_t fourierSize = 4096;
    WaveAnalysis::SpectralReassignmentTransform transform( data->getSamplingInfo(), fourierSize, fourierSize*7, 4 );
    WaveAnalysis::RawStftData::Ptr stftData = transform.execute( *data );
 
-   WaveAnalysis::SRSpectrum& spec = static_cast< WaveAnalysis::SRSpectrum& >( stftData->getSpectrum( 5 ) );
+   WaveAnalysis::SRSpectrum& spec = static_cast< WaveAnalysis::SRSpectrum& >( stftData->getSpectrum( monitorIndex ) );
 
    const Math::RegularAccumArray& accArr = spec.rebinToFourierLattice();
 
-   TH1F* hAccArr = new TH1F( "hAccArr", "hAccArr", accArr.getNumBins(), accArr.getMinX(), accArr.getMaxX() );
-   for ( size_t iBin = 0; iBin < accArr.getNumBins(); ++iBin )
-   {
-      double val = accArr.getBinContent( iBin );
-      hAccArr->SetBinContent( iBin + 1, val );
-   }
-
    SortCache sortX( spec.getFrequencies() );
+
+   TH1F* hAccArr = accArr.createHistogram();
 
    new TCanvas();
    hAccArr->Draw();
@@ -402,6 +400,16 @@ void DevSuite::devRebinSRSpec()
 
    // Visualisation::RebinnedSRGraph rebinnedGraph( *stftData, stftData->getNumSpectra(), 0 );
    // rebinnedGraph.create();
+
+   const WaveAnalysis::SRSpectrum& testSpec = dynamic_cast< WaveAnalysis::SRSpectrum& >( stftData->getSpectrum( monitorIndex ) );
+
+   FeatureAlgorithm::GroundtoneHypothesisBuilder gtSeed( testSpec );
+   const RealVector& vec = gtSeed.execute( 20 );
+   msg << Msg::Info << vec << Msg::EndReq;
+
+
+
+
 }
 
 
