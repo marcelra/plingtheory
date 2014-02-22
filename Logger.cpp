@@ -86,12 +86,19 @@ Logger& Logger::operator<<( const Msg::LogCommand& logCommand )
 template<>
 Logger& Logger::operator<<( const RealVector& vec )
 {
-   *this << "(";
-   for ( size_t i = 0; i < vec.size() - 1; ++i )
+   if ( vec.size() == 0 )
    {
-      *this << vec[i] << ", ";
+      *this << "()";
    }
-   *this << vec[ vec.size() - 1 ] << ")";
+   else
+   {
+      *this << "(";
+      for ( size_t i = 0; i < vec.size() - 1; ++i )
+      {
+         *this << vec[i] << ", ";
+      }
+      *this << vec[ vec.size() - 1 ] << ")";
+   }
    return *this;
 }
 
