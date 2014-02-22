@@ -73,7 +73,8 @@ SOURCES += main.cpp \
     RootFileCompare.cpp \
     IAccumArray.cpp \
     RegularAccumArray.cpp \
-    RebinnedSRGraph.cpp
+    RebinnedSRGraph.cpp \
+    GroundtoneHypothesisBuilder.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -147,7 +148,8 @@ HEADERS += \
     RootFileCompare.h \
     IAccumArray.h \
     RegularAccumArray.h \
-    RebinnedSRGraph.h
+    RebinnedSRGraph.h \
+    GroundtoneHypothesisBuilder.h
 
 OTHER_FILES += \
     Todos.txt

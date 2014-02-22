@@ -3,6 +3,8 @@
 
 #include "IAccumArray.h"
 
+class TH1F;
+
 namespace Math
 {
 
@@ -30,11 +32,13 @@ class RegularAccumArray : public IAccumArray
       void add( double x, double value );
 
    public:
+      TH1F* createHistogram() const;
+
+   public:
       std::vector< Bin >      m_bins;
       Bin                     m_underflow;
       Bin                     m_overflow;
       double                  m_binWidth;
-
 };
 
 } /// namespace Math
