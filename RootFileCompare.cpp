@@ -248,6 +248,7 @@ bool RootFileCompare::compareGraphs( TGraph& graphOld, TGraph& graphNew )
             getLogger() << Msg::Verbose << "point " << iPoint << " is different." << Msg::EndReq;
             getLogger() << Msg::Verbose << "(x, y)_old = (" << oldX << ", " << oldY << ")" << Msg::EndReq;
             getLogger() << Msg::Verbose << "(x, y)_new = (" << newX << ", " << newY << ")" << Msg::EndReq;
+            getLogger() << Msg::Verbose << "delta (x,y) = (" << newX-oldX << ", " << newY-oldY << ")"  << Msg::EndReq;
          }
       }
    }
