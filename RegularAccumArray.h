@@ -16,6 +16,7 @@ class RegularAccumArray : public IAccumArray
 
    public:
       double getBinContent( size_t iBin ) const;
+      RealVector getAllBinContents() const;
       double getMissedContent() const;
       double getUnderflow() const;
       double getOverflow() const;
@@ -30,6 +31,9 @@ class RegularAccumArray : public IAccumArray
       size_t findBin( double x ) const;
       Bin getBin( size_t binIndex ) const;
       void add( double x, double value );
+
+      void setBinContent( size_t binIndex, double value );
+      void setBinContents( const RealVector& vec );
 
    public:
       TH1F* createHistogram() const;

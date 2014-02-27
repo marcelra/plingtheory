@@ -9,6 +9,7 @@ class DevSuite
    public:
       static void devSidelobeSubtraction();
       static void devPeakFinder();
+      static void devPeakFinder2();
       static void devFourierPeakFinder1();
       static void devFourierPeakFinder2();
 
