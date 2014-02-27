@@ -14,7 +14,8 @@ void DevSuite::execute()
    // devFourierPeakFinder1();
    // devFourierPeakFinder2();
    // devTwoTuple();
-   devRebinSRSpec();
+   // devRebinSRSpec();
+   devPeakFinder2();
 }
 
 
@@ -23,6 +24,7 @@ void DevSuite::execute()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <set>
+#include "AccumArrayPeakAlgorithm.h"
 #include "GroundtoneHypothesisBuilder.h"
 #include "RebinnedSRGraph.h"
 #include "RegularAccumArray.h"
@@ -407,9 +409,25 @@ void DevSuite::devRebinSRSpec()
    const RealVector& vec = gtSeed.execute( 20 );
    msg << Msg::Info << vec << Msg::EndReq;
 
-
-
-
 }
 
+void DevSuite::devPeakFinder2()
+{
+   Logger msg( "devPeakFinder2" );
+   msg << Msg::Info << "Running devPeakFinder2..." << Msg::EndReq;
+
+   // const Math::RegularAccumArray& data = TestDataSupply::drawNoiseAndPeaks();
+   size_t specIndex = 0;
+   WaveAnalysis::RawStftData::Ptr stftData = TestDataSupply::getSrFtData();
+   const WaveAnalysis::SRSpectrum& spec = dynamic_cast< WaveAnalysis::SRSpectrum& >( stftData->getSpectrum( specIndex ) );
+   const Math::RegularAccumArray& data = spec.rebinToFourierLattice();
+
+   // TH1F* hist = data.createHistogram();
+   // hist->Draw();
+
+   FeatureAlgorithm::AccumArrayPeakAlgorithm peakAlg;
+   peakAlg.execute( data );
+
+   return;
+}
 

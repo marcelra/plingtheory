@@ -24,6 +24,8 @@ class IAccumArray
             double getContents() const;
 
             void add( double x, double value );
+            void set( double value );
+            void clearEntries();
 
             const TwoTuple& getEntries() const;
             TwoTuple& getEntries();
@@ -91,6 +93,18 @@ inline const TwoTuple& IAccumArray::Bin::getEntries() const
 inline TwoTuple& IAccumArray::Bin::getEntries()
 {
    return m_elements;
+}
+
+inline void IAccumArray::Bin::set( double value )
+{
+   clearEntries();
+   add( 0.5 * ( getMinX() + getMaxX() ), value );
+}
+
+inline void IAccumArray::Bin::clearEntries()
+{
+   m_elements = TwoTuple( 0 );
+
 }
 
 } /// namespace Math

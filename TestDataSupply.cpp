@@ -4,6 +4,7 @@
 #include "IGenerator.h"
 #include "MultiChannelRawPcmData.h"
 #include "NoteList.h"
+#include "SpectralReassignmentTransform.h"
 #include "SquareGenerator.h"
 #include "WaveFile.h"
 
@@ -20,7 +21,6 @@ RealVector TestDataSupply::createNoiseAndPeaks()
    const double peakSigmaArr[] = { 10, 2, 10, 5};
    const double peakAmpArr[] = { -10, -5, 10, -20 };
    size_t nPeaks = sizeof( peakLocArr ) / sizeof( double );
-   nPeaks = 0;
 
    RealVector peakLocs( &peakLocArr[0], &peakLocArr[0] + nPeaks );
    RealVector peakSigmas( &peakSigmaArr[0], &peakSigmaArr[0] + nPeaks );
@@ -62,6 +62,51 @@ RealVector TestDataSupply::createNoiseAndPeaks( RealVector peakLocs, RealVector 
       }
    }
    return dataSet;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// drawNoiseAndPeaks
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Math::RegularAccumArray TestDataSupply::drawNoiseAndPeaks()
+{
+   const double peakLocArr[] = { 100, 300, 600, 750 };
+   const double peakSigmaArr[] = { 10, 2, 10, 5};
+   const double peakAmpArr[] = { 200, 500, 100, 200 };
+   size_t nPeaks = sizeof( peakLocArr ) / sizeof( double );
+
+   RealVector peakLocs( &peakLocArr[0], &peakLocArr[0] + nPeaks );
+   RealVector peakSigmas( &peakSigmaArr[0], &peakSigmaArr[0] + nPeaks );
+   RealVector peakAmpsAtMax( &peakAmpArr[0], &peakAmpArr[0] + nPeaks );
+
+   return drawNoiseAndPeaks( peakLocs, peakSigmas, peakAmpsAtMax );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// drawNoiseAndPeaks
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Math::RegularAccumArray TestDataSupply::drawNoiseAndPeaks( RealVector peakLocs, RealVector peakSigmas, RealVector peakAmpsAtMax )
+{
+   Math::RegularAccumArray result( 1024, 0, 1024 );
+
+   TRandom3 rand( 1024 );
+
+   for ( size_t iPeak = 0; iPeak < peakLocs.size(); ++iPeak )
+   {
+      for ( size_t iSample = 0; iSample < peakAmpsAtMax[ iPeak ]; ++iSample )
+      {
+         double x = rand.Gaus( peakLocs[ iPeak ], peakSigmas[ iPeak ] );
+         result.add( x, 1 );
+      }
+   }
+
+   size_t nSamplesNoise = 10000;
+   for ( size_t i = 0; i < nSamplesNoise; ++i )
+   {
+      double x = rand.Exp( 256 );
+      result.add( x, 1 );
+   }
+
+   return result;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -122,5 +167,17 @@ RawPcmData::Ptr TestDataSupply::readSoundData()
 
    MultiChannelRawPcmData* data = WaveFile::read( GlobalParameters::getTestDataDir() + fileName );
    return RawPcmData::Ptr( new RawPcmData( data->getChannel( 0 ) ) );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// getSrFtData
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+WaveAnalysis::RawStftData::Ptr TestDataSupply::getSrFtData()
+{
+   RawPcmData::Ptr data = readSoundData();
+   size_t fourierSize = 4096;
+   WaveAnalysis::SpectralReassignmentTransform transform( data->getSamplingInfo(), fourierSize, fourierSize, 1 );
+   WaveAnalysis::RawStftData::Ptr stftData = transform.execute( *data );
+   return stftData;
 }
 

@@ -74,7 +74,8 @@ SOURCES += main.cpp \
     IAccumArray.cpp \
     RegularAccumArray.cpp \
     RebinnedSRGraph.cpp \
-    GroundtoneHypothesisBuilder.cpp
+    GroundtoneHypothesisBuilder.cpp \
+    AccumArrayPeakAlgorithm.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -149,7 +150,8 @@ HEADERS += \
     IAccumArray.h \
     RegularAccumArray.h \
     RebinnedSRGraph.h \
-    GroundtoneHypothesisBuilder.h
+    GroundtoneHypothesisBuilder.h \
+    AccumArrayPeakAlgorithm.h
 
 OTHER_FILES += \
     Todos.txt

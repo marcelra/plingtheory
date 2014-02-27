@@ -29,6 +29,16 @@ double RegularAccumArray::getBinContent( size_t iBin ) const
    return m_bins[ iBin ].getContents();
 }
 
+RealVector RegularAccumArray::getAllBinContents() const
+{
+   RealVector result( m_bins.size() );
+   for ( size_t iBin = 0; iBin < m_bins.size(); ++iBin )
+   {
+      result[ iBin ] = m_bins[ iBin ].getContents();
+   }
+   return result;
+}
+
 double RegularAccumArray::getMissedContent() const
 {
    return 0;
@@ -96,6 +106,20 @@ void RegularAccumArray::add( double x, double value )
    {
       size_t binIndex = findBin( x );
       m_bins[ binIndex ].add( x, value );
+   }
+}
+
+void RegularAccumArray::setBinContent( size_t binIndex, double value )
+{
+   m_bins[ binIndex ].set( value );
+}
+
+void RegularAccumArray::setBinContents( const RealVector& contents )
+{
+   assert( contents.size() == m_bins.size() );
+   for ( size_t iBin = 0; iBin < m_bins.size(); ++iBin )
+   {
+      setBinContent( iBin, contents[ iBin ] );
    }
 }
 
