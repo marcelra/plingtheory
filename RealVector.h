@@ -23,6 +23,7 @@ RealVector operator/( const RealVector& x, double lambda );
 double operator*( const RealVector& x, const RealVector& y );
 
 RealVector calcDerivative( const RealVector& x );
+bool isEqual( const RealVector& x, const RealVector& y );
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// inline methods
