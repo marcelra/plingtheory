@@ -13,8 +13,9 @@
 
 #include "IObjectiveFunction.h"
 
-#include <set>
 #include <algorithm>
+#include <limits>
+#include <set>
 
 namespace
 {
@@ -153,8 +154,8 @@ void FocalTones::execute()
    RealVector graphXErr;
    RealVector graphYErr;
 
-   double minGroundTone = 1e99;
-   double maxGroundTone = -1e99;
+   double minGroundTone = std::numeric_limits<double>::max();
+   double maxGroundTone = -std::numeric_limits<double>::max();
 
    std::vector< RealVector > groundToneCandidates( nHarmonicMax, RealVector( m_freqPeaks.size() ) );
    std::vector< RealVector > groundToneUncertainty( nHarmonicMax, RealVector( m_freqPeaks.size() ) );

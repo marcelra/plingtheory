@@ -1,8 +1,9 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#include <vector>
 #include <cstddef>
+#include <limits>
+#include <vector>
 
 /**
  * @class Utils
@@ -59,7 +60,7 @@ double Utils::getMaxValue( const std::vector< T >& valueVec )
 template <class T>
 double Utils::getMinValueAndIndex( const std::vector< T >& valueVec, size_t& index )
 {
-   double result = 1e99;
+   double result = std::numeric_limits< double >::max();
    for ( size_t i = 0; i < valueVec.size(); ++i )
    {
       if ( valueVec[i] < result )
@@ -77,7 +78,7 @@ double Utils::getMinValueAndIndex( const std::vector< T >& valueVec, size_t& ind
 template <class T>
 double Utils::getMaxValueAndIndex( const std::vector< T >& valueVec, size_t& index )
 {
-   double result = -1e99;
+   double result = -std::numeric_limits< double >::max();
    for ( size_t i = 0; i < valueVec.size(); ++i )
    {
       if ( valueVec[i] > result )
