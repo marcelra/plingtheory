@@ -8,7 +8,7 @@ class TH2F;
 
 namespace WaveAnalysis
 {
-   class RawStftData;
+   class StftData;
 }
 
 namespace Visualisation
@@ -17,7 +17,7 @@ namespace Visualisation
 class RebinnedSRGraph
 {
    public:
-      RebinnedSRGraph( const WaveAnalysis::RawStftData& stftData, size_t nBinsX = 0, size_t nBinsY = 0 );
+      RebinnedSRGraph( const WaveAnalysis::StftData& stftData, size_t nBinsX = 0, size_t nBinsY = 0 );
       virtual ~RebinnedSRGraph();
 
       TCanvas* create();
@@ -29,7 +29,7 @@ class RebinnedSRGraph
       TH2F* getGraph();
 
    private:
-      const WaveAnalysis::RawStftData&  m_stftData;
+      const WaveAnalysis::StftData&  m_stftData;
 
    private:
       TCanvas*  m_canvas;

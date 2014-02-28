@@ -172,12 +172,12 @@ RawPcmData::Ptr TestDataSupply::readSoundData()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// getSrFtData
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-WaveAnalysis::RawStftData::Ptr TestDataSupply::getSrFtData()
+WaveAnalysis::StftData::Ptr TestDataSupply::getSrFtData()
 {
    RawPcmData::Ptr data = getCurrentTestSample();
    size_t fourierSize = 4096;
    WaveAnalysis::SpectralReassignmentTransform transform( data->getSamplingInfo(), fourierSize, fourierSize, 1 );
-   WaveAnalysis::RawStftData::Ptr stftData = transform.execute( *data );
+   WaveAnalysis::StftData::Ptr stftData = transform.execute( *data );
    return stftData;
 }
 

@@ -18,14 +18,14 @@ StftAlgorithm::StftAlgorithm( const SamplingInfo& samplingInfo, size_t windowSiz
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// execute
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-RawStftData::Ptr StftAlgorithm::execute( const RawPcmData& data )
+StftData::Ptr StftAlgorithm::execute( const RawPcmData& data )
 {
    Logger msg( "StftAlgorithm" );
    msg << Msg::Verbose << "In execute" << Msg::EndReq;
    assert( m_transform.getConfig().getSamplingInfo() == data.getSamplingInfo() );
    assert( getHopShift() > 1 );
 
-   RawStftData* result = new RawStftData( m_transform.getConfigCSPtr() );
+   StftData* result = new StftData( m_transform.getConfigCSPtr() );
 
    double numHopsD = data.size() / getHopShift();
    double currentSampleD = 0;
@@ -33,7 +33,7 @@ RawStftData::Ptr StftAlgorithm::execute( const RawPcmData& data )
    for ( size_t iHop = 0; iHop < numHops; ++iHop )
    {
       size_t currentSampleI = currentSampleD;
-      RawStftData::WindowLocation* windowLocation = new RawStftData::WindowLocation( currentSampleI, currentSampleI + m_transform.getConfig().getWindowSize() );
+      StftData::WindowLocation* windowLocation = new StftData::WindowLocation( currentSampleI, currentSampleI + m_transform.getConfig().getWindowSize() );
 
       if ( currentSampleI + m_transform.getConfig().getWindowSize() < data.size() )
       {
@@ -48,13 +48,13 @@ RawStftData::Ptr StftAlgorithm::execute( const RawPcmData& data )
       currentSampleD += getHopShift();
    }
 
-   return RawStftData::Ptr( result );
+   return StftData::Ptr( result );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// reverseExecute
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-RawPcmData::Ptr StftAlgorithm::reverseExecute( const RawStftData& stftData )
+RawPcmData::Ptr StftAlgorithm::reverseExecute( const StftData& stftData )
 {
    assert( m_transform.getConfig().isInvertible() );
 
@@ -66,7 +66,7 @@ RawPcmData::Ptr StftAlgorithm::reverseExecute( const RawStftData& stftData )
    for ( size_t iSpec = 0; iSpec < stftData.getNumSpectra(); ++iSpec )
    {
       RealVectorPtr vec = m_transform.transform( stftData.getSpectrum( iSpec ) );
-      const RawStftData::WindowLocation& winLocNoOverlap = stftData.getWindowLocationNoOverlap( iSpec );
+      const StftData::WindowLocation& winLocNoOverlap = stftData.getWindowLocationNoOverlap( iSpec );
       size_t vecIndex = stftData.getWindowLocationNoOverlap( iSpec ).getFirstSample() - stftData.getWindowLocation( iSpec ).getFirstSample();
       /// TODO: memcheck indicates invalid write (probably <= goes wrong for last batch)
       for ( size_t iSample = winLocNoOverlap.getFirstSample(); iSample <= winLocNoOverlap.getLastSample(); ++iSample, ++vecIndex )

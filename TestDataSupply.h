@@ -3,7 +3,7 @@
 
 #include "Note.h"
 #include "RawPcmData.h"
-#include "RawStftData.h"
+#include "StftData.h"
 #include "RealVector.h"
 #include "RegularAccumArray.h"
 
@@ -22,7 +22,7 @@ class TestDataSupply
       static Math::RegularAccumArray drawNoiseAndPeaks( RealVector peakLocs, RealVector peakSigmas, RealVector peakAmpsAtMax );
 
       static RawPcmData::Ptr getCurrentTestSample();
-      static WaveAnalysis::RawStftData::Ptr getSrFtData();
+      static WaveAnalysis::StftData::Ptr getSrFtData();
 
       static RawPcmData::Ptr generateSoundData();
       static RawPcmData::Ptr generateChord( Synthesizer::IGenerator& generator, size_t numSamples, const std::vector< Music::Note >& notes );

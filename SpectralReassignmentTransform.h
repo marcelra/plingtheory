@@ -15,7 +15,7 @@ class SpectralReassignmentTransform
    public:
       SpectralReassignmentTransform( const SamplingInfo& samplingInfo, size_t fourierSize, size_t numSamplesZeroPadding, double hopRate );
 
-      RawStftData::Ptr execute( const RawPcmData& data );
+      StftData::Ptr execute( const RawPcmData& data );
 
    private:
       StftAlgorithm     m_stft;

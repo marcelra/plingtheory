@@ -66,7 +66,7 @@ void TestSuite::execute()
 #include "NoiseGenerator.h"
 #include "TriangleGenerator.h"
 #include "SawtoothGenerator.h"
-#include "RawStftData.h"
+#include "StftData.h"
 #include "SpectralReassignmentTransform.h"
 
 #include "TLine.h"
@@ -501,7 +501,7 @@ void TestSuite::testIntegration()
 
    size_t nSamples = 2048;
    WaveAnalysis::StftAlgorithm stft( musicData->getSamplingInfo(), nSamples, WaveAnalysis::HannPoissonWindowFuncDef(), nSamples * 3, 2 );
-   WaveAnalysis::RawStftData::Ptr stftData = stft.execute( *musicData );
+   WaveAnalysis::StftData::Ptr stftData = stft.execute( *musicData );
 
    TH2F* result = new TH2F( "result", "result", stftData->getNumSpectra(), -0.5, stftData->getNumSpectra() - 0.5, stft.getSpectrumDimension(), -0.5, stft.getSpectrumDimension() );
    std::vector< TLine* > detectedTones;
@@ -707,12 +707,12 @@ void TestSuite::testStftAlgorithm()
 //  WaveAnalysis::StftConfiguration stftConf( samplingInfo, windowSize, WaveAnalysis::HanningWindowFuncDef(), 3 * windowSize, 8 );
 
    WaveAnalysis::StftAlgorithm stftAlg( samplingInfo, windowSize, WaveAnalysis::HanningWindowFuncDef(), 3 * windowSize, 2 );
-   WaveAnalysis::RawStftData::Ptr stftData = stftAlg.execute( *data );
+   WaveAnalysis::StftData::Ptr stftData = stftAlg.execute( *data );
 
    for ( size_t i = 0; i < stftData->getNumSpectra(); ++i )
    {
-      const WaveAnalysis::RawStftData::WindowLocation& winLoc = stftData->getWindowLocation( i );
-      const WaveAnalysis::RawStftData::WindowLocation& winLocNoOv = stftData->getWindowLocationNoOverlap( i );
+      const WaveAnalysis::StftData::WindowLocation& winLoc = stftData->getWindowLocation( i );
+      const WaveAnalysis::StftData::WindowLocation& winLocNoOv = stftData->getWindowLocationNoOverlap( i );
       msg << Msg::Info << "-------------------------------------------------------" << Msg::EndReq;
       msg << Msg::Info << "Spectrum i = " << i << ": Windowlocation [" << winLoc.getFirstSample() << ", " << winLoc.getLastSample() << "]" << Msg::EndReq;
       msg << Msg::Info << "Spectrum i = " << i << ": No overlap     [" << winLocNoOv.getFirstSample() << ", " << winLocNoOv.getLastSample() << "]" << Msg::EndReq;
@@ -793,7 +793,7 @@ void TestSuite::testNoiseGenerator()
 
    size_t windowSize = 4096;
    WaveAnalysis::StftAlgorithm stftAlg( samplingInfo, windowSize, WaveAnalysis::HanningWindowFuncDef(), windowSize, 2 );
-   WaveAnalysis::RawStftData::Ptr stftData = stftAlg.execute( *data );
+   WaveAnalysis::StftData::Ptr stftData = stftAlg.execute( *data );
 
    Visualisation::StftGraph stftGraph( *stftData );
    stftGraph.create();
@@ -911,7 +911,7 @@ void TestSuite::testSpectralReassignment()
    // RawPcmData* data = &waveFile->getChannel( 0 );
 
    WaveAnalysis::SpectralReassignmentTransform specTrans( samplingInfo, fourierSize, fourierSize*3, 2 );
-   WaveAnalysis::RawStftData::Ptr trans = specTrans.execute( *data );
+   WaveAnalysis::StftData::Ptr trans = specTrans.execute( *data );
 
    const WaveAnalysis::SRSpectrum& specReass = dynamic_cast< const WaveAnalysis::SRSpectrum& >( trans->getSpectrum( 0 ) );
    WaveAnalysis::FourierSpectrum spec( specReass );

@@ -2,7 +2,7 @@
 
 #include "Exceptions.h"
 #include "Logger.h"
-#include "RawStftData.h"
+#include "StftData.h"
 #include "RootUtilities.h"
 #include "SRSpectrum.h"
 
@@ -16,7 +16,7 @@ namespace Visualisation
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// constructor
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-RebinnedSRGraph::RebinnedSRGraph( const WaveAnalysis::RawStftData& stftData, size_t nBinsX, size_t nBinsY ) :
+RebinnedSRGraph::RebinnedSRGraph( const WaveAnalysis::StftData& stftData, size_t nBinsX, size_t nBinsY ) :
    m_stftData( stftData ),
    m_canvas( 0 ),
    m_hist( 0 ),
