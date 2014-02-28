@@ -7,14 +7,21 @@ class DevSuite
       static void execute();
 
    public:
-      static void devSidelobeSubtraction();
-      static void devPeakFinder();
       static void devPeakFinder2();
-      static void devFourierPeakFinder1();
-      static void devFourierPeakFinder2();
-
-      static void devTwoTuple();
       static void devRebinSRSpec();
+
+      static void devFourierTemplates();
+      static void devSamples();
+
+   /// Parked.
+   public:
+      static void devSidelobeSubtraction();
+      static void devEntropyPeaks();
+
+   /// Parked and interesting.
+   public:
+      static void devFourierPeakFinder1();
+
 };
 
 #endif // DEVSUITE_H

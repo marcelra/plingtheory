@@ -9,13 +9,17 @@ void DevSuite::execute()
 {
    Logger msg( "DevSuite" );
    msg << Msg::Info << "Running development code..." << Msg::EndReq;
-   // devSidelobeSubtraction(); /// parked
-   // devPeakFinder();
-   // devFourierPeakFinder1();
-   // devFourierPeakFinder2();
-   // devTwoTuple();
    // devRebinSRSpec();
-   devPeakFinder2();
+   // devPeakFinder2();
+   devFourierTemplates();
+   // devSamples();
+
+   /// PARKED
+   // devSidelobeSubtraction();
+   // devEntropyPeaks();
+
+   /// PARKED AND INTERESTING
+   // devFourierPeakFinder1();
 }
 
 
@@ -24,6 +28,7 @@ void DevSuite::execute()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <set>
+#include "NoteList.h"
 #include "AccumArrayPeakAlgorithm.h"
 #include "GroundtoneHypothesisBuilder.h"
 #include "RebinnedSRGraph.h"
@@ -48,319 +53,6 @@ void DevSuite::execute()
 /// Parked code fragments
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "DevSuite.parked.cpp"
-
-void sortVectors( RealVector& freqVec, RealVector& magVec )
-{
-   std::map< double, int > sortIndices;
-   for ( size_t i = 0; i < freqVec.size(); ++i )
-   {
-      sortIndices[ freqVec[i] ] = i;
-   }
-
-   RealVector magVecNew( magVec.size() );
-   size_t i = 0;
-   for ( std::map< double, int >::const_iterator it = sortIndices.begin(); it != sortIndices.end(); ++it, ++i )
-   {
-      freqVec[ i ] = it->first;
-      magVecNew[ i ] = magVec[ it->second ];
-   }
-   magVec = magVecNew;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// devFourierPeakFinder
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void DevSuite::devFourierPeakFinder1()
-{
-   SamplingInfo samplingInfo;
-
-   Synthesizer::SquareGenerator square( samplingInfo );
-   square.setFrequency( 440 );
-   RawPcmData::Ptr data = square.generate( 44100 );
-   square.setFrequency( 900 );
-   RawPcmData::Ptr data2 = square.generate( 44100 );
-   // data->mixAdd( *data2 );
-
-   size_t fourierSize = 1024;
-   WaveAnalysis::SpectralReassignmentTransform transform( samplingInfo, fourierSize, 0, 2 );
-   WaveAnalysis::RawStftData::Ptr stftData = transform.execute( *data );
-
-   WaveAnalysis::SRSpectrum& spec = static_cast< WaveAnalysis::SRSpectrum& >( stftData->getSpectrum( 0 ) );
-   RealVector freqVec = spec.getFrequencies();
-   RealVector magVec = spec.getMagnitude();
-
-   sortVectors( freqVec, magVec );
-
-   new TCanvas();
-   TGraph* gr = RootUtilities::createGraph( freqVec, magVec );
-   gr->Draw( "AP" );
-   gr->SetMarkerStyle( 21 );
-   gr->SetMarkerSize( 0.5 );
-
-   size_t maxIndex;
-   size_t nIter = 0;
-   size_t maxIter = 100;
-
-   size_t nNbSearchRad = 5;
-   RealVector peaks;
-   RealVector peakMass;
-
-   while ( nIter < maxIter )
-   {
-      std::cout << "====== ITERATION " << nIter << " =====" << std::endl;
-      double maxVal = Utils::getMaxValueAndIndex( magVec, maxIndex );
-
-      std::cout << "Frequency @ max = " << freqVec[maxIndex] << std::endl;
-
-      RealVector distAddCand;
-      RealVector magAddCand;
-
-      size_t iMin = std::max( 0, static_cast< int >( maxIndex - nNbSearchRad ) );
-      size_t iMax = std::min( magVec.size() - 1, maxIndex + nNbSearchRad );
-
-      RealVector neighbourIndices;
-
-      for ( size_t i = iMin; i <= iMax; ++i )
-      {
-         if ( i != maxIndex )
-         {
-            distAddCand.push_back( freqVec[i] - freqVec[maxIndex] );
-            magAddCand.push_back( magVec[i] );
-            neighbourIndices.push_back( i );
-            std::cout << "relIndex = " << static_cast< int >( i - maxIndex ) << ": dist = " << distAddCand.back() << ", mag = " << magAddCand.back() << std::endl;
-         }
-      }
-
-      std::set< size_t > pointsAdded;
-      pointsAdded.insert( maxIndex );
-
-      double volume = 0;
-      double mass = maxVal;
-
-      size_t iDensIter = 0;
-      bool densHasImproved = true;
-      double density = 0;
-      while ( densHasImproved )
-      {
-         double highestNewDens = 0;
-         int iPointToAdd = -1;
-         RealVector::iterator itDist = distAddCand.begin();
-         RealVector::iterator itMag = magAddCand.begin();
-         while ( itDist != distAddCand.end() )
-         {
-            double newMass = mass + *itMag;
-            double newVol = volume + fabs( *itDist );
-            double newDens = newMass / newVol;
-            std::cout << "*itDist = " << *itDist << std::endl;
-            std::cout << "newDens candidate = " << newDens << std::endl;
-            if ( newDens > highestNewDens )
-            {
-               highestNewDens = newDens;
-               iPointToAdd = itDist - distAddCand.begin();
-            }
-            ++itDist;
-            ++itMag;
-         }
-
-         if ( iPointToAdd == -1 )
-         {
-            std::cout << "All points are assigned => break" << std::endl;
-            break;
-         }
-
-         if ( highestNewDens > density || iDensIter < 2 )
-         {
-            density = highestNewDens;
-            std::cout << "New dens = " << density << std::endl;
-            volume += distAddCand[ iPointToAdd ];
-            mass += magAddCand[ iPointToAdd ];
-            pointsAdded.insert( *( neighbourIndices.begin() + iPointToAdd ) );
-
-            distAddCand.erase( distAddCand.begin() + iPointToAdd );
-            magAddCand.erase( magAddCand.begin() + iPointToAdd );
-            neighbourIndices.erase( neighbourIndices.begin() + iPointToAdd );
-         }
-         else
-         {
-            densHasImproved = false;
-            std::cout << "Density did not improve" << std::endl;
-         }
-
-         ++iDensIter;
-      } /// inner while loop
-
-      peaks.push_back( freqVec[maxIndex] );
-      peakMass.push_back( mass );
-
-      for ( std::set< size_t >::reverse_iterator it = pointsAdded.rbegin(); it != pointsAdded.rend(); ++it )
-      {
-         std::cout << "Removing point " << *it << std::endl;
-         magVec.erase( magVec.begin() + *it );
-         freqVec.erase( freqVec.begin() + *it );
-      }
-
-      ++nIter;
-   }
-
-   TGraph* grRemoved = RootUtilities::createGraph( freqVec, magVec );
-   grRemoved->SetMarkerSize( 1 );
-   grRemoved->SetMarkerColor( kRed );
-   grRemoved->Draw( "PSAME" );
-
-   for ( size_t iPeak = 0; iPeak < peaks.size(); ++iPeak )
-   {
-      TLine* line = new TLine( peaks[iPeak], 0, peaks[iPeak], peakMass[iPeak] );
-      line->Draw();
-   }
-
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// Peakfinder development
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#include "TRandom3.h"
-
-
-void DevSuite::devPeakFinder()
-{
-   const RealVector& dataSet = TestDataSupply::createNoiseAndPeaks();
-
-   RealVector xArr;
-   for ( size_t i = 0; i < dataSet.size(); ++i )
-   {
-      xArr.push_back( i );
-   }
-
-   new TCanvas();
-   TGraph* gr = RootUtilities::createGraph( xArr, dataSet );
-   gr->Draw( "AL" );
-
-   size_t nBins = 50;
-   double maxVal = Utils::getMaxValue( dataSet );
-   double minVal = Utils::getMinValue( dataSet );
-   TH1F* h1 = new TH1F( "h1", "h1", nBins, minVal, maxVal);
-   for ( size_t iSample = 0; iSample < dataSet.size(); ++iSample )
-   {
-      h1->Fill( dataSet[iSample] );
-   }
-
-   new TCanvas();
-   h1->Scale( 1 / h1->Integral() );
-   h1->Draw();
-
-   RealVector localLhArr( xArr.size() );
-   RealVector movAvg( xArr.size() );
-
-   size_t nSamplesMovAvg = 20;
-   for ( size_t iSample = 0; iSample < dataSet.size(); ++iSample )
-   {
-      double avg = 0;
-      double localLh = 0;
-      size_t iLeft = std::max( 0, static_cast< int > ( iSample - nSamplesMovAvg / 2 ) );
-      size_t iRight = std::min( dataSet.size(), iSample + nSamplesMovAvg / 2 );
-      for ( size_t i = iLeft; i < iRight; ++i )
-      {
-         avg += dataSet[i];
-         size_t lhBin = h1->GetXaxis()->FindBin( dataSet[i] );
-         double p = h1->GetBinContent( lhBin );
-         localLh += -p * log( p );
-      }
-      movAvg[iSample] = avg / nSamplesMovAvg;
-      localLhArr[iSample] = localLh / ( iRight - iLeft );
-   }
-//
-   // TGraph* grMovAvg = RootUtilities::createGraph( xArr, movAvg );
-   // grMovAvg->SetLineColor( kBlue );
-   // grMovAvg->Draw( "LSAME" );
-
-   TCanvas* c = new TCanvas();
-   c->Divide( 1, 2 );
-   c->cd( 2 );
-   gr->Draw( "AL" );
-   c->cd( 1 );
-   TGraph* grLh = RootUtilities::createGraph( xArr, localLhArr );
-   grLh->Draw( "AL ");
-
-   RealVector localLhCopy = localLhArr;
-   std::sort( localLhCopy.begin(), localLhCopy.end() );
-
-   new TCanvas();
-   RootUtilities::createGraph( xArr, localLhCopy )->Draw( "AL" );
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// devFourierPeakFinder2
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void DevSuite::devFourierPeakFinder2()
-{
-   SamplingInfo samplingInfo;
-
-   Synthesizer::SquareGenerator square( samplingInfo );
-   square.setFrequency( 440 );
-   RawPcmData::Ptr data = square.generate( 44100 );
-   square.setFrequency( 900 );
-   RawPcmData::Ptr data2 = square.generate( 44100 );
-   // data->mixAdd( *data2 );
-
-   size_t fourierSize = 1024;
-   WaveAnalysis::SpectralReassignmentTransform transform( samplingInfo, fourierSize, 0, 2 );
-   WaveAnalysis::RawStftData::Ptr stftData = transform.execute( *data );
-
-   WaveAnalysis::SRSpectrum& spec = static_cast< WaveAnalysis::SRSpectrum& >( stftData->getSpectrum( 0 ) );
-   RealVector freqVec = spec.getFrequencies();
-   RealVector magVec = spec.getMagnitude();
-
-   sortVectors( freqVec, magVec );
-
-   new TCanvas();
-   TGraph* gr = RootUtilities::createGraph( freqVec, magVec );
-   gr->Draw( "AP" );
-   gr->SetMarkerStyle( 21 );
-   gr->SetMarkerSize( 0.5 );
-
-   // const RealVector& vMovAvg =
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// devTwoTuple
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void DevSuite::devTwoTuple()
-{
-   Logger msg( "devTwoTuple" );
-   msg << Msg::Info << "In devTwoTuple..." << Msg::EndReq;
-
-   SamplingInfo samplingInfo;
-
-   Synthesizer::SquareGenerator square( samplingInfo );
-   square.setAmplitude( 1 );
-   square.setFrequency( 440 );
-   RawPcmData::Ptr data = square.generate( 44100 );
-   square.setFrequency( 900 );
-   RawPcmData::Ptr data2 = square.generate( 44100 );
-   data->mixAdd( *data2 );
-
-   size_t fourierSize = 1024;
-   WaveAnalysis::SpectralReassignmentTransform transform( samplingInfo, fourierSize, 0, 2 );
-   WaveAnalysis::RawStftData::Ptr stftData = transform.execute( *data );
-
-   WaveAnalysis::SRSpectrum& spec = static_cast< WaveAnalysis::SRSpectrum& >( stftData->getSpectrum( 0 ) );
-   const RealVector& freqVec = spec.getFrequencies();
-   const RealVector& magVec = spec.getMagnitude();
-
-   Math::TwoTuple tuple( freqVec, magVec );
-   SortCache sortX( tuple.getX() );
-
-   const RealVector& xSorted = sortX.applyTo( tuple.getX() );
-   const RealVector& ySorted = sortX.applyTo( tuple.getY() );
-
-   for ( size_t i = 0; i < tuple.getNumElements(); ++i )
-   {
-      msg << Msg::Verbose << xSorted[ i ] << ", " << ySorted[ i ] << Msg::EndReq;
-   }
-
-   TGraph* gr = RootUtilities::createGraph( xSorted, ySorted );
-   gr->Draw( "AL" );
-}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// devRebinSRSpec
@@ -451,3 +143,193 @@ void DevSuite::devPeakFinder2()
    return;
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// devFourierTemplates
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void DevSuite::devFourierTemplates()
+{
+   Logger msg( "devFourierTemplates" );
+   msg << Msg::Info << "In devFourierTempaltes..." << Msg::EndReq;
+
+   Music::NoteList noteList = Music::createHugeDiatonicScale();
+   size_t numHarmonics = 10;
+   double amp = 1;
+   SamplingInfo samplingInfo( 44100 );
+   size_t fourierSize = 2048;
+   size_t zeroPadding = 7*fourierSize;
+   size_t numSamplesGenerate = 4096;
+   double hopRate = 1;
+
+   WaveAnalysis::SpectralReassignmentTransform transform( samplingInfo, fourierSize, zeroPadding, hopRate );
+
+   std::set< double > frequencies;
+
+   for ( size_t iNote = 0; iNote < noteList.size(); ++iNote )
+   {
+      for ( size_t iHarmonic = 0; iHarmonic < numHarmonics; ++iHarmonic )
+      {
+         frequencies.insert( noteList[ iNote ].getFrequency() * ( iHarmonic + 1 ) );
+      }
+   }
+
+   double freqMinDraw = 0;
+   double freqMaxDraw = samplingInfo.getNyquistFrequency();
+
+   size_t counter = 0;
+   size_t numGraphs = 0;
+   size_t graphSkip = 20;
+   size_t numGraphsDrawn = 0;
+   bool interactiveGraphs = true;
+   if ( !interactiveGraphs )
+   {
+      graphSkip = 1;
+   }
+   for ( std::set< double >::iterator it = frequencies.begin(); it != frequencies.end(); ++it, ++counter )
+   {
+
+      double frequency = *it;
+      if ( frequency > samplingInfo.getNyquistFrequency() )
+      {
+         break;
+      }
+      msg << Msg::Info << "Creating fourier templates for frequency " << frequency << "." << Msg::EndReq;
+
+      msg << Msg::Debug << "Generating waveform." << Msg::EndReq;
+
+      RawPcmData pcmData( samplingInfo, numSamplesGenerate );
+
+      double phase = 0;
+      double phaseStep = samplingInfo.getPhaseStepPerSample( frequency );
+      for ( size_t iSample = 0; iSample < numSamplesGenerate; ++iSample )
+      {
+         pcmData[ iSample ] = amp * sin( phase );
+         phase += phaseStep;
+      }
+
+      msg << Msg::Debug << "Fourier transforming waveform." << Msg::EndReq;
+      WaveAnalysis::RawStftData::Ptr stftData = transform.execute( pcmData );
+      const WaveAnalysis::SRSpectrum& srSpectrum = dynamic_cast< const WaveAnalysis::SRSpectrum& >( stftData->getSpectrum( 0 ) );
+      const Math::RegularAccumArray& accArr = srSpectrum.rebinToFourierLattice();
+      TH1F* hist = accArr.createHistogram();
+
+      msg << Msg::Debug << "Generating delayed waveform." << Msg::EndReq;
+      RawPcmData delayedData( samplingInfo, numSamplesGenerate, 0 );
+      phase = 0;
+      for ( size_t iSample = 0; /*fourierSize / 4*/ iSample < fourierSize / 2; ++iSample )
+      {
+         delayedData[ iSample ] = amp * sin( phase );
+         phase += phaseStep;
+      }
+      WaveAnalysis::RawStftData::Ptr stftDataDelayed = transform.execute( delayedData );
+      const WaveAnalysis::SRSpectrum& srSpectrumDelayed = dynamic_cast< const WaveAnalysis::SRSpectrum& >( stftDataDelayed->getSpectrum( 0 ) );
+      const Math::RegularAccumArray& accArrDelayed = srSpectrumDelayed.rebinToFourierLattice();
+      TH1F* histDelayed = accArrDelayed.createHistogram();
+
+      if ( frequency > freqMinDraw && frequency < freqMaxDraw )
+      {
+         ++numGraphs;
+         if ( numGraphs % graphSkip == 0 )
+         {
+            ++numGraphsDrawn;
+            std::stringstream name;
+            name << "templateCanvas" << counter;
+            std::stringstream title;
+            title << "Frequency = " << *it;
+            TCanvas* c = new TCanvas( name.str().c_str(), title.str().c_str() );
+            // c->SetLogy( true );
+
+            // if ( frequency < 1500 )
+            // {
+            //    c->SetLogx( true );
+            // }
+
+            msg << Msg::Info << counter << " histograms drawn." << Msg::EndReq;
+
+            hist->Draw();
+            hist->SetLineColor( kBlack );
+            TGraph* grHatT = RootUtilities::createGraph( srSpectrum.getFrequencies(), srSpectrum.getTimeCorrections() );
+            grHatT->Draw( "PSAME" );
+            grHatT->SetMarkerColor( kBlack );
+
+
+            histDelayed->Draw( "SAME" );
+            histDelayed->SetLineColor( kBlue );
+
+            TGraph* grHatTDelayed = RootUtilities::createGraph( srSpectrumDelayed.getFrequencies(), srSpectrumDelayed.getTimeCorrections() );
+            grHatTDelayed->SetMarkerColor( kBlue );
+            grHatTDelayed->Draw( "PSAME" );
+
+            TGraph* grHatOmegaDelayed = RootUtilities::createGraph( srSpectrumDelayed.getFrequencies(), 10 * srSpectrumDelayed.getFrequencyCorrections() );
+            grHatOmegaDelayed->SetMarkerColor( kRed );
+            grHatOmegaDelayed->Draw( "PSAME" );
+
+            if ( !interactiveGraphs )
+            {
+               name << ".gif";
+               c->SaveAs( name.str().c_str() );
+               delete c;
+            }
+         }
+      }
+   }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// devSamples
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void DevSuite::devSamples()
+{
+   size_t numSamples = 10 * 44100;
+
+   SamplingInfo samplingInfo( 44100 );
+   RawPcmData pcmData( samplingInfo, numSamples, 0 );
+
+   double frequency = 110;
+   double phase = 0;
+   double amp = 0.5;
+   double phaseStep = samplingInfo.getPhaseStepPerSample( frequency );
+
+   size_t i = 0;
+   while ( i < numSamples )
+   {
+      size_t tStart = samplingInfo.convertSecsToSamples( 0.1 ) + i;
+      size_t tEnd = samplingInfo.convertSecsToSamples( 0.50 ) + i;
+      size_t tRestart = samplingInfo.convertSecsToSamples( 1.0 ) + i;
+      double phaseAdd = M_PI / ( tEnd - tStart );
+
+
+      for ( ; i < tStart && i < numSamples ; ++i )
+      {
+         pcmData[ i ] = amp * sin( phase );
+         phase += phaseStep;
+      }
+
+      phaseStep += phaseAdd;
+      for ( ; i < tEnd && i < numSamples; ++i )
+      {
+         pcmData[ i ] = amp * sin( phase );
+         phase += phaseStep;
+      }
+
+      phaseStep -= phaseAdd;
+      for ( ; i < tRestart && i < numSamples; ++i )
+      {
+         pcmData[ i ] = amp * sin( phase );
+         phase += phaseStep;
+      }
+
+      ++i;
+   }
+
+   TGraph* grData = RootUtilities::createGraph( pcmData );
+   grData->Draw( "AL" );
+
+   WaveAnalysis::SpectralReassignmentTransform transform( samplingInfo, 4096, 3*4096, 4 );
+   WaveAnalysis::RawStftData::Ptr stft = transform.execute( pcmData );
+
+   Visualisation::RebinnedSRGraph graph( *stft );
+   graph.create();
+
+   MultiChannelRawPcmData mc( new RawPcmData( pcmData ) );
+   WaveFile::write( "sinefrag2.wav", mc );
+}
