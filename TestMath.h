@@ -12,6 +12,8 @@ class TestMath
 
    private:
       static void testSampledMovingAverage();
+      static void testTwoTuple();
+      static void testRegularAccumArray();
 
 };
 

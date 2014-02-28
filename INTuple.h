@@ -13,7 +13,7 @@ namespace Math
  * @brief Interface class for data set consisting of tuples of continuous (real) values.
  *
  * Internally the data is stored per variable which means that `vertical' queries (i.e. @see getVariable) are fast, but
- * `horizontal' queries (i.e. @see getTuple ) are slow.
+ * `horizontal' queries (i.e. @see getTuple ) are slow. (This requirement is implicit from the getVariable signature).
  */
 class INTuple
 {
@@ -24,10 +24,6 @@ class INTuple
       typedef std::auto_ptr< INTuple > Ptr;
 
    public:
-      /**
-       * Create a clone.
-       */
-      virtual INTuple::Ptr clone() const = 0;
       /**
        * Destructor
        */
