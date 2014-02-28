@@ -34,7 +34,6 @@ GradDescOptimiser::~GradDescOptimiser()
 RealVector GradDescOptimiser::solve()
 {
    double currentObjective = m_func.evaluate( m_input );
-   // double solutionChange = 1e99;
 
    Logger msg( "GradDescOptimiser" );
    msg << Msg::Info << "Optimising Objective function with " << m_func.getNumParameters() << " parameters..." << Msg::EndReq;
