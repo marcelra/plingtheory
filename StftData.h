@@ -1,5 +1,5 @@
-#ifndef RAWSTFTDATA_H
-#define RAWSTFTDATA_H
+#ifndef STFTDATA_H
+#define STFTDATA_H
 
 #include "FourierSpectrum.h"
 
@@ -9,10 +9,10 @@
 namespace WaveAnalysis
 {
 
-class RawStftData
+class StftData
 {
    public:
-      typedef std::auto_ptr< RawStftData > Ptr;
+      typedef std::auto_ptr< StftData > Ptr;
    public:
       /**
        * @class WindowLocation
@@ -33,8 +33,8 @@ class RawStftData
       };
 
    public:
-      RawStftData( FourierConfig::CSPtr config );
-      virtual ~RawStftData();
+      StftData( FourierConfig::CSPtr config );
+      virtual ~StftData();
 
       /**
        * Get the total number of Fourier spectra produced
@@ -70,10 +70,10 @@ class RawStftData
      * Blocked copy-constructor and assignment operator (default impl is not ok)
      */
     private:
-      RawStftData( const RawStftData& other );
-      RawStftData& operator=( const RawStftData& other );
+      StftData( const StftData& other );
+      StftData& operator=( const StftData& other );
 };
 
 } /// namespace WaveAnalysis
 
-#endif // RAWSTFTDATA_H
+#endif // STFTDATA_H

@@ -14,19 +14,19 @@ SpectralReassignmentTransform::SpectralReassignmentTransform( const SamplingInfo
 {
 }
 
-RawStftData::Ptr SpectralReassignmentTransform::execute( const RawPcmData& data )
+StftData::Ptr SpectralReassignmentTransform::execute( const RawPcmData& data )
 {
    Logger msg( "SpectralReassignmentTransform" );
    msg << Msg::Verbose << "In execute..." << Msg::EndReq;
 
    msg << Msg::Verbose << "Executing the STFT transforms..." << Msg::EndReq;
-   RawStftData::Ptr stft = m_stft.execute( data );
-   RawStftData::Ptr stftDerivative = m_stftDerivative.execute( data );
-   RawStftData::Ptr stftTimeRamped = m_stftTimeRamped.execute( data );
+   StftData::Ptr stft = m_stft.execute( data );
+   StftData::Ptr stftDerivative = m_stftDerivative.execute( data );
+   StftData::Ptr stftTimeRamped = m_stftTimeRamped.execute( data );
 
    assert( stft->getNumSpectra() == stftDerivative->getNumSpectra() );
    assert( stft->getNumSpectra() == stftTimeRamped->getNumSpectra() );
-   RawStftData* result = new RawStftData( m_stft.getConfig() );
+   StftData* result = new StftData( m_stft.getConfig() );
 
    msg << Msg::Verbose << "Calculating the reassigned spectra." << Msg::EndReq;
 
@@ -35,11 +35,11 @@ RawStftData::Ptr SpectralReassignmentTransform::execute( const RawPcmData& data 
       const FourierSpectrum& ft = stft->getSpectrum( iSpec );
       const FourierSpectrum& ftDerivative = stftDerivative->getSpectrum( iSpec );
       const FourierSpectrum& ftTimeRamped = stftTimeRamped->getSpectrum( iSpec );
-      result->addSpectrum( new SRSpectrum( ft, ftDerivative, ftTimeRamped ), new RawStftData::WindowLocation( stft->getWindowLocation( iSpec ) ) );
+      result->addSpectrum( new SRSpectrum( ft, ftDerivative, ftTimeRamped ), new StftData::WindowLocation( stft->getWindowLocation( iSpec ) ) );
    }
 
    msg << Msg::Verbose << "Done" << Msg::EndReq;
-   return RawStftData::Ptr( result );
+   return StftData::Ptr( result );
 }
 
 } /// namespace WaveAnalysis

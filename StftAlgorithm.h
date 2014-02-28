@@ -4,7 +4,7 @@
 #include "FourierTransform.h"
 #include "FourierSpectrum.h"
 #include "RawPcmData.h"
-#include "RawStftData.h"
+#include "StftData.h"
 
 namespace WaveAnalysis
 {
@@ -28,8 +28,8 @@ class StftAlgorithm
       /**
        * Execute an STFT transform on data
        */
-      RawStftData::Ptr execute( const RawPcmData& data );
-      RawPcmData::Ptr reverseExecute( const RawStftData& stftData );
+      StftData::Ptr execute( const RawPcmData& data );
+      RawPcmData::Ptr reverseExecute( const StftData& stftData );
 
       /**
        * Get the number of frequencies in the spectra

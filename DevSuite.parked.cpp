@@ -167,7 +167,7 @@ void DevSuite::devFourierPeakFinder1()
 
    size_t fourierSize = 1024;
    WaveAnalysis::SpectralReassignmentTransform transform( samplingInfo, fourierSize, 0, 2 );
-   WaveAnalysis::RawStftData::Ptr stftData = transform.execute( *data );
+   WaveAnalysis::StftData::Ptr stftData = transform.execute( *data );
 
    WaveAnalysis::SRSpectrum& spec = static_cast< WaveAnalysis::SRSpectrum& >( stftData->getSpectrum( 0 ) );
    RealVector freqVec = spec.getFrequencies();

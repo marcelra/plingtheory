@@ -68,7 +68,7 @@ void DevSuite::devRebinSRSpec()
 
    size_t fourierSize = 4096;
    WaveAnalysis::SpectralReassignmentTransform transform( data->getSamplingInfo(), fourierSize, fourierSize*7, 4 );
-   WaveAnalysis::RawStftData::Ptr stftData = transform.execute( *data );
+   WaveAnalysis::StftData::Ptr stftData = transform.execute( *data );
 
    WaveAnalysis::SRSpectrum& spec = static_cast< WaveAnalysis::SRSpectrum& >( stftData->getSpectrum( monitorIndex ) );
 
@@ -86,8 +86,8 @@ void DevSuite::devRebinSRSpec()
    // grUnbinned->Draw( "PSAME" );
 
    WaveAnalysis::StftAlgorithm normalTransAlg( data->getSamplingInfo(), fourierSize, WaveAnalysis::HanningWindowFuncDef(), 0, 2 );
-   WaveAnalysis::RawStftData::Ptr normalTrans = normalTransAlg.execute( *data );
-   const WaveAnalysis::FourierSpectrum& normalSpec = normalTrans->getSpectrum( 5 );
+   WaveAnalysis::StftData::Ptr normalTrans = normalTransAlg.execute( *data );
+   // const WaveAnalysis::FourierSpectrum& normalSpec = normalTrans->getSpectrum( 5 );
    // TGraph* grNormal = RootUtilities::createGraph( normalSpec.getFrequencies(), normalSpec.getMagnitude() );
    // grNormal->Draw( "LSAME" );
    // grNormal->SetLineColor( kBlue );
@@ -110,7 +110,7 @@ void DevSuite::devPeakFinder2()
 
    // const Math::RegularAccumArray& data = TestDataSupply::drawNoiseAndPeaks();
    size_t specIndex = 5;
-   WaveAnalysis::RawStftData::Ptr stftData = TestDataSupply::getSrFtData();
+   WaveAnalysis::StftData::Ptr stftData = TestDataSupply::getSrFtData();
    const WaveAnalysis::SRSpectrum& spec = dynamic_cast< WaveAnalysis::SRSpectrum& >( stftData->getSpectrum( specIndex ) );
    const Math::RegularAccumArray& data = spec.rebinToFourierLattice();
 
@@ -207,7 +207,7 @@ void DevSuite::devFourierTemplates()
       }
 
       msg << Msg::Debug << "Fourier transforming waveform." << Msg::EndReq;
-      WaveAnalysis::RawStftData::Ptr stftData = transform.execute( pcmData );
+      WaveAnalysis::StftData::Ptr stftData = transform.execute( pcmData );
       const WaveAnalysis::SRSpectrum& srSpectrum = dynamic_cast< const WaveAnalysis::SRSpectrum& >( stftData->getSpectrum( 0 ) );
       const Math::RegularAccumArray& accArr = srSpectrum.rebinToFourierLattice();
       TH1F* hist = accArr.createHistogram();
@@ -220,7 +220,7 @@ void DevSuite::devFourierTemplates()
          delayedData[ iSample ] = amp * sin( phase );
          phase += phaseStep;
       }
-      WaveAnalysis::RawStftData::Ptr stftDataDelayed = transform.execute( delayedData );
+      WaveAnalysis::StftData::Ptr stftDataDelayed = transform.execute( delayedData );
       const WaveAnalysis::SRSpectrum& srSpectrumDelayed = dynamic_cast< const WaveAnalysis::SRSpectrum& >( stftDataDelayed->getSpectrum( 0 ) );
       const Math::RegularAccumArray& accArrDelayed = srSpectrumDelayed.rebinToFourierLattice();
       TH1F* histDelayed = accArrDelayed.createHistogram();
@@ -325,7 +325,7 @@ void DevSuite::devSamples()
    grData->Draw( "AL" );
 
    WaveAnalysis::SpectralReassignmentTransform transform( samplingInfo, 4096, 3*4096, 4 );
-   WaveAnalysis::RawStftData::Ptr stft = transform.execute( pcmData );
+   WaveAnalysis::StftData::Ptr stft = transform.execute( pcmData );
 
    Visualisation::RebinnedSRGraph graph( *stft );
    graph.create();
