@@ -119,8 +119,8 @@ RawPcmData::Ptr TestDataSupply::generateSoundData()
 
    Music::NoteList noteList;
    noteList.push_back( Music::Note( Music::Note::C, 3 ) );
-   noteList.push_back( Music::Note( Music::Note::E, 3 ) );
-   noteList.push_back( Music::Note( Music::Note::G, 3 ) );
+   // noteList.push_back( Music::Note( Music::Note::E, 3 ) );
+   // noteList.push_back( Music::Note( Music::Note::G, 3 ) );
 
    return generateChord( square, 44100, noteList );
 }
@@ -151,8 +151,8 @@ RawPcmData::Ptr TestDataSupply::generateChord( Synthesizer::IGenerator& generato
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 RawPcmData::Ptr TestDataSupply::getCurrentTestSample()
 {
-   // return generateSoundData();
-   return readSoundData();
+   return generateSoundData();
+   // return readSoundData();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -174,7 +174,7 @@ RawPcmData::Ptr TestDataSupply::readSoundData()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 WaveAnalysis::RawStftData::Ptr TestDataSupply::getSrFtData()
 {
-   RawPcmData::Ptr data = readSoundData();
+   RawPcmData::Ptr data = getCurrentTestSample();
    size_t fourierSize = 4096;
    WaveAnalysis::SpectralReassignmentTransform transform( data->getSamplingInfo(), fourierSize, fourierSize, 1 );
    WaveAnalysis::RawStftData::Ptr stftData = transform.execute( *data );

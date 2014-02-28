@@ -14,15 +14,21 @@ class AccumArrayPeakAlgorithm
    public:
       AccumArrayPeakAlgorithm();
 
-      std::vector< Feature::Peak > execute( const Math::RegularAccumArray& data );
+      std::vector< Feature::Peak > execute( const Math::RegularAccumArray& data ) const;
+
+      void setDoMonitor( bool doMonitor );
 
    private:
       RealVector calculateSmoothedData( const Math::RegularAccumArray& data ) const;
       RealVector subtractBaseline( const RealVector& smoothedData, const RealVector& originalData ) const;
 
+      std::vector< Feature::Peak > findPeaks( const RealVector& baselineSubtractedData ) const;
+
    private:
       double         m_smoothFraction;
       double         m_sigmaFactor;
+      bool           m_doMonitor;
+      size_t         m_maxNumPeaks;
 
 };
 
