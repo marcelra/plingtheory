@@ -1,7 +1,7 @@
 #ifndef SPECTRALREASSIGNMENTTRANSFORM_H
 #define SPECTRALREASSIGNMENTTRANSFORM_H
 
-#include "SRSpectrum.h"
+#include "SrSpectrum.h"
 #include "StftAlgorithm.h"
 
 class SamplingInfo;

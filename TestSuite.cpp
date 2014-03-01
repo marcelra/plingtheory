@@ -913,7 +913,7 @@ void TestSuite::testSpectralReassignment()
    WaveAnalysis::SpectralReassignmentTransform specTrans( samplingInfo, fourierSize, fourierSize*3, 2 );
    WaveAnalysis::StftData::Ptr trans = specTrans.execute( *data );
 
-   const WaveAnalysis::SRSpectrum& specReass = dynamic_cast< const WaveAnalysis::SRSpectrum& >( trans->getSpectrum( 0 ) );
+   const WaveAnalysis::SrSpectrum& specReass = dynamic_cast< const WaveAnalysis::SrSpectrum& >( trans->getSpectrum( 0 ) );
    WaveAnalysis::FourierSpectrum spec( specReass );
 
    const RealVector& freqCorr = specReass.getFrequencyCorrections();

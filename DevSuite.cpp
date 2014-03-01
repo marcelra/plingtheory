@@ -70,7 +70,7 @@ void DevSuite::devRebinSRSpec()
    WaveAnalysis::SpectralReassignmentTransform transform( data->getSamplingInfo(), fourierSize, fourierSize*7, 4 );
    WaveAnalysis::StftData::Ptr stftData = transform.execute( *data );
 
-   WaveAnalysis::SRSpectrum& spec = static_cast< WaveAnalysis::SRSpectrum& >( stftData->getSpectrum( monitorIndex ) );
+   WaveAnalysis::SrSpectrum& spec = static_cast< WaveAnalysis::SrSpectrum& >( stftData->getSpectrum( monitorIndex ) );
 
    const Math::RegularAccumArray& accArr = spec.rebinToFourierLattice();
 
@@ -95,7 +95,7 @@ void DevSuite::devRebinSRSpec()
    // Visualisation::RebinnedSRGraph rebinnedGraph( *stftData, stftData->getNumSpectra(), 0 );
    // rebinnedGraph.create();
 
-   const WaveAnalysis::SRSpectrum& testSpec = dynamic_cast< WaveAnalysis::SRSpectrum& >( stftData->getSpectrum( monitorIndex ) );
+   const WaveAnalysis::SrSpectrum& testSpec = dynamic_cast< WaveAnalysis::SrSpectrum& >( stftData->getSpectrum( monitorIndex ) );
 
    FeatureAlgorithm::GroundtoneHypothesisBuilder gtSeed( testSpec );
    const RealVector& vec = gtSeed.execute( 20 );
@@ -111,7 +111,7 @@ void DevSuite::devPeakFinder2()
    // const Math::RegularAccumArray& data = TestDataSupply::drawNoiseAndPeaks();
    size_t specIndex = 5;
    WaveAnalysis::StftData::Ptr stftData = TestDataSupply::getSrFtData();
-   const WaveAnalysis::SRSpectrum& spec = dynamic_cast< WaveAnalysis::SRSpectrum& >( stftData->getSpectrum( specIndex ) );
+   const WaveAnalysis::SrSpectrum& spec = dynamic_cast< WaveAnalysis::SrSpectrum& >( stftData->getSpectrum( specIndex ) );
    const Math::RegularAccumArray& data = spec.rebinToFourierLattice();
 
    // TH1F* hist = data.createHistogram();
@@ -208,7 +208,7 @@ void DevSuite::devFourierTemplates()
 
       msg << Msg::Debug << "Fourier transforming waveform." << Msg::EndReq;
       WaveAnalysis::StftData::Ptr stftData = transform.execute( pcmData );
-      const WaveAnalysis::SRSpectrum& srSpectrum = dynamic_cast< const WaveAnalysis::SRSpectrum& >( stftData->getSpectrum( 0 ) );
+      const WaveAnalysis::SrSpectrum& srSpectrum = dynamic_cast< const WaveAnalysis::SrSpectrum& >( stftData->getSpectrum( 0 ) );
       const Math::RegularAccumArray& accArr = srSpectrum.rebinToFourierLattice();
       TH1F* hist = accArr.createHistogram();
 
@@ -221,7 +221,7 @@ void DevSuite::devFourierTemplates()
          phase += phaseStep;
       }
       WaveAnalysis::StftData::Ptr stftDataDelayed = transform.execute( delayedData );
-      const WaveAnalysis::SRSpectrum& srSpectrumDelayed = dynamic_cast< const WaveAnalysis::SRSpectrum& >( stftDataDelayed->getSpectrum( 0 ) );
+      const WaveAnalysis::SrSpectrum& srSpectrumDelayed = dynamic_cast< const WaveAnalysis::SrSpectrum& >( stftDataDelayed->getSpectrum( 0 ) );
       const Math::RegularAccumArray& accArrDelayed = srSpectrumDelayed.rebinToFourierLattice();
       TH1F* histDelayed = accArrDelayed.createHistogram();
 

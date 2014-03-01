@@ -46,23 +46,23 @@ const FourierSpectrum& StftData::getSpectrum( size_t spectrumIndex ) const
 bool StftData::isReassigned() const
 {
    assert( getNumSpectra() > 0 );
-   return ( dynamic_cast< const SRSpectrum* >( &this->getSpectrum( 0 ) ) );
+   return ( dynamic_cast< const SrSpectrum* >( &this->getSpectrum( 0 ) ) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// getSrSpectrum
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-SRSpectrum& StftData::getSrSpectrum( size_t spectrumIndex )
+SrSpectrum& StftData::getSrSpectrum( size_t spectrumIndex )
 {
-   return dynamic_cast< SRSpectrum& >( getSpectrum( spectrumIndex ) );
+   return dynamic_cast< SrSpectrum& >( getSpectrum( spectrumIndex ) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// getSrSpectrum
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-const SRSpectrum& StftData::getSrSpectrum( size_t spectrumIndex ) const
+const SrSpectrum& StftData::getSrSpectrum( size_t spectrumIndex ) const
 {
-   return dynamic_cast< const SRSpectrum& >( getSpectrum( spectrumIndex ) );
+   return dynamic_cast< const SrSpectrum& >( getSpectrum( spectrumIndex ) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -169,7 +169,7 @@ void DevSuite::devFourierPeakFinder1()
    WaveAnalysis::SpectralReassignmentTransform transform( samplingInfo, fourierSize, 0, 2 );
    WaveAnalysis::StftData::Ptr stftData = transform.execute( *data );
 
-   WaveAnalysis::SRSpectrum& spec = static_cast< WaveAnalysis::SRSpectrum& >( stftData->getSpectrum( 0 ) );
+   WaveAnalysis::SrSpectrum& spec = static_cast< WaveAnalysis::SrSpectrum& >( stftData->getSpectrum( 0 ) );
    RealVector freqVec = spec.getFrequencies();
    RealVector magVec = spec.getMagnitude();
 

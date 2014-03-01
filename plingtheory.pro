@@ -61,7 +61,6 @@ SOURCES += main.cpp \
     FourierConfig.cpp \
     DevSuite.cpp \
     SpectralReassignmentTransform.cpp \
-    SRSpectrum.cpp \
     DevSuite.parked.cpp \
     TestDataSupply.cpp \
     TwoTuple.cpp \
@@ -75,7 +74,8 @@ SOURCES += main.cpp \
     RebinnedSRGraph.cpp \
     GroundtoneHypothesisBuilder.cpp \
     AccumArrayPeakAlgorithm.cpp \
-    StftData.cpp
+    StftData.cpp \
+    SrSpectrum.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -138,7 +138,6 @@ HEADERS += \
     FourierConfig.h \
     DevSuite.h \
     SpectralReassignmentTransform.h \
-    SRSpectrum.h \
     TestDataSupply.h \
     TwoTuple.h \
     INTuple.h \
@@ -151,7 +150,8 @@ HEADERS += \
     RebinnedSRGraph.h \
     GroundtoneHypothesisBuilder.h \
     AccumArrayPeakAlgorithm.h \
-    StftData.h
+    StftData.h \
+    SrSpectrum.h
 
 OTHER_FILES += \
     Todos.txt
