@@ -2,7 +2,7 @@
 #define STFTDATA_H
 
 #include "FourierSpectrum.h"
-#include "SRSpectrum.h"
+#include "SrSpectrum.h"
 
 #include <vector>
 #include <memory>
@@ -93,8 +93,8 @@ class StftData
       /**
        * Gets a SrSpectrum (asserts, when the spectra are not reassigned).
        */
-      SRSpectrum& getSrSpectrum( size_t spectrumIndex );
-      const SRSpectrum& getSrSpectrum( size_t spectrumIndex ) const;
+      SrSpectrum& getSrSpectrum( size_t spectrumIndex );
+      const SrSpectrum& getSrSpectrum( size_t spectrumIndex ) const;
 
    private:
       /**

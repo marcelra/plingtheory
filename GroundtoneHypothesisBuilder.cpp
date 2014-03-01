@@ -1,7 +1,7 @@
 #include "GroundtoneHypothesisBuilder.h"
 
 #include "RegularAccumArray.h"
-#include "SRSpectrum.h"
+#include "SrSpectrum.h"
 
 /// TODO: temp
 #include "TCanvas.h"
@@ -10,7 +10,7 @@
 namespace FeatureAlgorithm
 {
 
-GroundtoneHypothesisBuilder::GroundtoneHypothesisBuilder( const WaveAnalysis::SRSpectrum& spec ) :
+GroundtoneHypothesisBuilder::GroundtoneHypothesisBuilder( const WaveAnalysis::SrSpectrum& spec ) :
    m_spec( spec )
 {}
 

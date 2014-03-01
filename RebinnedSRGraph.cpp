@@ -4,7 +4,7 @@
 #include "Logger.h"
 #include "StftData.h"
 #include "RootUtilities.h"
-#include "SRSpectrum.h"
+#include "SrSpectrum.h"
 
 #include "TCanvas.h"
 #include "TColor.h"
@@ -44,7 +44,7 @@ TCanvas* RebinnedSRGraph::create()
    {
       throw ExceptionDataNotPrepared( "StftGraph", "StftAlgorithm data" );
    }
-   assert( dynamic_cast< const WaveAnalysis::SRSpectrum* >( &m_stftData.getSpectrum( 0 ) ) );
+   assert( dynamic_cast< const WaveAnalysis::SrSpectrum* >( &m_stftData.getSpectrum( 0 ) ) );
 
    m_canvas = new TCanvas();
 
@@ -59,7 +59,7 @@ TCanvas* RebinnedSRGraph::create()
 
    for ( size_t iX = 0; iX < m_nBinsX; ++iX )
    {
-      const WaveAnalysis::SRSpectrum& srSpec = static_cast< const WaveAnalysis::SRSpectrum& >( m_stftData.getSpectrum( iX ) );
+      const WaveAnalysis::SrSpectrum& srSpec = static_cast< const WaveAnalysis::SrSpectrum& >( m_stftData.getSpectrum( iX ) );
       const Math::RegularAccumArray& binnedSrSpec = srSpec.rebinToFourierLattice();
       for ( size_t iY = 0; iY < m_nBinsY; ++iY )
       {

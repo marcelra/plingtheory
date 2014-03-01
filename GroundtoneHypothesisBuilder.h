@@ -5,7 +5,7 @@
 
 namespace WaveAnalysis
 {
-   class SRSpectrum;
+   class SrSpectrum;
 };
 
 namespace FeatureAlgorithm
@@ -14,12 +14,12 @@ namespace FeatureAlgorithm
 class GroundtoneHypothesisBuilder
 {
    public:
-      GroundtoneHypothesisBuilder( const WaveAnalysis::SRSpectrum& spec );
+      GroundtoneHypothesisBuilder( const WaveAnalysis::SrSpectrum& spec );
 
       RealVector execute( size_t numIterations );
 
    private:
-      const WaveAnalysis::SRSpectrum&     m_spec;
+      const WaveAnalysis::SrSpectrum&     m_spec;
 
 };
 
