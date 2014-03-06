@@ -1,6 +1,8 @@
 #ifndef PEAK_H
 #define PEAK_H
 
+#include "RealVector.h"
+
 #include <cstddef>
 #include <cassert>
 #include <cmath>
@@ -23,7 +25,8 @@ class Peak
        * @param width: width at half prominence of the peak.
        * @param pedestal: offset.
        */
-      Peak( double position, double prominence, double width, double pedestal );
+      Peak( size_t positionIndex );
+      // Peak( double position, double prominence, double width, double pedestal );
       virtual ~Peak();
 
       /**
@@ -31,7 +34,7 @@ class Peak
        */
       double getPosition() const;
       /**
-       * Get the position as index.
+       * Get the position index in data set.
        */
       size_t getPositionIndex() const;
       /**
@@ -65,6 +68,26 @@ class Peak
       void setPedestal( double pedestal );
 
       /**
+       * Set left and right bound indices.
+       */
+      void setBoundIndices( size_t leftIndex, size_t rightIndex );
+
+      /**
+       * Set peak data.
+       */
+      void setData( const RealVector& data );
+      /**
+       * Get peak data.
+       */
+      const RealVector& getData() const;
+
+      /**
+       * Get left and right bound indices.
+       */
+      size_t getLeftBoundIndex() const;
+      size_t getRightBoundIndex() const;
+
+      /**
        * Set links to neighbouring peak.
        */
       void setLeftNeighbourPeak( Peak* peak );
@@ -78,14 +101,17 @@ class Peak
       const Peak* getLeftNeighbourPeak() const;
       const Peak* getRightNeighbourPeak() const;
 
-
    private:
+      size_t                m_positionIndex;   //! Position of peak in data set
+      size_t                m_leftBoundIndex;  //! Index of left bound
+      size_t                m_rightBoundIndex; //! Index of right bound
       double                m_position;        //! Position of centre of peak
       double                m_prominence;      //! Prominence of peak
       double                m_width;           //! Width at half prominence
       double                m_pedestal;        //! Offset
       Peak*                 m_leftNeighbour;   //! Pointer to peak left of this peak
       Peak*                 m_rightNeighbour;  //! Pointer to peak right of this peak
+      RealVector            m_data;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -98,8 +124,7 @@ inline double Peak::getPosition() const
 
 inline size_t Peak::getPositionIndex() const
 {
-   assert( m_position > 0 );
-   return floor( m_position + 0.5 );
+   return m_positionIndex;
 }
 
 inline double Peak::getProminence() const

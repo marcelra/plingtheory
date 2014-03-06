@@ -41,7 +41,6 @@ void TestSuite::execute()
    testSpectralReassignment();
 
    /// Feature algorithms
-   testFeatureData();
    testPeakDetection();
 
    /// Everything together
@@ -441,21 +440,6 @@ void TestSuite::testFftw()
       }
    }
    msg << Msg::Info << "Test passed!" << Msg::EndReq;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// testFeatureData
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void TestSuite::testFeatureData()
-{
-   Logger msg( "testFeatureData" );
-   msg << Msg::Info << "Running testFeatureData..." << Msg::EndReq;
-
-   Feature::Peak peak( 10, 0.5, 2, 0 );
-
-   msg << Msg::Info << "Peak: pos = " << peak.getPosition()
-                    << ", height = " << peak.getProminence()
-                    << ", width = " << peak.getWidth() << Msg::EndReq;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

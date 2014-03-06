@@ -65,11 +65,6 @@ class TestSuite
       static void testFftw();
 
       /**
-       * Feature data
-       */
-      static void testFeatureData();
-
-      /**
        * Feature algorithms
        */
       static void testPeakDetection();

@@ -153,7 +153,11 @@ void NaivePeaks::execute()
       double position = arrayIndex;
       double prominence = height - pedestal;
 
-      Feature::Peak* peak = new Feature::Peak( position, prominence, width, pedestal );
+      Feature::Peak* peak = new Feature::Peak( peakIndex );
+      peak->setPosition( position );
+      peak->setProminence( prominence );
+      peak->setWidth( width );
+      peak->setPedestal( pedestal );
       m_peaks.push_back( peak );
    }
 }
