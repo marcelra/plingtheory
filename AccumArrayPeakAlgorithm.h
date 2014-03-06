@@ -22,7 +22,8 @@ class AccumArrayPeakAlgorithm
       RealVector calculateSmoothedData( const Math::RegularAccumArray& data ) const;
       RealVector subtractBaseline( const RealVector& smoothedData, const RealVector& originalData ) const;
 
-      std::vector< Feature::Peak > findPeaks( const RealVector& baselineSubtractedData ) const;
+      std::vector< Feature::Peak > findPeaks( const RealVector& baselineSubtractedData, const Math::RegularAccumArray& data ) const;
+      void dressPeaks( const Math::RegularAccumArray& data, const RealVector& baselineSubtractedData, std::vector< Feature::Peak >& peaks ) const;
 
    private:
       double         m_smoothFraction;

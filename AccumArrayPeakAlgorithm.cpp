@@ -38,20 +38,9 @@ std::vector< Feature::Peak > AccumArrayPeakAlgorithm::execute( const Math::Regul
       grData->SetLineColor( kGray + 2 );
    }
 
-   std::vector< Feature::Peak > peaks = findPeaks( baselineSubtractedData );
+   std::vector< Feature::Peak > peaks = findPeaks( baselineSubtractedData, data );
    for ( size_t iPeak = 0; iPeak < peaks.size(); ++iPeak )
    {
-      size_t binIndexPos = peaks[ iPeak ].getPosition();
-      const Math::TwoTuple& entries = data.getBinEntries( binIndexPos );
-      double weightedPos = 0;
-      double totalWeight = 0;
-      for ( size_t iEntry = 0; iEntry < entries.getNumElements(); ++iEntry )
-      {
-         weightedPos += entries.getX()[ iEntry ] * entries.getY()[ iEntry ];
-         totalWeight += entries.getY()[ iEntry ];
-      }
-      weightedPos /= totalWeight;
-      peaks[ iPeak ].setPosition( weightedPos );
    }
 
 
@@ -162,7 +151,7 @@ void AccumArrayPeakAlgorithm::setDoMonitor( bool doMonitor )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// findPeaks
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-std::vector< Feature::Peak > AccumArrayPeakAlgorithm::findPeaks( const RealVector& baselineSubtractedData ) const
+std::vector< Feature::Peak > AccumArrayPeakAlgorithm::findPeaks( const RealVector& baselineSubtractedData, const Math::RegularAccumArray& data ) const
 {
    /// The resulting vector of peaks.
    std::vector< Feature::Peak > peaks;
@@ -177,7 +166,6 @@ std::vector< Feature::Peak > AccumArrayPeakAlgorithm::findPeaks( const RealVecto
    }
 
    /// First find the position of peaks in indices.
-   std::vector< size_t > peakPos;
    for ( size_t iPeak = 0; iPeak < minPositionVec.size() - 1; ++iPeak )
    {
       size_t iLeftMin = minPositionVec[ iPeak ];
@@ -204,17 +192,20 @@ std::vector< Feature::Peak > AccumArrayPeakAlgorithm::findPeaks( const RealVecto
          continue;
       }
 
-      peakPos.push_back( maxPos );
-
-      Feature::Peak peak( maxPos, maxVal, 0, 0 );
+      Feature::Peak peak( maxPos );
+      peak.setProminence( maxVal );
+      peak.setBoundIndices( iLeftMin, iRightMin );
       peaks.push_back( peak );
    }
 
+   dressPeaks( data, baselineSubtractedData, peaks );
+
    if ( m_doMonitor )
    {
-      for ( size_t iPeak = 0; iPeak < peakPos.size(); ++iPeak )
+      for ( size_t iPeak = 0; iPeak < peaks.size(); ++iPeak )
       {
-         double thisPeakPos = peakPos[ iPeak ];
+         double thisPeakPos = peaks[ iPeak ].getPositionIndex();
+
          TLine* l = new TLine( thisPeakPos, 0, thisPeakPos, 1e10 );
          l->SetLineWidth( 1 );
          l->SetLineColor( kGray );
@@ -224,5 +215,31 @@ std::vector< Feature::Peak > AccumArrayPeakAlgorithm::findPeaks( const RealVecto
 
    return peaks;
 }
+
+void AccumArrayPeakAlgorithm::dressPeaks( const Math::RegularAccumArray& data, const RealVector& baselineSubtractedData, std::vector< Feature::Peak >& peaks ) const
+{
+   for ( size_t iPeak = 0; iPeak < peaks.size(); ++iPeak )
+   {
+      size_t binIndexPos = peaks[ iPeak ].getPositionIndex();
+      const Math::TwoTuple& entries = data.getBinEntries( binIndexPos );
+      double weightedPos = 0;
+      double totalWeight = 0;
+      for ( size_t iEntry = 0; iEntry < entries.getNumElements(); ++iEntry )
+      {
+         weightedPos += entries.getX()[ iEntry ] * entries.getY()[ iEntry ];
+         totalWeight += entries.getY()[ iEntry ];
+      }
+      weightedPos /= totalWeight;
+      std::cout << "Setting position to: "<< weightedPos << std::endl;
+      peaks[ iPeak ].setPosition( weightedPos );
+   }
+
+   for ( size_t iPeak = 1; iPeak < peaks.size() - 1; ++iPeak )
+   {
+      peaks[ iPeak ].setLeftNeighbourPeak( &peaks[ iPeak - 1 ] );
+      peaks[ iPeak ].setRightNeighbourPeak( &peaks[ iPeak + 1 ] );
+   }
+}
+
 
 } /// FeatureAlgorithm
