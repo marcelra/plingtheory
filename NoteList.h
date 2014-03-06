@@ -25,6 +25,11 @@ namespace Music
    NoteList createGenericScale( const Note& root, const std::vector<int>& scaleDef );
 
    /**
+    * Create a scale with all semitones satarting from root.
+    */
+   NoteList createDiatonicScale( const Note& root );
+
+   /**
     * Create a `scale' from all the notes between C0 to C10
     */
    NoteList createHugeDiatonicScale();

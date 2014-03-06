@@ -16,7 +16,7 @@ class SortCache
        */
       SortCache( const RealVector& values );
       /**
-       * Destructor
+       * Destructor.
        */
       virtual ~SortCache();
 
@@ -24,11 +24,19 @@ class SortCache
        * Get the index in the original vector of the @index-th item sorted by value.
        */
       size_t getSortedIndex( size_t index ) const;
+      /**
+       * Get the index in the original vector of the @index-th item reverse sorted by value (i.e. large items first).
+       */
+      size_t getReverseSortedIndex( size_t index ) const;
 
       /**
-       *
+       * Sort vector.
        */
       RealVector applyTo( const RealVector& vector ) const;
+      /**
+       * Sort vector reverse (i.e. from large to small).
+       */
+      RealVector applyReverseTo( const RealVector& vector ) const;
 
    private:
       std::vector< size_t >   m_translation;
@@ -42,6 +50,11 @@ class SortCache
 inline size_t SortCache::getSortedIndex( size_t index ) const
 {
    return m_translation[ index ];
+}
+
+inline size_t SortCache::getReverseSortedIndex( size_t index ) const
+{
+   return *(m_translation.rbegin() + index);
 }
 
 #endif // SORTCACHE_H

@@ -10,9 +10,10 @@ void DevSuite::execute()
    Logger msg( "DevSuite" );
    msg << Msg::Info << "Running development code..." << Msg::EndReq;
    // devRebinSRSpec();
-   // devPeakFinder2();
-   devFourierTemplates();
+   // devFourierTemplates();
    // devSamples();
+
+   devPeakFinder2();
 
    /// PARKED
    // devSidelobeSubtraction();
@@ -134,11 +135,31 @@ void DevSuite::devPeakFinder2()
    }
 
    new TCanvas();
-   TGraph* grPromVsFreq = RootUtilities::createGraph( prominence, frequencyBin );
+   TGraph* grPromVsFreq = RootUtilities::createGraph( frequencyBin, prominence );
    grPromVsFreq->Draw( "AP" );
    new TCanvas();
    TGraph* grWidthVsFreq = RootUtilities::createGraph( width, frequencyBin );
    grWidthVsFreq->Draw( "AP" );
+
+   SortCache sortProminence( prominence );
+   const RealVector& sortedPeaks = sortProminence.applyReverseTo( frequencyBin );
+   const RealVector& sortedProminence = sortProminence.applyReverseTo( prominence );
+
+   for ( size_t i = 0; i < 100; ++i )
+   {
+      msg << Msg::Info << "Peak at " << sortedPeaks[i] << " with prominence: " << sortedProminence[i] << Msg::EndReq;
+   }
+
+   const Music::NoteList& notes = Music::createDiatonicScale( Music::Note( Music::Note::B, 1 ) );
+   for ( size_t iNote = 0; iNote < notes.size(); ++iNote )
+   {
+      msg << Msg::Info << "Note " << notes[ iNote ] << " has frequency " << notes[ iNote ].getFrequency() << Msg::EndReq;
+   }
+
+
+   // new TCanvas();
+   // Visualisation::RebinnedSRGraph stftGraph( *stftData );
+   // stftGraph.create();
 
    return;
 }
@@ -155,8 +176,8 @@ void DevSuite::devFourierTemplates()
    size_t numHarmonics = 10;
    double amp = 1;
    SamplingInfo samplingInfo( 44100 );
-   size_t fourierSize = 2048;
-   size_t zeroPadding = 7*fourierSize;
+   size_t fourierSize = 1024;
+   size_t zeroPadding = 0; //fourierSize;
    size_t numSamplesGenerate = 4096;
    double hopRate = 1;
 
@@ -164,13 +185,14 @@ void DevSuite::devFourierTemplates()
 
    std::set< double > frequencies;
 
-   for ( size_t iNote = 0; iNote < noteList.size(); ++iNote )
-   {
-      for ( size_t iHarmonic = 0; iHarmonic < numHarmonics; ++iHarmonic )
-      {
-         frequencies.insert( noteList[ iNote ].getFrequency() * ( iHarmonic + 1 ) );
-      }
-   }
+   // for ( size_t iNote = 0; iNote < noteList.size(); ++iNote )
+   // {
+   //    for ( size_t iHarmonic = 0; iHarmonic < numHarmonics; ++iHarmonic )
+   //    {
+   //       frequencies.insert( noteList[ iNote ].getFrequency() * ( iHarmonic + 1 ) );
+   //    }
+   // }
+   frequencies.insert( 1000 );
 
    double freqMinDraw = 0;
    double freqMaxDraw = samplingInfo.getNyquistFrequency();
@@ -215,9 +237,9 @@ void DevSuite::devFourierTemplates()
       msg << Msg::Debug << "Generating delayed waveform." << Msg::EndReq;
       RawPcmData delayedData( samplingInfo, numSamplesGenerate, 0 );
       phase = 0;
-      for ( size_t iSample = 0; /*fourierSize / 4*/ iSample < fourierSize / 2; ++iSample )
+      for ( size_t iSample = 0; iSample < fourierSize; ++iSample )
       {
-         delayedData[ iSample ] = amp * sin( phase );
+         delayedData[ iSample ] = ( amp / fourierSize ) * iSample * sin( phase );
          phase += phaseStep;
       }
       WaveAnalysis::StftData::Ptr stftDataDelayed = transform.execute( delayedData );
@@ -227,7 +249,6 @@ void DevSuite::devFourierTemplates()
 
       if ( frequency > freqMinDraw && frequency < freqMaxDraw )
       {
-         ++numGraphs;
          if ( numGraphs % graphSkip == 0 )
          {
             ++numGraphsDrawn;
@@ -247,9 +268,9 @@ void DevSuite::devFourierTemplates()
 
             hist->Draw();
             hist->SetLineColor( kBlack );
-            TGraph* grHatT = RootUtilities::createGraph( srSpectrum.getFrequencies(), srSpectrum.getTimeCorrections() );
-            grHatT->Draw( "PSAME" );
-            grHatT->SetMarkerColor( kBlack );
+            // TGraph* grHatT = RootUtilities::createGraph( srSpectrum.getFrequencies(), srSpectrum.getTimeCorrections() );
+            // grHatT->Draw( "PSAME" );
+            // grHatT->SetMarkerColor( kBlack );
 
 
             histDelayed->Draw( "SAME" );
@@ -258,10 +279,10 @@ void DevSuite::devFourierTemplates()
             TGraph* grHatTDelayed = RootUtilities::createGraph( srSpectrumDelayed.getFrequencies(), srSpectrumDelayed.getTimeCorrections() );
             grHatTDelayed->SetMarkerColor( kBlue );
             grHatTDelayed->Draw( "PSAME" );
-
-            TGraph* grHatOmegaDelayed = RootUtilities::createGraph( srSpectrumDelayed.getFrequencies(), 10 * srSpectrumDelayed.getFrequencyCorrections() );
-            grHatOmegaDelayed->SetMarkerColor( kRed );
-            grHatOmegaDelayed->Draw( "PSAME" );
+//
+            // TGraph* grHatOmegaDelayed = RootUtilities::createGraph( srSpectrumDelayed.getFrequencies(), 10 * srSpectrumDelayed.getFrequencyCorrections() );
+            // grHatOmegaDelayed->SetMarkerColor( kRed );
+            // grHatOmegaDelayed->Draw( "PSAME" );
 
             if ( !interactiveGraphs )
             {
@@ -269,7 +290,10 @@ void DevSuite::devFourierTemplates()
                c->SaveAs( name.str().c_str() );
                delete c;
             }
+
+            // grHatTDelayed->Draw( "AL" );
          }
+         ++numGraphs;
       }
    }
 }
@@ -324,7 +348,7 @@ void DevSuite::devSamples()
    TGraph* grData = RootUtilities::createGraph( pcmData );
    grData->Draw( "AL" );
 
-   WaveAnalysis::SpectralReassignmentTransform transform( samplingInfo, 4096, 3*4096, 4 );
+   WaveAnalysis::SpectralReassignmentTransform transform( samplingInfo, 1024, 3*1024, 4 );
    WaveAnalysis::StftData::Ptr stft = transform.execute( pcmData );
 
    Visualisation::RebinnedSRGraph graph( *stft );
@@ -333,3 +357,4 @@ void DevSuite::devSamples()
    MultiChannelRawPcmData mc( new RawPcmData( pcmData ) );
    WaveFile::write( "sinefrag2.wav", mc );
 }
+

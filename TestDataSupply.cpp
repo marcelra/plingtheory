@@ -151,8 +151,8 @@ RawPcmData::Ptr TestDataSupply::generateChord( Synthesizer::IGenerator& generato
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 RawPcmData::Ptr TestDataSupply::getCurrentTestSample()
 {
-   return generateSoundData();
-   // return readSoundData();
+   // return generateSoundData();
+   return readSoundData();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -175,8 +175,8 @@ RawPcmData::Ptr TestDataSupply::readSoundData()
 WaveAnalysis::StftData::Ptr TestDataSupply::getSrFtData()
 {
    RawPcmData::Ptr data = getCurrentTestSample();
-   size_t fourierSize = 4096;
-   WaveAnalysis::SpectralReassignmentTransform transform( data->getSamplingInfo(), fourierSize, fourierSize, 1 );
+   size_t fourierSize = 2048;
+   WaveAnalysis::SpectralReassignmentTransform transform( data->getSamplingInfo(), fourierSize, 3*fourierSize, 2 );
    WaveAnalysis::StftData::Ptr stftData = transform.execute( *data );
    return stftData;
 }

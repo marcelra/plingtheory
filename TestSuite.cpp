@@ -9,30 +9,48 @@
 ////////////////////////////////////////////////////////////////////////////////
 void TestSuite::execute()
 {
+   singleTest();
+   return;
+
    runTestMath();
 
+   /// Utilities
+   testFindMinima();
+
+   /// Base classes
    testSoundData();
    testWaveFile();
    testNote();
-   testSineGenerator();
-   testRandomMusic();
 
+   /// Infrastucture
    testObjectPool();
    testAlgorithmFramework();
 
-   testFeatureData();
-   testPeakDetection();
-   testIntegration();
+   /// Generators
+   testEnvelope();
+   testSineGenerator();
+   testNoiseGenerator();
+   testTriangleGenerator();
+   testSawtoothGenerator();
+   testRandomMusic();
 
+   /// WaveAnalysis
    testDynamicFourier();
    testAdvancedFourier();
    testStftAlgorithm();
    testSpectralReassignment();
 
-   testEnvelope();
-   testNoiseGenerator();
-   testTriangleGenerator();
-   testSawtoothGenerator();
+   /// Feature algorithms
+   testFeatureData();
+   testPeakDetection();
+
+   /// Everything together
+   testIntegration();
+}
+
+void TestSuite::singleTest()
+{
+   testFindMinima();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -939,3 +957,43 @@ void TestSuite::testSpectralReassignment()
    // Visualisation::StftGraph graph( *trans );
    // graph.create();
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// testFindMinima
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void TestSuite::testFindMinima()
+{
+   Logger msg( "testFindMinima" );
+   msg << Msg::Info << "In testFindMinima..." << Msg::EndReq;
+
+   TRandom3 rand( 1 );
+
+   size_t nElements = 100;
+   RealVector v( nElements );
+   for ( size_t i = 0; i < nElements; ++i )
+   {
+      v[ i ] = rand.Uniform();
+      if ( v[ i ] < 0.3 )
+      {
+         v[ i ] = 0;
+      }
+      if ( v[ i ] > 0.5 && v[ i ] < 0.7 )
+      {
+         v[ i ] = 0.5;
+      }
+      if ( v[ i ] > 0.8 )
+      {
+         v[ i ] = 1;
+      }
+   }
+
+   TGraph* graph = RootUtilities::createGraph( v );
+   graph->Draw( "ALP" );
+
+   std::vector< size_t > result = Utils::findMinima( v );
+   for ( size_t i = 0; i < result.size(); ++i )
+   {
+      msg << Msg::Info << "Min at " << result[ i ] << Msg::EndReq;
+   }
+}
+
