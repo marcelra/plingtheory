@@ -5,10 +5,10 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// findMinima
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-std::vector< size_t > Utils::findMinima( const RealVector& vector )
+IndexVector Utils::findMinima( const RealVector& vector )
 {
    /// Define the result vector with the indices of the minima.
-   std::vector< size_t > minPos;
+   IndexVector minPos;
 
    /// Define the left difference and right difference of current point.
    /// The right difference is calculated at the begin of every loop iteration, the left derivative is set to the right
@@ -80,7 +80,7 @@ std::vector< size_t > Utils::findMinima( const RealVector& vector )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// getSelection
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-RealVector Utils::getSelection( const RealVector& vector, const std::vector< size_t >& selectedIndices )
+RealVector Utils::createSelection( const RealVector& vector, const IndexVector& selectedIndices )
 {
    RealVector result( selectedIndices.size() );
    for ( size_t i = 0; i < selectedIndices.size(); ++i )
@@ -90,3 +90,16 @@ RealVector Utils::getSelection( const RealVector& vector, const std::vector< siz
    return result;
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// createRange
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+IndexVector Utils::createRange( size_t minIndex, size_t maxIndex )
+{
+   IndexVector result( maxIndex - minIndex );
+   size_t i = 0;
+   for ( size_t index = minIndex; index < maxIndex - minIndex; ++index, ++i )
+   {
+      result[ i ] = index;
+   }
+   return result;
+}

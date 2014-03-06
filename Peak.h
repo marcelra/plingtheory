@@ -111,7 +111,7 @@ class Peak
       double                m_pedestal;        //! Offset
       Peak*                 m_leftNeighbour;   //! Pointer to peak left of this peak
       Peak*                 m_rightNeighbour;  //! Pointer to peak right of this peak
-      RealVector            m_data;
+      RealVector            m_data;            //! Data points between peak minima
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

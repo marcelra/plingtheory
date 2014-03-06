@@ -111,7 +111,7 @@ RealVector AccumArrayPeakAlgorithm::subtractBaseline( const RealVector& smoothed
 
    if ( m_doMonitor )
    {
-      const RealVector& minima = Utils::getSelection( smoothedData, minPositionVec );
+      const RealVector& minima = Utils::createSelection( smoothedData, minPositionVec );
       RealVector minPosReal( minPositionVec.begin(), minPositionVec.end() );
       TGraph* grMin = RootUtilities::createGraph( minPosReal, minima );
       grMin->Draw( "LSAME" );
@@ -238,7 +238,11 @@ void AccumArrayPeakAlgorithm::dressPeaks( const Math::RegularAccumArray& data, c
    {
       peaks[ iPeak ].setLeftNeighbourPeak( &peaks[ iPeak - 1 ] );
       peaks[ iPeak ].setRightNeighbourPeak( &peaks[ iPeak + 1 ] );
+      IndexVector indexVec = Utils::createRange( peaks[ iPeak ].getLeftBoundIndex(), peaks[ iPeak ].getRightBoundIndex() );
+
+      peaks[ iPeak ].setData( Utils::createSelection( baselineSubtractedData, indexVec ) );
    }
+
 }
 
 
