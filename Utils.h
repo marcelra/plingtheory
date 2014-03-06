@@ -7,6 +7,8 @@
 #include <limits>
 #include <vector>
 
+typedef std::vector< size_t > IndexVector;
+
 /**
  * @class Utils
  * @brief Class with static utility methods.
@@ -44,7 +46,13 @@ class Utils
       /**
        * Get selected indices, @param selectedIndices, from a vector @param vector.
        */
-      static RealVector getSelection( const RealVector& vector, const std::vector< size_t >& selectedIndices );
+      static RealVector createSelection( const RealVector& vector, const IndexVector& selectedIndices );
+
+      /**
+       * Create an index vector of consecutive indices between @param minIndex and @param maxIndex. Index @param maxIndex
+       * is not included in the vector.
+       */
+      static IndexVector createRange( size_t minIndex, size_t maxIndex );
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
