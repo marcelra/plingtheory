@@ -13,38 +13,6 @@ namespace FeatureAlgorithm
 {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// findMinima
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-std::pair< std::vector< size_t >, RealVector > findMinima( const RealVector& vector )
-{
-   std::vector< size_t > minPos;
-   RealVector minima;
-
-   minima.push_back( vector[ 0 ] );
-   minPos.push_back( 0 );
-
-   double leftDeriv = vector[ 1 ] - vector[ 0 ];
-
-   for ( size_t i = 1; i < vector.size() - 2; ++i )
-   {
-      double rightDeriv = vector[ i + 1 ] - vector[ i ];
-
-      if ( leftDeriv < 0 && rightDeriv >= 0 )
-      {
-         minima.push_back( vector[i] );
-         minPos.push_back( i );
-      }
-
-      leftDeriv = rightDeriv;
-   }
-
-   minima.push_back( vector[ vector.size() - 1 ] );
-   minPos.push_back( vector.size() - 1 );
-
-   return std::pair< std::vector< size_t >, RealVector >( minPos, minima );
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// constructor
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 AccumArrayPeakAlgorithm::AccumArrayPeakAlgorithm()
@@ -70,7 +38,22 @@ std::vector< Feature::Peak > AccumArrayPeakAlgorithm::execute( const Math::Regul
       grData->SetLineColor( kGray + 2 );
    }
 
-   const std::vector< Feature::Peak >& peaks = findPeaks( baselineSubtractedData );
+   std::vector< Feature::Peak > peaks = findPeaks( baselineSubtractedData );
+   for ( size_t iPeak = 0; iPeak < peaks.size(); ++iPeak )
+   {
+      size_t binIndexPos = peaks[ iPeak ].getPosition();
+      const Math::TwoTuple& entries = data.getBinEntries( binIndexPos );
+      double weightedPos = 0;
+      double totalWeight = 0;
+      for ( size_t iEntry = 0; iEntry < entries.getNumElements(); ++iEntry )
+      {
+         weightedPos += entries.getX()[ iEntry ] * entries.getY()[ iEntry ];
+         totalWeight += entries.getY()[ iEntry ];
+      }
+      weightedPos /= totalWeight;
+      peaks[ iPeak ].setPosition( weightedPos );
+   }
+
 
    if ( m_doMonitor )
    {
@@ -89,23 +72,24 @@ std::vector< Feature::Peak > AccumArrayPeakAlgorithm::execute( const Math::Regul
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 RealVector AccumArrayPeakAlgorithm::subtractBaseline( const RealVector& smoothedData, const RealVector& originalData ) const
 {
+   /// Define result.
    RealVector subtractedData( smoothedData.size() );
 
-   const std::pair< std::vector< size_t >, RealVector >& minimaPair = findMinima( smoothedData );
-
-   const std::vector< size_t >& minPos = minimaPair.first;
-   const RealVector& minima = minimaPair.second;
+   /// Find position of minima.
+   const std::vector< size_t >& minPositionVec = Utils::findMinima( smoothedData );
 
    size_t rightPosIndex = 1;
-   double leftMin = minima[ 0 ];
-   double rightMin = minima[ 1 ];
-   size_t leftPos = minPos[ 0 ];
-   size_t rightPos = minPos[ 1 ];
+   size_t leftPos = minPositionVec[ 0 ];
+   size_t rightPos = minPositionVec[ 1 ];
+   double leftMin = smoothedData[ leftPos ];
+   double rightMin = smoothedData[ rightPos ];
+
    double step = ( rightMin - leftMin ) / ( rightPos - leftPos );
    double baseline = leftMin;
 
    for ( size_t i = 0; i < originalData.size(); ++i )
    {
+      /// Linear interpolation, subtract if smaller than original data values.
       baseline += step;
       if ( originalData[ i ] > baseline )
       {
@@ -119,10 +103,18 @@ RealVector AccumArrayPeakAlgorithm::subtractBaseline( const RealVector& smoothed
       if ( i > rightPos )
       {
          ++rightPosIndex;
+         std::cout << "Right pos index = " << rightPosIndex << ", total size = " << minPositionVec.size() << std::endl;
          leftPos = rightPos;
-         rightPos = minPos[ rightPosIndex ];
+         if ( rightPosIndex < minPositionVec.size() )
+         {
+            rightPos = minPositionVec[ rightPosIndex ];
+         }
+         else
+         {
+            rightPos = smoothedData.size() - 1;
+         }
          leftMin = rightMin;
-         rightMin = minima[ rightPosIndex ];
+         rightMin = smoothedData[ rightPos ];
          step = ( rightMin - leftMin ) / ( rightPos - leftPos );
          baseline = leftMin;
       }
@@ -130,12 +122,14 @@ RealVector AccumArrayPeakAlgorithm::subtractBaseline( const RealVector& smoothed
 
    if ( m_doMonitor )
    {
-      RealVector minPosReal( minPos.begin(), minPos.end() );
+      const RealVector& minima = Utils::getSelection( smoothedData, minPositionVec );
+      RealVector minPosReal( minPositionVec.begin(), minPositionVec.end() );
       TGraph* grMin = RootUtilities::createGraph( minPosReal, minima );
       grMin->Draw( "LSAME" );
       grMin->SetLineColor( kRed );
    }
 
+   /// Return result.
    return subtractedData;
 }
 
@@ -170,24 +164,30 @@ void AccumArrayPeakAlgorithm::setDoMonitor( bool doMonitor )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 std::vector< Feature::Peak > AccumArrayPeakAlgorithm::findPeaks( const RealVector& baselineSubtractedData ) const
 {
+   /// The resulting vector of peaks.
    std::vector< Feature::Peak > peaks;
 
-   /// Between two minima there is one maximum
-   const std::pair< std::vector< size_t >, RealVector >& minima = findMinima( baselineSubtractedData );
-   const std::vector< size_t >& minPos = minima.first;
-   const RealVector& minValues = minima.second;
+   /// Between two minima there is one maximum.
+   const std::vector< size_t >& minPositionVec = Utils::findMinima( baselineSubtractedData );
 
-   std::vector< size_t > peakPos;
-
-   for ( size_t iPeak = 0; iPeak < minPos.size() - 1; ++iPeak )
+   /// No peaks can be found.
+   if ( minPositionVec.size() < 2 )
    {
-      size_t iLeftMin = minPos[ iPeak ];
-      size_t iRightMin = minPos[ iPeak + 1 ];
+      return peaks;
+   }
+
+   /// First find the position of peaks in indices.
+   std::vector< size_t > peakPos;
+   for ( size_t iPeak = 0; iPeak < minPositionVec.size() - 1; ++iPeak )
+   {
+      size_t iLeftMin = minPositionVec[ iPeak ];
+      size_t iRightMin = minPositionVec[ iPeak + 1 ];
       assert( iLeftMin < iRightMin );
 
-      double maxVal = minValues[ iLeftMin ];
+      double maxVal = baselineSubtractedData[ iLeftMin ];
       size_t maxPos = iLeftMin;
 
+      /// Find max value between two indices.
       for ( size_t iValue = iLeftMin + 1; iValue < iRightMin; ++iValue )
       {
          double val = baselineSubtractedData[ iValue ];
@@ -198,9 +198,7 @@ std::vector< Feature::Peak > AccumArrayPeakAlgorithm::findPeaks( const RealVecto
          }
       }
 
-      /// TODO: make this a valid assert
-      // assert( maxPos > iLeftMin );
-      /// For now use workaround
+      /// Flat regions will not yield successfull search of maximum. We can safely ignore this area with no peaks.
       if ( maxPos == iLeftMin )
       {
          continue;
@@ -208,17 +206,12 @@ std::vector< Feature::Peak > AccumArrayPeakAlgorithm::findPeaks( const RealVecto
 
       peakPos.push_back( maxPos );
 
-      Feature::Peak peak( maxPos, maxVal, iRightMin - iLeftMin, 0 );
+      Feature::Peak peak( maxPos, maxVal, 0, 0 );
       peaks.push_back( peak );
    }
 
    if ( m_doMonitor )
    {
-      RealVector vMinX( minPos.begin(), minPos.end() );
-      TGraph* grMinVals = RootUtilities::createGraph( vMinX, minValues );
-      grMinVals->SetLineColor( kRed );
-      grMinVals->Draw( "LSAME" );
-
       for ( size_t iPeak = 0; iPeak < peakPos.size(); ++iPeak )
       {
          double thisPeakPos = peakPos[ iPeak ];

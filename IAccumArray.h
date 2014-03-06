@@ -46,9 +46,13 @@ class IAccumArray
              */
             double getMaxX() const;
             /**
-             * Get bin width
+             * Get bin width.
              */
-            double getBinWidth() const;
+            double getWidth() const;
+            /**
+             * Get centre.
+             */
+            double getCentre() const;
 
          public:
             /**
@@ -183,9 +187,14 @@ inline double IAccumArray::Bin::getMaxX() const
    return m_maxX;
 }
 
-inline double IAccumArray::Bin::getBinWidth() const
+inline double IAccumArray::Bin::getWidth() const
 {
    return m_maxX - m_minX;
+}
+
+inline double IAccumArray::Bin::getCentre() const
+{
+   return ( m_minX + m_maxX ) / 2;
 }
 
 inline double IAccumArray::Bin::getContents() const

@@ -15,12 +15,18 @@ class TestSuite
        */
       static void execute();
       static void runTestMath();
+      static void singleTest();
 
       /**
        * Infrastructure
        */
       static void testObjectPool();
       static void testAlgorithmFramework();
+
+      /**
+       * Utilities
+       */
+      static void testFindMinima();
 
       /**
        * Data framework

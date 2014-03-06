@@ -80,6 +80,7 @@ Math::RegularAccumArray SrSpectrum::rebinToFourierLattice() const
 
    for ( size_t i = 0; i < nBins; ++i )
    {
+      // result.add( getFrequencies()[i], getMagnitudeInBin( i ) );
       result.add( getFrequencies()[i], getMagnitudeInBin( i ) );
    }
    return result;
