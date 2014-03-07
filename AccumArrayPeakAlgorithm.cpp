@@ -1,5 +1,6 @@
 #include "AccumArrayPeakAlgorithm.h"
 
+#include "Logger.h"
 #include "RootUtilities.h"
 #include "SampledMovingAverage.h"
 
@@ -194,11 +195,10 @@ std::vector< Feature::Peak > AccumArrayPeakAlgorithm::findPeaks( const RealVecto
 
       Feature::Peak peak( maxPos );
       peak.setProminence( maxVal );
-      peak.setBoundIndices( iLeftMin, iRightMin );
+      size_t rightBoundIndex = iRightMin < baselineSubtractedData.size() - 1? rightBoundIndex + 1 : rightBoundIndex;
+      peak.setBoundIndices( iLeftMin, iRightMin + 1 );
       peaks.push_back( peak );
    }
-
-   dressPeaks( data, baselineSubtractedData, peaks );
 
    if ( m_doMonitor )
    {
@@ -213,13 +213,16 @@ std::vector< Feature::Peak > AccumArrayPeakAlgorithm::findPeaks( const RealVecto
       }
    }
 
+   dressPeaks( data, baselineSubtractedData, peaks );
    return peaks;
 }
 
 void AccumArrayPeakAlgorithm::dressPeaks( const Math::RegularAccumArray& data, const RealVector& baselineSubtractedData, std::vector< Feature::Peak >& peaks ) const
 {
+   Logger msg( "AccumArrayPeakAlgorithm" );
    for ( size_t iPeak = 0; iPeak < peaks.size(); ++iPeak )
    {
+      /// Do position weighting in peak bin.
       size_t binIndexPos = peaks[ iPeak ].getPositionIndex();
       const Math::TwoTuple& entries = data.getBinEntries( binIndexPos );
       double weightedPos = 0;
@@ -230,17 +233,41 @@ void AccumArrayPeakAlgorithm::dressPeaks( const Math::RegularAccumArray& data, c
          totalWeight += entries.getY()[ iEntry ];
       }
       weightedPos /= totalWeight;
-      std::cout << "Setting position to: "<< weightedPos << std::endl;
       peaks[ iPeak ].setPosition( weightedPos );
+
+      /// Set peak data.
+      IndexVector indexVec = Utils::createRange( peaks[ iPeak ].getLeftBoundIndex(), peaks[ iPeak ].getRightBoundIndex() );
+      msg << Msg::Verbose << indexVec << Msg::EndReq;
+      const RealVector& peakData = Utils::createSelection( baselineSubtractedData, indexVec );
+      msg << Msg::Verbose << "peakData = " << peakData << Msg::EndReq;
+      peaks[ iPeak ].setData( peakData );
    }
 
    for ( size_t iPeak = 1; iPeak < peaks.size() - 1; ++iPeak )
    {
       peaks[ iPeak ].setLeftNeighbourPeak( &peaks[ iPeak - 1 ] );
       peaks[ iPeak ].setRightNeighbourPeak( &peaks[ iPeak + 1 ] );
-      IndexVector indexVec = Utils::createRange( peaks[ iPeak ].getLeftBoundIndex(), peaks[ iPeak ].getRightBoundIndex() );
+   }
 
-      peaks[ iPeak ].setData( Utils::createSelection( baselineSubtractedData, indexVec ) );
+   if ( m_doMonitor )
+   {
+      size_t showPeak = 1;
+      const Feature::Peak& peak = peaks[ showPeak ];
+      new TCanvas();
+      std::cout << "peak.getData() = " << peak.getData().size() << std::endl;
+      msg << Msg::Info << peak.getData() << Msg::EndReq;
+      TGraph* gr = RootUtilities::createGraph( peak.getData() );
+      gr->Draw( "AL" );
+
+      IndexVector range = Utils::createRange( peak.getLeftBoundIndex(), peak.getRightBoundIndex() );
+      Math::TwoTuple allEntries;
+      for ( size_t i = 0; i < range.size(); ++i )
+      {
+         Math::TwoTuple binTuple = data.getBinEntries( range[ i ] );
+         allEntries.append( binTuple );
+      }
+      TGraph* gr2 = RootUtilities::createGraph( allEntries.getX(), allEntries.getY() );
+      gr2->Draw( "P" );
    }
 
 }

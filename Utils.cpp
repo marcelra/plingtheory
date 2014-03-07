@@ -85,7 +85,7 @@ RealVector Utils::createSelection( const RealVector& vector, const IndexVector& 
    RealVector result( selectedIndices.size() );
    for ( size_t i = 0; i < selectedIndices.size(); ++i )
    {
-      result[ i ] = vector[ i ];
+      result[ i ] = vector[ selectedIndices[ i ] ];
    }
    return result;
 }
@@ -95,9 +95,10 @@ RealVector Utils::createSelection( const RealVector& vector, const IndexVector& 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 IndexVector Utils::createRange( size_t minIndex, size_t maxIndex )
 {
+   assert( minIndex < maxIndex );
    IndexVector result( maxIndex - minIndex );
    size_t i = 0;
-   for ( size_t index = minIndex; index < maxIndex - minIndex; ++index, ++i )
+   for ( size_t index = minIndex; index < maxIndex; ++index, ++i )
    {
       result[ i ] = index;
    }

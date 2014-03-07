@@ -58,6 +58,10 @@ class INTuple
        * Add a tuple (row).
        */
       virtual void addTuple( const RealVector& values ) = 0;
+      /**
+       * Append another ntuple to this one.
+       */
+      virtual void append( const INTuple& ntuple );
 };
 
 } /// namespace Math

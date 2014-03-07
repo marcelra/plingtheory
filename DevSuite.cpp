@@ -121,6 +121,7 @@ void DevSuite::devPeakFinder2()
    FeatureAlgorithm::AccumArrayPeakAlgorithm peakAlg;
    peakAlg.setDoMonitor( true );
    const std::vector< Feature::Peak>& peaks = peakAlg.execute( data );
+   return;
 
    RealVector prominence( peaks.size() );
    RealVector frequencyBin( peaks.size() );

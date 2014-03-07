@@ -70,12 +70,13 @@ Logger& Logger::operator<<( const T& x )
 }
 
 template<>
+Logger& Logger::operator<<( const std::vector< size_t >& indexVector );
+template<>
 Logger& Logger::operator<<( const RealVector& vec );
 template <>
 Logger& Logger::operator<<( const Msg::LogLevel& logLevel );
 template <>
 Logger& Logger::operator<<( const Msg::LogCommand& logCommand );
-
 
 /// Access global Logger.
 Logger& gLog();

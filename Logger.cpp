@@ -102,6 +102,25 @@ Logger& Logger::operator<<( const RealVector& vec )
    return *this;
 }
 
+template<>
+Logger& Logger::operator<<( const std::vector< size_t >& indexVector )
+{
+   if ( indexVector.size() == 0 )
+   {
+      *this << "()";
+   }
+   else
+   {
+      *this << "(";
+      for ( size_t i = 0; i < indexVector.size() - 1; ++i )
+      {
+         *this << indexVector[i] << ", ";
+      }
+   }
+   *this << indexVector[ indexVector.size() - 1 ] << ")";
+   return *this;
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// formatInField
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
