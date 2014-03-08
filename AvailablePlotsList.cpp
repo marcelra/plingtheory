@@ -1,7 +1,5 @@
 #include "AvailablePlotsList.h"
 
-#include "Plot2D.h"
-
 #include <QStandardItemModel>
 
 namespace Gui
