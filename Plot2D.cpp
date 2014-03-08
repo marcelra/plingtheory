@@ -21,8 +21,6 @@ namespace Plotting
 
 Plot2D::Plot2D( QWidget* parent ) :
    QWidget( parent ),
-   m_xScrollItem( 0 ),
-   m_yScrollItem( 0 ),
    m_gridItem( 0 )
 {
    m_xAxisPaintArea = new XAxisPaintArea( this );

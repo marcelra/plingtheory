@@ -17,7 +17,6 @@ class CurveItem;
 class GridItem;
 class IPaintItem;
 class PaintArea;
-class ScrollItem;
 class ScrollPaintArea;
 class XAxisPaintArea;
 class YAxisPaintArea;
@@ -52,8 +51,6 @@ class Plot2D : public QWidget
       ScrollPaintArea*   m_xScroll;
       ScrollPaintArea*   m_yScroll;
 
-      ScrollItem*        m_xScrollItem;
-      ScrollItem*        m_yScrollItem;
       GridItem*          m_gridItem;
 
       bool               m_horizontalMouseWheel;

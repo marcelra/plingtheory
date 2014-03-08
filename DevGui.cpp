@@ -7,6 +7,7 @@
 
 #include "RegLargeDataCurve.h"
 #include "CurveItem.h"
+#include "ScatterItem.h"
 #include "Plot2D.h"
 
 void DevGui::execute()
@@ -35,11 +36,15 @@ void DevGui::execute()
    WaveAnalysis::StftAlgorithm stftAlg( data->getSamplingInfo() );
    WaveAnalysis::StftData::Ptr stft = stftAlg.execute( *data );
    const WaveAnalysis::FourierSpectrum& spec = stft->getSpectrum( 0 );
+
    Plotting::CurveItem* specItem = new Plotting::CurveItem( spec.getFrequencies(), spec.getMagnitude() );
    specItem->setAntialiasing( true );
    plot2D = new Plotting::Plot2D();
 
+   Plotting::ScatterItem* scatter = new Plotting::ScatterItem( spec.getFrequencies(), spec.getMagnitude() );
+
    plot2D->addItem( specItem );
+   plot2D->addItem( scatter );
    plotsList.addPlot( "Fourier transform", plot2D );
 
 }

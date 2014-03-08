@@ -103,7 +103,9 @@ SOURCES += main.cpp \
     PcLinePaint.cpp \
     PcSetDrawAttr.cpp \
     PcRectanglePaint.cpp \
-    RegLargeDataCurve.cpp
+    RegLargeDataCurve.cpp \
+    PcMarkerPaint.cpp \
+    ScatterItem.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -203,7 +205,9 @@ HEADERS += \
     PcLinePaint.h \
     PcSetDrawAttr.h \
     PcRectanglePaint.h \
-    RegLargeDataCurve.h
+    RegLargeDataCurve.h \
+    PcMarkerPaint.h \
+    ScatterItem.h
 
 OTHER_FILES += \
     Todos.txt
