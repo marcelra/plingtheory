@@ -1,9 +1,11 @@
 /// Framework classes
+#include "DevGui.h"
 #include "DevSuite.h"
 #include "Exceptions.h"
 #include "GlobalLogParameters.h"
 #include "GlobalParameters.h"
 #include "Logger.h"
+#include "MainWindow.h"
 #include "ProgramOptions.h"
 #include "RootFileCompare.h"
 #include "RootUtilities.h"
@@ -15,6 +17,9 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <stdio.h>
+
+/// Qt includes
+#include <QApplication>
 
 #define DEBUG_APPLICATION 0
 
@@ -40,7 +45,8 @@ enum ProgramStatus
    PS_UNRECOVERABLE_USER_EXCEPTION,
    PS_TEST_FAILED,
    PS_UNRECOVERABLE_INTERNAL_EXCEPTION,
-   PS_UNCAUGHT_INTERNAL_EXCEPTION
+   PS_UNCAUGHT_INTERNAL_EXCEPTION,
+   PS_GUI_NONZERO_STATUSCODE
 } programStatus;
 
 class StopExecutionException {};
@@ -206,10 +212,24 @@ int main( int argc, char* argv[] )
          {
             if ( programStatus == PS_OK )
             {
-               std::cout << "Running complete." << std::endl;
-               std::cout << "Press CTRL+C to end...";
-               std::cout.flush();
-               RootUtilities::processRootEvents();
+               DevGui::execute();
+
+               // std::cout << "Running complete." << std::endl;
+               // std::cout << "Press CTRL+C to end...";
+               // std::cout.flush();
+
+               // RootUtilities::processRootEvents();
+
+               QApplication qApplication( argc, argv );
+
+               Gui::MainWindow mainWindow;
+               mainWindow.show();
+
+               if ( qApplication.exec() != 0 )
+               {
+                  programStatus = PS_GUI_NONZERO_STATUSCODE;
+                  throw StopExecutionException();
+               }
             }
          }
       }

@@ -1,5 +1,7 @@
 # ignore object files
 *.o
+moc_*
+*.wav
 
 # ignore auto-generated files
 plingtheory.pro.user
