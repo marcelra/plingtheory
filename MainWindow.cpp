@@ -1,10 +1,15 @@
 #include "MainWindow.h"
 
+#include "AvailablePlotsList.h"
+#include "Plot2D.h"
+
 #include <QHBoxLayout>
 #include <QListWidget>
 #include <QPushButton>
 #include <QStandardItemModel>
 #include <QVBoxLayout>
+
+#include <QDebug>
 
 namespace Gui
 {
@@ -19,9 +24,11 @@ MainWindow::MainWindow( QWidget* parent ) :
    /// Initialise widgets.
    QStandardItemModel* model = new QStandardItemModel( m_plotsListView );
    m_plotsListView->setModel( model );
+   m_plotsListView->setFixedWidth( 200 );
 
    m_plotWidget = new DummyPlotWidget( this );
-   m_plotWidget->setFixedWidth( 400 );
+   m_plotWidget->setFixedWidth( 800 );
+   m_plotWidget->setFixedHeight( 800 );
 
    /// Set layout.
    QWidget* centralWidget = new QWidget( this );
@@ -56,19 +63,27 @@ void MainWindow::plotSelectedSlot( QModelIndex index )
 {
    QStandardItemModel* model = static_cast< QStandardItemModel* >( m_plotsListView->model() );
    QStandardItem* item = model->itemFromIndex( index );
-   m_plotWidget->m_label->setText( QString( "%1" ).arg( item->data().toInt() ) );
+   // m_plotWidget->m_label->setText( QString( "%1" ).arg( (long) item->data().value< Plotting::Plot2D* >() ) );
+
+   QLayout* layout = centralWidget()->layout();
+   // int plotLayoutIndex = layout->indexOf( m_plotWidget );
+   // QLayoutItem* layoutItem = layout->takeAt( plotLayoutIndex );
+   // layoutItem->
+   layout->removeWidget( m_plotWidget );
+   m_plotWidget->hide();
+   m_plotWidget = item->data().value< Plotting::Plot2D* >();
+   m_plotWidget->setFixedWidth( 800 );
+   m_plotWidget->show();
+   layout->addWidget( m_plotWidget );
+
 }
 
 void MainWindow::buildPlotList()
 {
    delete m_plotsListView->model();
-   QStandardItemModel* model = new QStandardItemModel( m_plotsListView );
+   AvailablePlotsList& plotsProvider = AvailablePlotsList::getInstance();
 
-   QStandardItem* item = new QStandardItem();
-   item->setText( "Test" );
-   item->setData( QVariant( 1 ) );
-   item->setEditable( false );
-   model->insertRow( 0, item );
+   QStandardItemModel* model = plotsProvider.buildModel();
 
    m_plotsListView->setModel( model );
 }

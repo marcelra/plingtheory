@@ -29,7 +29,12 @@ void AxisPaintArea::paintEventImpl( QPaintEvent* paintEvent )
 
    for ( size_t iTick = 0; iTick < m_majorTicks.size(); ++iTick )
    {
-      drawMajorTick( m_majorTicks[ iTick ] );
+      double tickValue = m_majorTicks[ iTick ];
+      if ( fabs( tickValue ) < 1e-14 )
+      {
+         tickValue = 0;
+      }
+      drawMajorTick( tickValue );
    }
    for ( size_t iMinorTick = 0; iMinorTick < m_minorTicks.size(); ++iMinorTick )
    {
@@ -65,6 +70,7 @@ void AxisPaintArea::updateTicks()
    if ( nTries <= 0 )
    {
       qDebug() << "Failed to create axis. Probably zoom level is too large or too small.";
+      qDebug() << "min = " << min << ", max = " << max;
       return;
    }
 
