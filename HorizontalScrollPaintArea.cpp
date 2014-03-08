@@ -59,4 +59,22 @@ void HorizontalScrollPaintArea::viewPortChangedSlot( const QRectF& newViewPort )
    }
 }
 
+void HorizontalScrollPaintArea::updateViewPortGraphFromShift( const QPointF& shift )
+{
+   double oldWidth = m_viewPortGraph.width();
+   m_viewPortGraph.setLeft( m_viewPortGraph.left() + shift.x() );
+   m_viewPortGraph.setRight( m_viewPortGraph.right() + shift.x() );
+
+   if ( m_viewPortGraph.left() < m_viewPort.left() )
+   {
+      m_viewPortGraph.setLeft( m_viewPort.left() );
+      m_viewPortGraph.setRight( m_viewPort.left() + oldWidth );
+   }
+   if ( m_viewPortGraph.right() > m_viewPort.right() )
+   {
+      m_viewPortGraph.setLeft( m_viewPort.right() - oldWidth );
+      m_viewPortGraph.setRight( m_viewPort.right() );
+   }
+}
+
 } /// namespace Plotting

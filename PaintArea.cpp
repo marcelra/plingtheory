@@ -3,7 +3,6 @@
 #include "IPaintCommand.h"
 #include "IPaintItem.h"
 
-#include <QDebug>
 #include <QPainter>
 #include <QPaintEvent>
 #include <QPen>
@@ -22,8 +21,7 @@ PaintArea::PaintArea( QWidget* parent ) :
    PaintAreaBase( parent ),
    m_paintItems(),
    m_paintCommands(),
-   m_horizontalMouseWheel( true ),
-   m_oldMousePos( 0 )
+   m_horizontalMouseWheel( true )
 {
    m_dataRange = QRectF( QPointF( 0, 0 ), QPointF( 0, 0 ) );
    QRectF initialViewPort( QPointF( -1, -1 ), QPointF( 1, 1 ) );
@@ -72,8 +70,6 @@ void PaintArea::paintEventImpl( QPaintEvent* event )
 {
    assert( event );
 
-   // qDebug() << "In paintEventImpl for " << m_name;
-
    /// Regenerate paint commands if needed
    generatePaintCommands();
 
@@ -89,7 +85,6 @@ void PaintArea::paintEventImpl( QPaintEvent* event )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void PaintArea::addPaintItem( const IPaintItem* paintItem )
 {
-   // qDebug() << "m_name = " << m_name;
    m_paintItems.push_back( paintItem );
 
    if ( m_paintItems.size() == 1 )
@@ -125,7 +120,6 @@ void PaintArea::addPaintItem( const IPaintItem* paintItem )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void PaintArea::autoScale()
 {
-   // qDebug() << m_name << " AUTOSCALE: " << m_dataRange;
    m_viewPort = m_dataRange;
    emit viewPortChanged( m_viewPort );
 }
@@ -179,10 +173,10 @@ void PaintArea::wheelEvent( QWheelEvent* event )
       QRectF newViewPort( viewPort );
 
       double y = viewPortCenter.y();
-      double newBottom = newHeight / viewPort.height() * ( y + viewPort.bottom() ) - y;
+      double newTop = newHeight/viewPort.height() * newViewPort.top() + y * ( 1.0 - newHeight/viewPort.height() );
 
-      newViewPort.setTop( newBottom - newHeight );
-      newViewPort.setHeight( newHeight );
+      newViewPort.setTop( newTop );
+      newViewPort.setBottom( newTop + newHeight );
 
       setViewPort( newViewPort );
       update();
@@ -205,7 +199,6 @@ void PaintArea::mouseDoubleClickEvent( QMouseEvent* event )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void PaintArea::mouseMoveEvent( QMouseEvent* event )
 {
-   // qDebug() << "Mouse move: " << m_name;
    /// Store old mouse pos if it does not exist.
    if ( !m_oldMousePos )
    {
@@ -221,8 +214,8 @@ void PaintArea::mouseMoveEvent( QMouseEvent* event )
    QRectF viewPort = getViewPort();
    viewPort.setLeft( viewPort.left() - shiftOfViewport.x() );
    viewPort.setRight( viewPort.right() - shiftOfViewport.x() );
-   viewPort.setTop( viewPort.top() + shiftOfViewport.y() );
-   viewPort.setBottom( viewPort.bottom() + shiftOfViewport.y() );
+   viewPort.setTop( viewPort.top() - shiftOfViewport.y() );
+   viewPort.setBottom( viewPort.bottom() - shiftOfViewport.y() );
 
    /// Apply new viewport.
    setViewPort( viewPort );
@@ -231,19 +224,6 @@ void PaintArea::mouseMoveEvent( QMouseEvent* event )
    *m_oldMousePos = event->pos();
 
    /// Set event handled.
-   event->accept();
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// mouseReleaseEvent
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void PaintArea::mouseReleaseEvent( QMouseEvent* event )
-{
-   if ( m_oldMousePos )
-   {
-      delete m_oldMousePos;
-      m_oldMousePos = 0;
-   }
    event->accept();
 }
 

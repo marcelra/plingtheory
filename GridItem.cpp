@@ -5,8 +5,6 @@
 #include "PcLinePaint.h"
 #include "PcSetDrawAttr.h"
 
-#include <QDebug>
-
 #include <QPainter>
 
 namespace Plotting

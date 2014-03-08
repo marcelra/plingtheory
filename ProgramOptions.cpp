@@ -76,6 +76,10 @@ void ProgramOptions::parseArguments()
       {
          m_doProcessRootEvents = false;
       }
+      else if ( opt == "-qt" )
+      {
+         m_useQtInterface = true;
+      }
       else if ( opt == "-r" )
       {
          it = safeAdvanceIter( it, m_argList, "-r" );
@@ -154,6 +158,7 @@ void ProgramOptions::printOptions( std::ostream& os )
    os << "Options:\n";
    os << "-b                  : Do not enter the root event loop.\n";
    os << "                      This causes the application to terminate directly (i.e. without showing graphs etc.).\n";
+   os << "-qt                 : Use Qt interface.\n";
    os << "-o <filename>       : Write all log data to file with name <filename>.\n";
    os << "-r <filename>       : Save all root objects to file with name <filename>.\n";
    os << "-v <level>          : Verbosity level of logger. Range [0,6]: 0 is least verbose, 6 is maximally verbose.\n";
@@ -259,6 +264,14 @@ StringList::const_iterator ProgramOptions::safeAdvanceIter( StringList::const_it
       throw ExceptionOptionArgumentParsing( currentOption );
    }
    return it;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// getUseQtInterface
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+bool ProgramOptions::useQtInterface() const
+{
+   return m_useQtInterface;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

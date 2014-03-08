@@ -1,5 +1,6 @@
 #include "PaintAreaBase.h"
 
+#include <QMouseEvent>
 #include <QPainter>
 #include <QPaintEvent>
 
@@ -11,7 +12,8 @@ namespace Plotting
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 PaintAreaBase::PaintAreaBase( QWidget* parent ) :
    QWidget( parent ),
-   m_name( "Undefined" )
+   m_name( "Undefined" ),
+   m_oldMousePos( 0 )
 {
    setBackgroundRole( QPalette::Base );
    setAutoFillBackground( true );
@@ -31,30 +33,13 @@ QPointF PaintAreaBase::transformToCanvasCoordinates( const QPointF& point ) cons
    QPointF result;
 
    double scaleX = m_canvas.width() / m_viewPort.width();
-   double scaleY = m_canvas.height() / m_viewPort.height();
+   double scaleY = - m_canvas.height() / m_viewPort.height();
 
    double shiftX = -m_viewPort.left();
-   double shiftY = m_viewPort.bottom();
 
    result.setX( ( point.x() + shiftX ) * scaleX );
-   result.setY( ( -point.y() + shiftY ) * scaleY );
+   result.setY( scaleY * ( m_viewPort.top() - point.y() ) );
 
-   // if ( result.x() < 0 )
-   // {
-   //    result.setX( -1 );
-   // }
-   // else if ( result.x() > m_canvas.width() )
-   // {
-   //    result.setX( m_canvas.width() + 2 );
-   // }
-   // if ( result.y() < 0 )
-   // {
-   //    result.setY( -1 );
-   // }
-   // else if ( result.y() > m_canvas.height() )
-   // {
-   //    result.setY( m_canvas.height() + 2 );
-   // }
    return result;
 }
 
@@ -64,14 +49,13 @@ QPointF PaintAreaBase::transformToCanvasCoordinates( const QPointF& point ) cons
 QPointF PaintAreaBase::transformToWorldCoordinates( const QPoint& point ) const
 {
    double scaleX = m_viewPort.width() / m_canvas.width();
-   double scaleY =  m_viewPort.height() / m_canvas.height();
+   double scaleY = -m_viewPort.height() / m_canvas.height();
 
    double shiftX = m_viewPort.left();
-   double shiftY = -m_viewPort.bottom();
 
    QPointF result;
    result.setX( point.x() * scaleX + shiftX );
-   result.setY( point.y() * scaleY + shiftY );
+   result.setY( -scaleY * point.y() + m_viewPort.top() );
 
    return result;
 }
@@ -121,6 +105,19 @@ void PaintAreaBase::setViewPort( const QRectF& viewPort )
    m_viewPort = viewPort;
    emit viewPortChanged( m_viewPort );
    update();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// mouseReleaseEvent
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void PaintAreaBase::mouseReleaseEvent( QMouseEvent* event )
+{
+   if ( m_oldMousePos )
+   {
+      delete m_oldMousePos;
+      m_oldMousePos = 0;
+   }
+   event->accept();
 }
 
 } /// namespace Plotting

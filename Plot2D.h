@@ -31,13 +31,13 @@ class Plot2D : public QWidget
       virtual ~Plot2D();
 
       void addItem( const IPaintItem* item );
-      void setViewPort( const QRectF& viewPort );
       void setEnableGrid( bool enableGrid );
 
       // void wheelEvent( QWheelEvent* event );
       // void mouseDoubleClickEvent( QMouseEvent* event );
 
    private slots:
+      void setViewPort( const QRectF& viewPort );
       void synchroniseViewPorts( const QRectF& viewPort );
 
    private:

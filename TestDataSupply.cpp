@@ -164,6 +164,7 @@ RawPcmData::Ptr TestDataSupply::readSoundData()
    // std::string fileName = "Cscale.wav";
    // std::string fileName = "monophDistGuitar.wav";
    std::string fileName = "monophDifficult.wav";
+   // std::string fileName = "outcry.wav";
 
    MultiChannelRawPcmData* data = WaveFile::read( GlobalParameters::getTestDataDir() + fileName );
    return RawPcmData::Ptr( new RawPcmData( data->getChannel( 0 ) ) );

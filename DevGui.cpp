@@ -2,9 +2,11 @@
 
 #include "AvailablePlotsList.h"
 #include "Logger.h"
+#include "StftAlgorithm.h"
 #include "TestDataSupply.h"
 
 #include "RegLargeDataCurve.h"
+#include "CurveItem.h"
 #include "Plot2D.h"
 
 void DevGui::execute()
@@ -29,5 +31,15 @@ void DevGui::execute()
    plot2D->addItem( curveItem );
 
    plotsList.addPlot( "CurrentTestSample", plot2D );
+
+   WaveAnalysis::StftAlgorithm stftAlg( data->getSamplingInfo() );
+   WaveAnalysis::StftData::Ptr stft = stftAlg.execute( *data );
+   const WaveAnalysis::FourierSpectrum& spec = stft->getSpectrum( 0 );
+   Plotting::CurveItem* specItem = new Plotting::CurveItem( spec.getFrequencies(), spec.getMagnitude() );
+   specItem->setAntialiasing( true );
+   plot2D = new Plotting::Plot2D();
+
+   plot2D->addItem( specItem );
+   plotsList.addPlot( "Fourier transform", plot2D );
 
 }
