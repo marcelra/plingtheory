@@ -2,6 +2,7 @@
 #define PLOT2D_H
 
 #include <QWidget>
+#include <QMetaType>
 
 class QGridLayout;
 class QHBoxLayout;
@@ -59,5 +60,7 @@ class Plot2D : public QWidget
 };
 
 } /// namespace Plotting
+
+Q_DECLARE_METATYPE( Plotting::Plot2D* );
 
 #endif // PLOT2D_H

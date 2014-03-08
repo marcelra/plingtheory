@@ -2,13 +2,10 @@
 #define AVAILABLEPLOTSLIST_H
 
 #include "SingletonBase.h"
+#include "Plot2D.h"
 
 #include <vector>
 
-namespace Plotting
-{
-class Plot2D;
-}
 class QStandardItemModel;
 
 namespace Gui
