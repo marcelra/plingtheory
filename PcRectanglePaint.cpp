@@ -5,6 +5,9 @@
 #include <QDebug>
 #include <QPainter>
 
+namespace Plotting
+{
+
 PcRectanglePaint::PcRectanglePaint( const QPointF& topLeft, const QPointF& bottomRight ) :
    m_rect( topLeft, bottomRight )
 {}
@@ -20,3 +23,5 @@ void PcRectanglePaint::execute( PaintArea& paintArea ) const
    qDebug() << "rect_transformed = " << rect_transformed;
    paintArea.getPainter().drawRect( rect_transformed );
 }
+
+} /// namespace Plotting

@@ -7,6 +7,9 @@
 #include <QPen>
 #include <QRectF>
 
+namespace Plotting
+{
+
 ScrollItem::ScrollItem( Orientation orientation, double dataMin, double dataMax, double viewMin, double viewMax ) :
    m_orientation( orientation ),
    m_dataMin( dataMin ),
@@ -99,3 +102,5 @@ void ScrollItem::generatePlotCommands( PaintArea* paintArea ) const
       // paintArea->addRectangle( 0, m_viewMin, 1, m_viewMax );
     }
 }
+
+} /// namespace Plotting

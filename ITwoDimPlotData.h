@@ -1,6 +1,9 @@
 #ifndef ITWODIMPLOTDATA_H
 #define ITWODIMPLOTDATA_H
 
+namespace Plotting
+{
+
 class ITwoDimPlotData
 {
    public:
@@ -14,5 +17,7 @@ class ITwoDimPlotData
       virtual double getMaxY() const = 0;
 
 };
+
+} /// namespace Plotting
 
 #endif // ITWODIMPLOTDATA_H

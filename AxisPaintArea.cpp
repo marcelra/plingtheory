@@ -7,6 +7,9 @@
 
 #include <cmath>
 
+namespace Plotting
+{
+
 AxisPaintArea::AxisPaintArea( QWidget* parent ) :
    PaintAreaBase( parent )
 {
@@ -137,3 +140,5 @@ const std::vector< double >& AxisPaintArea::getMajorTicks() const
 {
    return m_majorTicks;
 }
+
+} /// namespace Plotting

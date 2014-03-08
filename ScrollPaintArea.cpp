@@ -5,6 +5,9 @@
 #include <QPainter>
 #include <QPen>
 
+namespace Plotting
+{
+
 ScrollPaintArea::ScrollPaintArea( QWidget* parent ) :
    PaintAreaBase( parent ),
    m_dataMin( 0 ),
@@ -49,3 +52,4 @@ void ScrollPaintArea::paintEventImpl( QPaintEvent* paintEvent )
 
 }
 
+} /// namespace Plotting

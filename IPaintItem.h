@@ -1,6 +1,9 @@
 #ifndef IPAINTITEM_H
 #define IPAINTITEM_H
 
+namespace Plotting
+{
+
 class PaintArea;
 
 class IPaintItem
@@ -23,5 +26,7 @@ class IPaintItem
       friend class PaintArea;
 
 };
+
+} /// namespace Plotting
 
 #endif // IPAINTITEM_H

@@ -9,6 +9,9 @@
 
 #include <QPainter>
 
+namespace Plotting
+{
+
 GridItem::GridItem( const AxisPaintArea& xAxis, const AxisPaintArea& yAxis ) :
    m_xAxis( xAxis ),
    m_yAxis( yAxis )
@@ -70,3 +73,5 @@ double GridItem::getMaxY() const
 {
    return m_yAxis.getMax();
 }
+
+} /// namespace Plotting

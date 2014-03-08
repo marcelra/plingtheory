@@ -3,6 +3,9 @@
 
 #include "PaintAreaBase.h"
 
+namespace Plotting
+{
+
 class IPaintItem;
 class IPaintCommand;
 
@@ -49,5 +52,7 @@ class PaintArea : public PaintAreaBase
       QPoint*     m_oldMousePos;
 
 };
+
+} /// namespace Plotting
 
 #endif // PAINTAREA_H

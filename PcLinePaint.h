@@ -7,6 +7,9 @@
 
 class QPointF;
 
+namespace Plotting
+{
+
 class PcLinePaint : public IPaintCommand
 {
    public:
@@ -20,5 +23,7 @@ class PcLinePaint : public IPaintCommand
       QPointF     m_v1;
 
 };
+
+} /// namespace Plotting
 
 #endif // PCLINEPAINT_H

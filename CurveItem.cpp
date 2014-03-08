@@ -10,6 +10,9 @@
 
 #include <QDebug>
 
+namespace Plotting
+{
+
 CurveItem::CurveItem( const std::vector< double >& xData, const std::vector< double >& yData ) :
    IYVsXItem( xData, yData )
 {}
@@ -31,3 +34,5 @@ void CurveItem::generatePlotCommands( PaintArea* paintArea ) const
       paintArea->addPaintCommand( linePaint );
    }
 }
+
+} /// namespace Plotting

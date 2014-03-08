@@ -5,6 +5,9 @@
 
 #include <QWidget>
 
+namespace Plotting
+{
+
 class PaintAreaBase : public QWidget
 {
    Q_OBJECT
@@ -50,5 +53,7 @@ inline QPainter& PaintAreaBase::getPainter()
    assert( m_painter );
    return *m_painter;
 }
+
+} /// namespace Plotting
 
 #endif // PAINTAREABASE_H

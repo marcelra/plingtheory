@@ -7,6 +7,9 @@
 
 class QPointF;
 
+namespace Plotting
+{
+
 class PcRectanglePaint : public IPaintCommand
 {
    public:
@@ -18,5 +21,7 @@ class PcRectanglePaint : public IPaintCommand
    private:
       QRectF         m_rect;
 };
+
+} /// namespace Plotting
 
 #endif // PCRECTANGLEPAINT_H

@@ -4,6 +4,9 @@
 #include "IPaintItem.h"
 #include "YVsXData.h"
 
+namespace Plotting
+{
+
 class IYVsXItem : public IPaintItem
 {
    public:
@@ -54,5 +57,7 @@ inline double IYVsXItem::getMaxY() const
 {
    return m_data.getMaxY();
 }
+
+} /// namespace Plotting
 
 #endif // IYVSXITEM_H

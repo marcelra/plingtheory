@@ -3,6 +3,9 @@
 
 #include "AxisPaintArea.h"
 
+namespace Plotting
+{
+
 class YAxisPaintArea : public AxisPaintArea
 {
    Q_OBJECT
@@ -21,5 +24,7 @@ class YAxisPaintArea : public AxisPaintArea
       void drawMinorTick( double tickValue );
       int getNumsPixelsAlongAxis();
 };
+
+} /// namespace Plotting
 
 #endif // YAXISPAINTAREA_H

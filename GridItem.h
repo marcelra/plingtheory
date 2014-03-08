@@ -4,9 +4,12 @@
 #include "LineDrawAttr.h"
 #include "IPaintItem.h"
 
-class AxisPaintArea;
-
 #include <vector>
+
+namespace Plotting
+{
+
+class AxisPaintArea;
 
 class GridItem : public IPaintItem, public LineDrawAttr
 {
@@ -26,5 +29,7 @@ class GridItem : public IPaintItem, public LineDrawAttr
       const AxisPaintArea&      m_xAxis;
       const AxisPaintArea&      m_yAxis;
 };
+
+} /// namespace Plotting
 
 #endif // GRIDITEM_H

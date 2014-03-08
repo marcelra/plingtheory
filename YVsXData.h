@@ -5,6 +5,9 @@
 
 #include <vector>
 
+namespace Plotting
+{
+
 class YVsXData : public ITwoDimPlotData
 {
    public:
@@ -84,5 +87,7 @@ inline const std::vector< double >& YVsXData::getY() const
 {
    return m_yData;
 }
+
+} /// namespace Plotting
 
 #endif // YVSXDATA_H

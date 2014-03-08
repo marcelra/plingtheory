@@ -1,6 +1,9 @@
 #ifndef IPAINTCOMMAND_H
 #define IPAINTCOMMAND_H
 
+namespace Plotting
+{
+
 class PaintArea;
 
 class IPaintCommand
@@ -10,5 +13,7 @@ class IPaintCommand
 
       virtual void execute( PaintArea& paintArea ) const = 0;
 };
+
+} /// namespace Plotting
 
 #endif // IPAINTCOMMAND_H
