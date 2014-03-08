@@ -4,8 +4,6 @@
 #include "PcLinePaint.h"
 #include "PcSetDrawAttr.h"
 
-#include <QDebug>
-
 #include <cmath>
 
 namespace Plotting
@@ -92,7 +90,6 @@ void RegLargeDataCurve::generatePlotCommands( PaintArea *paintArea ) const
 
 void RegLargeDataCurve::generateLowResCommands( PaintArea* paintArea ) const
 {
-   qDebug() << "Generating low res commands...";
    const std::vector< double >& xData = m_lowResCache->getX();
    const std::vector< double >& yData = m_lowResCache->getY();
 
@@ -111,11 +108,9 @@ void RegLargeDataCurve::generateHiResCommands( PaintArea* paintArea ) const
    double dist = xData[ 1 ] - xData[ 0 ];
 
    size_t firstIndex = ( paintArea->getViewPort().left() - getMinX() ) / dist;
-   size_t lastIndex = ( paintArea->getViewPort().right() - getMinX() ) / dist + 1;
+   size_t lastIndex = ceil( ( paintArea->getViewPort().right() - getMinX() ) / dist ) + 1;
    firstIndex = paintArea->getViewPort().left() > getMinX() ? firstIndex : 0;
    lastIndex = lastIndex < xData.size() ? lastIndex : xData.size();
-
-   qDebug() << "firstIndex = " << firstIndex << ", lastIndex = " << lastIndex;
 
    for ( size_t i = firstIndex; i < lastIndex - 1; ++i )
    {

@@ -4,12 +4,10 @@
 #include "GridItem.h"
 #include "HorizontalScrollPaintArea.h"
 #include "PaintArea.h"
-#include "ScrollItem.h"
 #include "VerticalScrollPaintArea.h"
 #include "XAxisPaintArea.h"
 #include "YAxisPaintArea.h"
 
-#include <QDebug>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QScrollBar>
@@ -78,17 +76,15 @@ Plot2D::Plot2D( QWidget* parent ) :
    // m_yAxis = new CurveItem( yAxisPointsX, yAxisPointsY );
    // addCurve( m_yAxis );
 
-   const QRectF& dataRange = m_graph->getDataRange();
-
-   /// Create dummy scroll items.
-   // m_xScrollItem = new ScrollItem( ScrollItem::Horizontal, 0, 1, 0, 1 );
-   // m_yScrollItem = new ScrollItem( ScrollItem::Vertical, 0, 1, 0, 1 );
-   // m_xScroll->addPaintItem( m_xScrollItem );
-   // m_yScroll->addPaintItem( m_yScrollItem );
 
    setLayout( m_gridLayout );
 
-   bool isConnected = connect( m_graph, SIGNAL( viewPortChanged( QRectF ) ), this, SLOT( synchroniseViewPorts( QRectF ) ) );
+   bool isConnected;
+   isConnected = connect( m_graph, SIGNAL( viewPortChanged( QRectF ) ), this, SLOT( synchroniseViewPorts( QRectF ) ) );
+   assert( isConnected );
+   isConnected = connect( m_xScroll, SIGNAL( viewPortFromScroll( QRectF ) ), this, SLOT( setViewPort( QRectF ) ) );
+   assert( isConnected );
+   isConnected = connect( m_yScroll, SIGNAL( viewPortFromScroll( QRectF ) ), this, SLOT( setViewPort( QRectF ) ) );
    assert( isConnected );
 
    setEnableGrid( true );

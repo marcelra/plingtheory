@@ -18,10 +18,15 @@ class ScrollPaintArea : public PaintAreaBase
 
    private:
       void paintEventImpl( QPaintEvent* paintEvent );
+      void mouseMoveEvent( QMouseEvent* event );
 
    private:
       virtual QRectF getDataRangeRect() const = 0;
       virtual QRectF getViewRangeRect() const = 0;
+      virtual void updateViewPortGraphFromShift( const QPointF& shift ) = 0;
+
+   signals:
+      void viewPortFromScroll( const QRectF& viewPort );
 
    private slots:
       virtual void viewPortChangedSlot( const QRectF& newViewPort ) = 0;

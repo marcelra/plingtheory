@@ -6,9 +6,6 @@
 
 #include <cassert>
 #include <cstddef>
-#include <limits>
-
-#include <QDebug>
 
 namespace Plotting
 {

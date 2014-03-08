@@ -1,7 +1,7 @@
 #include "ScrollPaintArea.h"
 
 #include <QBrush>
-#include <QDebug>
+#include <QMouseEvent>
 #include <QPainter>
 #include <QPen>
 
@@ -50,6 +50,35 @@ void ScrollPaintArea::paintEventImpl( QPaintEvent* paintEvent )
    getPainter().setPen( QPen( brush, 2 ) );
    getPainter().drawRect( getViewRangeRect() );
 
+}
+
+void ScrollPaintArea::mouseMoveEvent( QMouseEvent* event )
+{
+   /// Store old mouse pos if it does not exist.
+   if ( !m_oldMousePos )
+   {
+      m_oldMousePos = new QPoint( event->pos() );
+      event->accept();
+      return;
+   }
+
+   /// Calculate shift in world coordinates.
+   const QPointF& shiftOfViewport = transformToWorldCoordinates( event->pos() ) - transformToWorldCoordinates( *m_oldMousePos );
+
+   /// Modify current viewport.
+   // QRectF viewPort = m_viewPortGraph;
+   updateViewPortGraphFromShift( shiftOfViewport );
+
+   /// Apply new viewport.
+   emit viewPortFromScroll( m_viewPortGraph );
+
+   /// Update mouse position.
+   *m_oldMousePos = event->pos();
+
+   /// Set event handled.
+   event->accept();
+
+   update();
 }
 
 } /// namespace Plotting

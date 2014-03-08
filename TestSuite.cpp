@@ -10,7 +10,6 @@
 void TestSuite::execute()
 {
    singleTest();
-   return;
 
    runTestMath();
 
@@ -35,7 +34,6 @@ void TestSuite::execute()
    testRandomMusic();
 
    /// WaveAnalysis
-   testDynamicFourier();
    testAdvancedFourier();
    testStftAlgorithm();
    testSpectralReassignment();
@@ -45,6 +43,10 @@ void TestSuite::execute()
 
    /// Everything together
    testIntegration();
+
+   return;
+   /// Expensive tests
+   // testDynamicFourier();
 }
 
 void TestSuite::singleTest()

@@ -5,6 +5,8 @@
 
 #include <QWidget>
 
+class QMouseEvent;
+
 namespace Plotting
 {
 
@@ -30,6 +32,8 @@ class PaintAreaBase : public QWidget
 
    protected:
       virtual void paintEvent( QPaintEvent* event );
+      void mouseReleaseEvent( QMouseEvent* event );
+
       virtual void paintEventImpl( QPaintEvent* event ) = 0;
 
    protected:
@@ -37,6 +41,7 @@ class PaintAreaBase : public QWidget
       QRectF      m_viewPort;
       QRect       m_canvas;
       QPainter*   m_painter;
+      QPoint*     m_oldMousePos;
 };
 
 

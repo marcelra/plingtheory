@@ -30,6 +30,7 @@ class ProgramOptions
     */
    public:
       bool                 doProcessRootEvents() const;
+      bool                 useQtInterface() const;
       bool                 doUseColorLogger() const;
       const std::string&   getLogFileName() const;
       const std::string&   getDataDir() const;
@@ -54,6 +55,7 @@ class ProgramOptions
 
    private:
       bool              m_doProcessRootEvents;
+      bool              m_useQtInterface;
       bool              m_doUseColorLogger;
       bool              m_doSaveRootObjects;
       std::string       m_rootFileNameOld;

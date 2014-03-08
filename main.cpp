@@ -102,15 +102,17 @@ const ProgramOptions* initialiseApplication( int argc, char* argv[] )
       DBG_MSG( "Global logger initialised; message threshold is " << Msg::strRep( threshold ) );
 
       /// Setup ROOT
-      // TODO: commented out... reconsider
-      // RootUtilities::initRootApplication();
+      if ( programOptions->doProcessRootEvents() )
+      {
+         RootUtilities::initRootApplication();
 
-      /// Handle interrupt signal
-      struct sigaction sigIntHandler;
-      sigIntHandler.sa_handler = &handleSIGINT;
-      sigemptyset( &sigIntHandler.sa_mask );
-      sigIntHandler.sa_flags = 0;
-      sigaction( SIGINT, &sigIntHandler, 0 );
+         /// Handle interrupt signal
+         struct sigaction sigIntHandler;
+         sigIntHandler.sa_handler = &handleSIGINT;
+         sigemptyset( &sigIntHandler.sa_mask );
+         sigIntHandler.sa_flags = 0;
+         sigaction( SIGINT, &sigIntHandler, 0 );
+      }
 
       /// Report finalisation complete
       gLog() << Msg::Verbose << "Application initialised" << Msg::EndReq;
@@ -158,8 +160,11 @@ void finaliseApplication()
       RootUtilities::closeRootAppIfRunning( programStatus );
 
       /// Exit
-      DBG_MSG( "Deleting the GUI application..." );
-      delete gApp;
+      if ( gApp )
+      {
+         DBG_MSG( "Deleting the GUI application..." );
+         delete gApp;
+      }
       DBG_MSG( "Leaving finaliseApplication" );
       DBG_MSG( "Leaving " << GlobalParameters::getProgramName() << "(exit code " << programStatus << ")" );
    }
@@ -190,7 +195,9 @@ int main( int argc, char* argv[] )
             programStatus = PS_UNRECOVERABLE_USER_EXCEPTION;
             return programStatus;
          }
-         if ( programOptions->doProcessRootEvents() )
+
+         /// Start Qt Application
+         if ( programOptions->useQtInterface() )
          {
             gApp = new QApplication( argc, argv );
          }
@@ -221,14 +228,18 @@ int main( int argc, char* argv[] )
          {
             if ( programStatus == PS_OK )
             {
+               std::cout << "Running complete." << std::endl;
+               std::cout << "Press CTRL+C to end...";
+               std::cout.flush();
+
+               RootUtilities::processRootEvents();
+            }
+         }
+         if ( programOptions->useQtInterface() )
+         {
+            if ( programStatus == PS_OK )
+            {
                DevGui::execute();
-
-               // std::cout << "Running complete." << std::endl;
-               // std::cout << "Press CTRL+C to end...";
-               // std::cout.flush();
-
-               // RootUtilities::processRootEvents();
-
 
                Gui::MainWindow mainWindow;
                mainWindow.show();

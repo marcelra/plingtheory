@@ -15,8 +15,9 @@ class HorizontalScrollPaintArea : public ScrollPaintArea
       virtual ~HorizontalScrollPaintArea();
 
    private:
-      virtual QRectF getDataRangeRect() const;
-      virtual QRectF getViewRangeRect() const;
+      QRectF getDataRangeRect() const;
+      QRectF getViewRangeRect() const;
+      void updateViewPortGraphFromShift( const QPointF& shift );
 
    private slots:
       virtual void viewPortChangedSlot( const QRectF& newViewPort );

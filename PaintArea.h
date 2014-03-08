@@ -24,7 +24,6 @@ class PaintArea : public PaintAreaBase
       void wheelEvent( QWheelEvent* event );
       void mouseDoubleClickEvent( QMouseEvent* event );
 
-      void mouseReleaseEvent( QMouseEvent* event );
       void mouseMoveEvent( QMouseEvent* event );
 
    public:
@@ -49,7 +48,6 @@ class PaintArea : public PaintAreaBase
       std::vector< const IPaintCommand* >  m_paintCommands;
 
       bool        m_horizontalMouseWheel;
-      QPoint*     m_oldMousePos;
 
 };
 

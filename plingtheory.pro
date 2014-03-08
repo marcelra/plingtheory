@@ -95,7 +95,6 @@ SOURCES += main.cpp \
     LineDrawAttr.cpp \
     PaintArea.cpp \
     PaintAreaBase.cpp \
-    ScrollItem.cpp \
     ScrollPaintArea.cpp \
     VerticalScrollPaintArea.cpp \
     XAxisPaintArea.cpp \
@@ -196,7 +195,6 @@ HEADERS += \
     LineDrawAttr.h \
     PaintArea.h \
     PaintAreaBase.h \
-    ScrollItem.h \
     ScrollPaintArea.h \
     VerticalScrollPaintArea.h \
     XAxisPaintArea.h \

@@ -9,7 +9,7 @@
 #include <QStandardItemModel>
 #include <QVBoxLayout>
 
-#include <QDebug>
+#include <cassert>
 
 namespace Gui
 {
@@ -27,8 +27,8 @@ MainWindow::MainWindow( QWidget* parent ) :
    m_plotsListView->setFixedWidth( 200 );
 
    m_plotWidget = new DummyPlotWidget( this );
-   m_plotWidget->setFixedWidth( 800 );
-   m_plotWidget->setFixedHeight( 800 );
+   m_plotWidget->setMinimumWidth( 400 );
+   m_plotWidget->setMinimumHeight( 400 );
 
    /// Set layout.
    QWidget* centralWidget = new QWidget( this );
@@ -65,17 +65,18 @@ void MainWindow::plotSelectedSlot( QModelIndex index )
    QStandardItem* item = model->itemFromIndex( index );
    // m_plotWidget->m_label->setText( QString( "%1" ).arg( (long) item->data().value< Plotting::Plot2D* >() ) );
 
-   QLayout* layout = centralWidget()->layout();
+   QHBoxLayout* layout = dynamic_cast< QHBoxLayout* >( centralWidget()->layout() );
+   assert( layout );
    // int plotLayoutIndex = layout->indexOf( m_plotWidget );
    // QLayoutItem* layoutItem = layout->takeAt( plotLayoutIndex );
    // layoutItem->
    layout->removeWidget( m_plotWidget );
    m_plotWidget->hide();
    m_plotWidget = item->data().value< Plotting::Plot2D* >();
-   m_plotWidget->setFixedWidth( 800 );
+   layout->addWidget( m_plotWidget, 1 );
    m_plotWidget->show();
-   layout->addWidget( m_plotWidget );
-
+   m_plotWidget->setMinimumWidth( 400 );
+   m_plotWidget->setMinimumHeight( 400 );
 }
 
 void MainWindow::buildPlotList()
