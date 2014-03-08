@@ -8,6 +8,9 @@
 
 #include <vector>
 
+namespace Plotting
+{
+
 class CurveItem : public IYVsXItem, public LineDrawAttr
 {
    public:
@@ -18,5 +21,7 @@ class CurveItem : public IYVsXItem, public LineDrawAttr
       void generatePlotCommands( PaintArea* paintArea ) const;
 
 };
+
+} /// namespace Plotting
 
 #endif // CURVEITEM_H

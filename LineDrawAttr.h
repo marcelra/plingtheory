@@ -3,6 +3,9 @@
 
 #include <QColor>
 
+namespace Plotting
+{
+
 class LineDrawAttr
 {
    public:
@@ -24,5 +27,7 @@ class LineDrawAttr
       bool        m_antialiasing;
 
 };
+
+} /// namespace Plotting
 
 #endif // LINEDRAWATTR_H

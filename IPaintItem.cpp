@@ -2,6 +2,9 @@
 
 #include "PaintArea.h"
 
+namespace Plotting
+{
+
 IPaintItem::IPaintItem()
 {}
 
@@ -12,3 +15,5 @@ void IPaintItem::paintOn( PaintArea* paintArea ) const
 {
    paintArea->addPaintItem( this );
 }
+
+} /// namespace Plotting

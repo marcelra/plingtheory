@@ -4,6 +4,9 @@
 
 #include <QPainter>
 
+namespace Plotting
+{
+
 PcSetDrawAttr::PcSetDrawAttr( QColor lineColor, double lineWidth, bool antialiasing ) :
    m_pen( lineColor,lineWidth ),
    m_brush( Qt::NoBrush ),
@@ -25,3 +28,5 @@ void PcSetDrawAttr::execute( PaintArea& paintArea ) const
    paintArea.getPainter().setBrush( m_brush );
    paintArea.getPainter().setRenderHint( QPainter::Antialiasing, m_antialiasing );
 }
+
+} /// namespace Plotting

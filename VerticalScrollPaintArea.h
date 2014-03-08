@@ -3,6 +3,9 @@
 
 #include "ScrollPaintArea.h"
 
+namespace Plotting
+{
+
 class VerticalScrollPaintArea : public ScrollPaintArea
 {
    Q_OBJECT
@@ -18,5 +21,7 @@ class VerticalScrollPaintArea : public ScrollPaintArea
    private slots:
       virtual void viewPortChangedSlot( const QRectF& newViewPort );
 };
+
+} /// namespace Plotting
 
 #endif // VERTICALSCROLLPAINTAREA_H

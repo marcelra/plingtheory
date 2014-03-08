@@ -5,6 +5,9 @@
 
 class QRectF;
 
+namespace Plotting
+{
+
 class ScrollItem : public IPaintItem
 {
    public:
@@ -35,5 +38,7 @@ class ScrollItem : public IPaintItem
 
 
 };
+
+} /// namespace Plotting
 
 #endif // SCROLLITEM_H

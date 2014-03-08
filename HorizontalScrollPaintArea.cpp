@@ -1,5 +1,8 @@
 #include "HorizontalScrollPaintArea.h"
 
+namespace Plotting
+{
+
 HorizontalScrollPaintArea::HorizontalScrollPaintArea( QWidget* parent ) :
    ScrollPaintArea( parent )
 {}
@@ -56,3 +59,4 @@ void HorizontalScrollPaintArea::viewPortChangedSlot( const QRectF& newViewPort )
    }
 }
 
+} /// namespace Plotting

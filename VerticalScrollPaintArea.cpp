@@ -2,6 +2,9 @@
 
 #include <QDebug>
 
+namespace Plotting
+{
+
 VerticalScrollPaintArea::VerticalScrollPaintArea( QWidget* parent ) :
    ScrollPaintArea( parent )
 {}
@@ -61,3 +64,4 @@ void VerticalScrollPaintArea::viewPortChangedSlot( const QRectF& newViewPort )
    }
 }
 
+} /// namespace Plotting

@@ -6,6 +6,9 @@
 #include <QPen>
 #include <QBrush>
 
+namespace Plotting
+{
+
 class PcSetDrawAttr : public IPaintCommand
 {
    public:
@@ -20,5 +23,7 @@ class PcSetDrawAttr : public IPaintCommand
       QBrush      m_brush;
       bool        m_antialiasing;
 };
+
+} /// namespace Plotting
 
 #endif // PCSETDRAWATTR_H

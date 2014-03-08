@@ -3,6 +3,9 @@
 
 #include "PaintAreaBase.h"
 
+namespace Plotting
+{
+
 class AxisPaintArea : public PaintAreaBase
 {
    Q_OBJECT
@@ -37,5 +40,7 @@ class AxisPaintArea : public PaintAreaBase
       std::vector< double >      m_majorTicks;
       std::vector< double >      m_minorTicks;
 };
+
+} /// namespace Plotting
 
 #endif // AXISPAINTAREA_H

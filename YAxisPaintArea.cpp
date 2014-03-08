@@ -2,6 +2,9 @@
 
 #include <QPainter>
 
+namespace Plotting
+{
+
 YAxisPaintArea::YAxisPaintArea( QWidget* parent ) :
    AxisPaintArea( parent )
 {}
@@ -77,3 +80,5 @@ double YAxisPaintArea::getMax() const
 {
    return getViewPort().bottom();
 }
+
+} /// namespace Plotting

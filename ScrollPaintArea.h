@@ -3,6 +3,9 @@
 
 #include "PaintArea.h"
 
+namespace Plotting
+{
+
 class ScrollPaintArea : public PaintAreaBase
 {
    Q_OBJECT
@@ -29,5 +32,7 @@ class ScrollPaintArea : public PaintAreaBase
       QRectF   m_viewPortGraph;
 
 };
+
+} /// namespace Plotting
 
 #endif // SCROLLPAINTAREA_H
