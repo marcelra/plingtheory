@@ -1,7 +1,11 @@
 TEMPLATE = app
 CONFIG += console
-CONFIG -= qt
+# CONFIG -= qt
+QT += core  gui
 CONFIG -= app_bundle
+TEMPLATE = app
+
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 SOURCES += main.cpp \
     RawPcmData.cpp \
@@ -75,7 +79,31 @@ SOURCES += main.cpp \
     GroundtoneHypothesisBuilder.cpp \
     AccumArrayPeakAlgorithm.cpp \
     StftData.cpp \
-    SrSpectrum.cpp
+    SrSpectrum.cpp \
+    MainWindow.cpp \
+    DevGui.cpp \
+    AvailablePlotsList.cpp \
+    Plot2D.cpp \
+    IPaintItem.cpp \
+    AxisPaintArea.cpp \
+    CurveItem.cpp \
+    GridItem.cpp \
+    HorizontalScrollPaintArea.cpp \
+    IPaintCommand.cpp \
+    ITwoDimPlotData.cpp \
+    IYVsXItem.cpp \
+    LineDrawAttr.cpp \
+    PaintArea.cpp \
+    PaintAreaBase.cpp \
+    ScrollItem.cpp \
+    ScrollPaintArea.cpp \
+    VerticalScrollPaintArea.cpp \
+    XAxisPaintArea.cpp \
+    YAxisPaintArea.cpp \
+    YVsXData.cpp \
+    PcLinePaint.cpp \
+    PcSetDrawAttr.cpp \
+    PcRectanglePaint.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -151,7 +179,31 @@ HEADERS += \
     GroundtoneHypothesisBuilder.h \
     AccumArrayPeakAlgorithm.h \
     StftData.h \
-    SrSpectrum.h
+    SrSpectrum.h \
+    MainWindow.h \
+    DevGui.h \
+    AvailablePlotsList.h \
+    Plot2D.h \
+    IPaintItem.h \
+    AxisPaintArea.h \
+    CurveItem.h \
+    GridItem.h \
+    HorizontalScrollPaintArea.h \
+    IPaintCommand.h \
+    ITwoDimPlotData.h \
+    IYVsXItem.h \
+    LineDrawAttr.h \
+    PaintArea.h \
+    PaintAreaBase.h \
+    ScrollItem.h \
+    ScrollPaintArea.h \
+    VerticalScrollPaintArea.h \
+    XAxisPaintArea.h \
+    YAxisPaintArea.h \
+    YVsXData.h \
+    PcLinePaint.h \
+    PcSetDrawAttr.h \
+    PcRectanglePaint.h
 
 OTHER_FILES += \
     Todos.txt

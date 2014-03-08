@@ -61,9 +61,9 @@ class ObjectPool : SingletonBase
        */
       ObjectPool();
 
-      typedef std::map< std::string, IStorable*> Store;
-      typedef Store::iterator                    StoreIt;
-      typedef Store::const_iterator              StoreConstIt;
+      typedef std::map< std::string, IStorable* > Store;
+      typedef Store::iterator                     StoreIt;
+      typedef Store::const_iterator               StoreConstIt;
 
       Store           m_store;
       mutable Logger* m_logger;
