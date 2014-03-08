@@ -53,7 +53,7 @@ class MainWindow : public QMainWindow
    private:
       QPushButton*         m_quitButton;
       QListView*           m_plotsListView;
-      DummyPlotWidget*     m_plotWidget;
+      QWidget*             m_plotWidget;
 };
 
 } /// namespace Gui

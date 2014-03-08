@@ -73,12 +73,12 @@ void YAxisPaintArea::drawAxisLine()
 
 double YAxisPaintArea::getMin() const
 {
-   return getViewPort().top();
+   return getViewPort().bottom();
 }
 
 double YAxisPaintArea::getMax() const
 {
-   return getViewPort().bottom();
+   return getViewPort().top();
 }
 
 } /// namespace Plotting

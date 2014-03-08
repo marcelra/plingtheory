@@ -49,6 +49,8 @@ enum ProgramStatus
    PS_GUI_NONZERO_STATUSCODE
 } programStatus;
 
+QApplication* gApp = 0;
+
 class StopExecutionException {};
 class ImmediateStopExecutionException {};
 
@@ -100,7 +102,8 @@ const ProgramOptions* initialiseApplication( int argc, char* argv[] )
       DBG_MSG( "Global logger initialised; message threshold is " << Msg::strRep( threshold ) );
 
       /// Setup ROOT
-      RootUtilities::initRootApplication();
+      // TODO: commented out... reconsider
+      // RootUtilities::initRootApplication();
 
       /// Handle interrupt signal
       struct sigaction sigIntHandler;
@@ -155,6 +158,8 @@ void finaliseApplication()
       RootUtilities::closeRootAppIfRunning( programStatus );
 
       /// Exit
+      DBG_MSG( "Deleting the GUI application..." );
+      delete gApp;
       DBG_MSG( "Leaving finaliseApplication" );
       DBG_MSG( "Leaving " << GlobalParameters::getProgramName() << "(exit code " << programStatus << ")" );
    }
@@ -184,6 +189,10 @@ int main( int argc, char* argv[] )
          {
             programStatus = PS_UNRECOVERABLE_USER_EXCEPTION;
             return programStatus;
+         }
+         if ( programOptions->doProcessRootEvents() )
+         {
+            gApp = new QApplication( argc, argv );
          }
 
          /// Run tests
@@ -220,12 +229,11 @@ int main( int argc, char* argv[] )
 
                // RootUtilities::processRootEvents();
 
-               QApplication qApplication( argc, argv );
 
                Gui::MainWindow mainWindow;
                mainWindow.show();
 
-               if ( qApplication.exec() != 0 )
+               if ( gApp->exec() != 0 )
                {
                   programStatus = PS_GUI_NONZERO_STATUSCODE;
                   throw StopExecutionException();

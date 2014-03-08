@@ -9,7 +9,7 @@ namespace Plotting
 class LineDrawAttr
 {
    public:
-      LineDrawAttr( QColor color = Qt::black, double width = 2, bool antialiasing = true );
+      LineDrawAttr( QColor color = Qt::black, double width = 2, bool antialiasing = false );
       virtual ~LineDrawAttr();
 
       void setLineColor( const QColor& color );

@@ -34,7 +34,6 @@ void XAxisPaintArea::drawMajorTick( double tickValue )
 
    QString label = QString( "%1" ).arg( tickValue );
 
-   // QFont font( "Ubuntu Mono" );
    QFont font;
    font.setPixelSize( 15 );
    p.setFont( font );
