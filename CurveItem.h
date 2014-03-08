@@ -4,10 +4,6 @@
 #include "IYVsXItem.h"
 #include "LineDrawAttr.h"
 
-#include <QColor>
-
-#include <vector>
-
 namespace Plotting
 {
 
