@@ -103,7 +103,8 @@ SOURCES += main.cpp \
     YVsXData.cpp \
     PcLinePaint.cpp \
     PcSetDrawAttr.cpp \
-    PcRectanglePaint.cpp
+    PcRectanglePaint.cpp \
+    RegLargeDataCurve.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -203,7 +204,8 @@ HEADERS += \
     YVsXData.h \
     PcLinePaint.h \
     PcSetDrawAttr.h \
-    PcRectanglePaint.h
+    PcRectanglePaint.h \
+    RegLargeDataCurve.h
 
 OTHER_FILES += \
     Todos.txt

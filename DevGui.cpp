@@ -4,7 +4,7 @@
 #include "Logger.h"
 #include "TestDataSupply.h"
 
-#include "CurveItem.h"
+#include "RegLargeDataCurve.h"
 #include "Plot2D.h"
 
 void DevGui::execute()
@@ -23,7 +23,7 @@ void DevGui::execute()
       xData[ i ] = i;
    }
 
-   Plotting::CurveItem* curveItem = new Plotting::CurveItem( xData, *yData );
+   Plotting::RegLargeDataCurve* curveItem = new Plotting::RegLargeDataCurve( xData, *yData );
 
    Plotting::Plot2D* plot2D = new Plotting::Plot2D();
    plot2D->addItem( curveItem );
