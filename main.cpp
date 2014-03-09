@@ -8,7 +8,9 @@
 #include "MainWindow.h"
 #include "ProgramOptions.h"
 #include "RootFileCompare.h"
+#include "RootPlotFactory.h"
 #include "RootUtilities.h"
+#include "QtPlotFactory.h"
 #include "SingletonStore.h"
 #include "TestSuite.h"
 
@@ -102,9 +104,11 @@ const ProgramOptions* initialiseApplication( int argc, char* argv[] )
       DBG_MSG( "Global logger initialised; message threshold is " << Msg::strRep( threshold ) );
 
       /// Setup ROOT
-      if ( programOptions->doProcessRootEvents() )
+      if ( programOptions->useRootInterface() )
       {
          RootUtilities::initRootApplication();
+
+         PlotInterface::RootPlotFactory::initialise();
 
          /// Handle interrupt signal
          struct sigaction sigIntHandler;
@@ -112,6 +116,11 @@ const ProgramOptions* initialiseApplication( int argc, char* argv[] )
          sigemptyset( &sigIntHandler.sa_mask );
          sigIntHandler.sa_flags = 0;
          sigaction( SIGINT, &sigIntHandler, 0 );
+      }
+
+      if ( programOptions->useQtInterface() )
+      {
+         PlotInterface::QtPlotFactory::initialise();
       }
 
       /// Report finalisation complete
@@ -220,11 +229,16 @@ int main( int argc, char* argv[] )
             compareRootFiles( programOptions );
          }
 
-         /// Finalisation
-         bool doProcessRootEvents = programOptions->doProcessRootEvents();
-
-         if ( doProcessRootEvents )
+         /// TODO: Temp for development of PlotFactory
+         if ( programOptions->useRootInterface() || programOptions->useQtInterface() )
          {
+         //   DevGui::devPlotFactory();
+         }
+
+         /// Event loops.
+         if ( programOptions->useRootInterface() )
+         {
+
             if ( programStatus == PS_OK )
             {
                std::cout << "Running complete." << std::endl;
@@ -238,8 +252,6 @@ int main( int argc, char* argv[] )
          {
             if ( programStatus == PS_OK )
             {
-               DevGui::execute();
-
                Gui::MainWindow mainWindow;
                mainWindow.show();
 

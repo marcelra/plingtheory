@@ -2,6 +2,7 @@
 
 #include "PaintArea.h"
 #include "PcMarkerPaint.h"
+#include "PcSetDrawAttr.h"
 
 #include <cstddef>
 
@@ -17,6 +18,9 @@ ScatterItem::~ScatterItem()
 
 void ScatterItem::generatePlotCommands( PaintArea* paintArea ) const
 {
+   PcSetDrawAttr* drawAttrCmd = new PcSetDrawAttr( getLineColor(), getLineWidth(), getAntialiasing() );
+   paintArea->addPaintCommand( drawAttrCmd );
+
    const std::vector< double >& xData = m_data.getX();
    const std::vector< double >& yData = m_data.getY();
 

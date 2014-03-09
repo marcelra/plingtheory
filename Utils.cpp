@@ -104,3 +104,19 @@ IndexVector Utils::createRange( size_t minIndex, size_t maxIndex )
    }
    return result;
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// createRangeReal
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+RealVector Utils::createRangeReal( size_t minIndex, size_t maxIndex )
+{
+   assert( minIndex < maxIndex );
+   RealVector result( maxIndex - minIndex );
+   size_t i = 0;
+   for ( size_t index = minIndex; index < maxIndex; ++index, ++i )
+   {
+      result[ i ] = index;
+   }
+   return result;
+}
+
