@@ -1,5 +1,6 @@
 #include "Plot2D.h"
 
+/// Plotting includes
 #include "CurveItem.h"
 #include "GridItem.h"
 #include "HorizontalScrollPaintArea.h"
@@ -8,32 +9,31 @@
 #include "XAxisPaintArea.h"
 #include "YAxisPaintArea.h"
 
-#include <QHBoxLayout>
-#include <QVBoxLayout>
-#include <QScrollBar>
-#include <QWheelEvent>
+/// Qt includes
+#include <QGridLayout>
 
+/// STL includes
 #include <cassert>
-#include <limits>
 
 namespace Plotting
 {
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// constructor
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 Plot2D::Plot2D( QWidget* parent ) :
    QWidget( parent ),
    m_gridItem( 0 )
 {
+   /// Construct widgets.
    m_xAxisPaintArea = new XAxisPaintArea( this );
-   m_xAxisPaintArea->setName( "xAxis" );
    m_yAxisPaintArea = new YAxisPaintArea( this );
-   m_yAxisPaintArea->setName( "yAxis" );
    m_graph = new PaintArea( this );
    m_empty = new PaintArea( this );
    m_xScroll = new HorizontalScrollPaintArea( this );
-   m_xScroll->setName( "xScroll" );
    m_yScroll = new VerticalScrollPaintArea( this );
-   m_yScroll->setName( "yScroll" );
 
+   /// Set Layout.
    m_xScroll->setFixedHeight( 20 );
    m_yScroll->setFixedWidth( 20 );
 
@@ -52,31 +52,17 @@ Plot2D::Plot2D( QWidget* parent ) :
 
    m_gridLayout->setSpacing( 5 );
    m_gridLayout->setContentsMargins( 0, 0, 0, 0 );
-
-   m_graph->setName( "graph" );
-   m_empty->setName( "empty" );
-
-   std::vector< double> xAxisPointsX;
-   xAxisPointsX.push_back( -std::numeric_limits< double >::max() );
-   xAxisPointsX.push_back( std::numeric_limits< double >::max() );
-   std::vector< double> xAxisPointsY;
-   xAxisPointsY.push_back( 0 );
-   xAxisPointsY.push_back( 0 );
-   // m_xAxis = new CurveItem( xAxisPointsX, xAxisPointsY );
-   // addCurve( m_xAxis );
-
-   std::vector< double> yAxisPointsX;
-   yAxisPointsX.push_back( 0 );
-   yAxisPointsX.push_back( 0 );
-   std::vector< double> yAxisPointsY;
-   yAxisPointsY.push_back( -std::numeric_limits< double >::max() );
-   yAxisPointsY.push_back( std::numeric_limits< double >::max() );
-   // m_yAxis = new CurveItem( yAxisPointsX, yAxisPointsY );
-   // addCurve( m_yAxis );
-
-
    setLayout( m_gridLayout );
 
+   /// Set debug names.
+   m_graph->setName( "graph" );
+   m_empty->setName( "empty" );
+   m_xScroll->setName( "xScroll" );
+   m_yScroll->setName( "yScroll" );
+   m_xAxisPaintArea->setName( "xAxis" );
+   m_yAxisPaintArea->setName( "yAxis" );
+
+   /// Make connections.
    bool isConnected;
    isConnected = connect( m_graph, SIGNAL( viewPortChanged( QRectF ) ), this, SLOT( synchroniseViewPorts( QRectF ) ) );
    assert( isConnected );
@@ -85,15 +71,20 @@ Plot2D::Plot2D( QWidget* parent ) :
    isConnected = connect( m_yScroll, SIGNAL( viewPortFromScroll( QRectF ) ), this, SLOT( setViewPort( QRectF ) ) );
    assert( isConnected );
 
+   /// Enable grid by default.
    setEnableGrid( true );
-
-   // setLayout( m_horizontalLayout );
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// destructor
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 Plot2D::~Plot2D()
 {
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// setEnableGrid
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void Plot2D::setEnableGrid( bool enableGrid )
 {
    if ( enableGrid && !m_gridItem )
@@ -116,6 +107,9 @@ void Plot2D::setEnableGrid( bool enableGrid )
    }
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// addItem
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void Plot2D::addItem( const IPaintItem* item )
 {
    item->paintOn( m_graph );
@@ -127,11 +121,17 @@ void Plot2D::addItem( const IPaintItem* item )
    m_yScroll->setDataRange( dataRange.bottom(), dataRange.top() );
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// setViewPort
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void Plot2D::setViewPort( const QRectF& viewPort )
 {
   m_graph->setViewPort( viewPort );
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// synchroniseViewPorts
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void Plot2D::synchroniseViewPorts( const QRectF& viewPort )
 {
    m_xScroll->setViewPort( viewPort );
@@ -140,5 +140,4 @@ void Plot2D::synchroniseViewPorts( const QRectF& viewPort )
    m_yAxisPaintArea->setViewPort( viewPort );
 }
 
-
-}
+} /// namespace Plotting
