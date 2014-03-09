@@ -2,7 +2,11 @@
 
 #include "Exceptions.h"
 #include "GlobalParameters.h"
+#include "IPlotFactory.h"
 #include "RootUtilities.h"
+
+/// TODO: handle these items.
+bool checkTodos = false;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// runCurrentDevelopmentTest
@@ -37,6 +41,7 @@ void TestSuite::execute()
    testAdvancedFourier();
    testStftAlgorithm();
    testSpectralReassignment();
+   return;
 
    /// Feature algorithms
    testPeakDetection();
@@ -288,9 +293,9 @@ void TestSuite::testWaveFile()
       {
          pcmData.push_back( data->getChannel(0)[i] );
       }
-      TGraph* graph = RootUtilities::createGraph( pcmData );
-      new TCanvas( "canWaveFile", "canWaveFile" );
-      graph->Draw( "AL" );
+
+      gPlotFactory().createPlot( "testWaveFile/WaveFileView" );
+      gPlotFactory().createGraph( pcmData );
 
       /// Clean up
       delete data;
@@ -672,17 +677,18 @@ void TestSuite::testAdvancedFourier()
    RealVectorPtr dataVec = data->copyToVectorData();
    dataVec->resize( 8192 );
 
-   RealVector dataSub = *dataRev - *dataRev;
+   const RealVector& dataSub = *dataRev - *dataRev;
 
-   TGraph* gr = RootUtilities::createGraph( spec->getFrequencies(), spec->getMagnitude() );
-   new TCanvas( "AdvancedFourierTransform", "AdvancedFourierTransform" );
-   gr->Draw( "AL" );
+   gPlotFactory().createPlot( "testAdvancedFourier/FT" );
+   gPlotFactory().createGraph( spec->getFrequencies(), spec->getMagnitude() );
 
-   TGraph* grRevCheck = RootUtilities::createGraph( dataSub );
-   new TCanvas( "ReverseCheck", "ReverseCheck" );
-   grRevCheck->Draw( "AL" );
-
-
+   for ( size_t i = 0; i < dataSub.size(); ++i )
+   {
+      if ( fabs( dataSub[ i ] ) > 1e-14 )
+      {
+         throw ExceptionTestFailed( "testAdvancedFourier", "Reverse Fourier transform did not yield original result." );
+      }
+   }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -723,22 +729,32 @@ void TestSuite::testStftAlgorithm()
    }
 
    const WaveAnalysis::FourierSpectrum& spec = stftData->getSpectrum( 0 );
-   new TCanvas();
-   TGraph* gr = RootUtilities::createGraph( spec.getFrequencies(), spec.getMagnitude() );
-   gr->Draw( "AL" );
+   gPlotFactory().createPlot( "testStftAlgorithm/First FT" );
+   gPlotFactory().createGraph( spec.getFrequencies(), spec.getMagnitude() );
 
-   Visualisation::StftGraph stftGraph( *stftData );
-   stftGraph.create();
+   if ( checkTodos )
+   {
+      assert( !"Uncomment STFT graph code" );
+   }
+   // Visualisation::StftGraph stftGraph( *stftData );
+   // stftGraph.create();
 
    RawPcmData::Ptr reverse = stftAlg.reverseExecute( *stftData );
-   msg << Msg::Info << data->size() << ", " << reverse->size() << Msg::EndReq;
 
-   new TCanvas();
-   RealVectorPtr dataVec = data->copyToVectorData();
-   RealVectorPtr reverseVec = reverse->copyToVectorData();
-   reverseVec->resize( dataVec->size() );
-   TGraph* grSub = RootUtilities::createGraph(  *dataVec - *reverseVec );
-   grSub->Draw( "AL" );
+   msg << Msg::Info << "The reverse STFT produced " << reverse->size() << " samples." << Msg::EndReq;
+   msg << Msg::Info << "The original contains " << data->size() << " samples." << Msg::EndReq;
+
+   const RealVector& vecReverse = Utils::createSelection( *reverse->copyToVectorData(), Utils::createRange( 0, data->size() ) );
+
+   const RealVector& dataSub = *data->copyToVectorData() - vecReverse;
+
+   for ( size_t i = 0; i < dataSub.size(); ++i )
+   {
+      if ( fabs( dataSub[ i ] ) > 1e-14 )
+      {
+         throw ExceptionTestFailed( "testStftAlgorithm", "Reverse Fourier transform did not yield original result." );
+      }
+   }
 
    delete mcData;
 
@@ -759,17 +775,16 @@ void TestSuite::testEnvelope()
       v[i] = envelope.getEnvelope( i );
    }
 
-   new TCanvas();
-   TGraph* gr = RootUtilities::createGraph( v );
-   gr->Draw( "AL" );
-
    SamplingInfo samplingInfo( 44100 );
-   Synthesizer::SineGenerator square( samplingInfo );
+   Synthesizer::SquareGenerator square( samplingInfo );
    square.setFrequency( 880 * 4 );
    square.setEnvelope( new Synthesizer::AdsrEnvelope( envelope ) );
    RawPcmData::Ptr data = square.generate( 1000 );
 
-   RootUtilities::createGraph( *data )->Draw( "AL" );
+   gPlotFactory().createPlot( "testEnvelope/Envelope" );
+   gPlotFactory().createGraph( *data->copyToVectorData() );
+   gPlotFactory().createGraph( v );
+   gPlotFactory().createGraph( -1 * v );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -791,16 +806,19 @@ void TestSuite::testNoiseGenerator()
    toneGen.setEnvelope( new Synthesizer::AdsrEnvelope( 10000, 5000, 10000, 0.5, 5000 ) );
    data->mixAdd( *toneGen.generate( 44100 ) );
 
-   TGraph* gr = RootUtilities::createGraph( *data );
-   new TCanvas();
-   gr->Draw( "AL" );
+   gPlotFactory().createPlot( "testNoiseGenerator/PCM" );
+   gPlotFactory().drawPcmData( *data );
 
    size_t windowSize = 4096;
    WaveAnalysis::StftAlgorithm stftAlg( samplingInfo, windowSize, WaveAnalysis::HanningWindowFuncDef(), windowSize, 2 );
    WaveAnalysis::StftData::Ptr stftData = stftAlg.execute( *data );
 
-   Visualisation::StftGraph stftGraph( *stftData );
-   stftGraph.create();
+   if ( checkTodos )
+   {
+      assert( !"Enable code below" );
+   }
+   // Visualisation::StftGraph stftGraph( *stftData );
+   // stftGraph.create();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -828,15 +846,12 @@ void TestSuite::testTriangleGenerator()
    toneGen.resetEnvelopePhase();
    RawPcmData::Ptr data = toneGen.generate( 44100 );
 
-   TGraph* grRaw = RootUtilities::createGraph( *data );
-   new TCanvas();
-   grRaw->Draw( "AL" );
-
    RealVectorPtr correctData = data->copyToVectorData();
    RealVectorPtr testData = dataCombined.copyToVectorData();
-   TGraph* grPhaseCheck = RootUtilities::createGraph( *testData );
-   new TCanvas();
-   grPhaseCheck->Draw( "AL" );
+
+   gPlotFactory().createPlot( "testTriangleGenerator/PCM" );
+   gPlotFactory().drawPcmData( *data );
+   gPlotFactory().createGraph( Utils::createRangeReal( 0, dataCombined.size() ), *dataCombined.copyToVectorData() - *data->copyToVectorData(), Qt::blue );
 
    MultiChannelRawPcmData triangleMcRpcm( new RawPcmData( dataCombined ) );
    WaveFile::write( "triangle.wav", triangleMcRpcm );
@@ -867,15 +882,9 @@ void TestSuite::testSawtoothGenerator()
    toneGen.resetEnvelopePhase();
    RawPcmData::Ptr data = toneGen.generate( 44100 );
 
-   TGraph* grRaw = RootUtilities::createGraph( *data );
-   new TCanvas();
-   grRaw->Draw( "AL" );
-
-   RealVectorPtr correctData = data->copyToVectorData();
-   RealVectorPtr testData = dataCombined.copyToVectorData();
-   TGraph* grPhaseCheck = RootUtilities::createGraph( *testData );
-   new TCanvas();
-   grPhaseCheck->Draw( "AL" );
+   gPlotFactory().createPlot( "testSawtoothGenerator/PCM" );
+   gPlotFactory().drawPcmData( *data );
+   gPlotFactory().createGraph( Utils::createRangeReal( 0, dataCombined.size() ), *dataCombined.copyToVectorData() - *data->copyToVectorData(), Qt::blue );
 
    MultiChannelRawPcmData sawtoothMcRpcm( new RawPcmData( dataCombined ) );
    WaveFile::write( "sawtooth.wav", sawtoothMcRpcm );
@@ -883,10 +892,14 @@ void TestSuite::testSawtoothGenerator()
    WaveAnalysis::FourierTransform ft( samplingInfo, 4096 * 10, WaveAnalysis::RectangularWindowFuncDef(), 0 );
    double* arr = &((*data)[0]);
    WaveAnalysis::FourierSpectrum::Ptr spec = ft.transform( arr );
-   TGraph* grSpec = RootUtilities::createGraph( spec->getFrequencies(), spec->getMagnitude() );
-   new TCanvas();
-   grSpec->Draw( "AL" );
 
+   gPlotFactory().createPlot( "testSawtoothGenerator/FT" );
+   gPlotFactory().createGraph( spec->getFrequencies(), spec->getMagnitude() );
+
+   if ( checkTodos )
+   {
+      assert( !"Enable code below" );
+   }
    // WaveAnalysis::StftAlgorithm stftAlg( samplingInfo, 4096, WaveAnalysis::RectangularWindowFuncDef(), 4096, 2 );
    // stftAlg.execute( dataCombined );
    // Visualisation::StftGraph stftGraph( stftAlg );
@@ -921,9 +934,9 @@ void TestSuite::testSpectralReassignment()
    WaveAnalysis::FourierSpectrum spec( specReass );
 
    const RealVector& freqCorr = specReass.getFrequencyCorrections();
-   new TCanvas();
-   TGraph* grCorr = RootUtilities::createGraph( freqCorr );
-   grCorr->Draw( "AL" );
+
+   gPlotFactory().createPlot( "testSpectralReassignment/FrequencyCorrections" );
+   gPlotFactory().createGraph( freqCorr );
 
    size_t index = 0;
    Utils::getMaxValueAndIndex( spec.getMagnitude(), index );
@@ -932,13 +945,9 @@ void TestSuite::testSpectralReassignment()
    msg << Msg::Info << "Correction given = " << freqCorr[ index ] << Msg::EndReq;
    msg << Msg::Info << "Correction factor on correction = " << ratio / freqCorr[index] << Msg::EndReq;
 
-   TGraph* gr = RootUtilities::createGraph( spec.getFrequencies(), spec.getMagnitude() );
-   TGraph* grReass = RootUtilities::createGraph( specReass.getFrequencies(), specReass.getMagnitude() );
-
-   new TCanvas();
-   grReass->Draw( "AP" );
-   gr->SetLineColor( kRed );
-   gr->Draw( "LSAME" );
+   gPlotFactory().createPlot( "testSpectralReassignment/Comaprison with Fourier" );
+   gPlotFactory().createGraph( spec.getFrequencies(), spec.getMagnitude(), Qt::red );
+   gPlotFactory().createScatter( specReass.getFrequencies(), specReass.getMagnitude(), Qt::black );
 
    // Visualisation::StftGraph graph( *trans );
    // graph.create();
@@ -973,8 +982,9 @@ void TestSuite::testFindMinima()
       }
    }
 
-   TGraph* graph = RootUtilities::createGraph( v );
-   graph->Draw( "ALP" );
+   gPlotFactory().createPlot( "testFindMinima/sampleData" );
+   gPlotFactory().createGraph( v );
+   gPlotFactory().createScatter( Utils::createRangeReal( 0, v.size() ), v );
 
    std::vector< size_t > result = Utils::findMinima( v );
    for ( size_t i = 0; i < result.size(); ++i )

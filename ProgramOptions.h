@@ -29,7 +29,7 @@ class ProgramOptions
     * Options
     */
    public:
-      bool                 doProcessRootEvents() const;
+      bool                 useRootInterface() const;
       bool                 useQtInterface() const;
       bool                 doUseColorLogger() const;
       const std::string&   getLogFileName() const;
@@ -54,7 +54,7 @@ class ProgramOptions
       bool              m_doCompareRootFiles;
 
    private:
-      bool              m_doProcessRootEvents;
+      bool              m_useRootInterface;
       bool              m_useQtInterface;
       bool              m_doUseColorLogger;
       bool              m_doSaveRootObjects;

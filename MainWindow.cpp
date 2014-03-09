@@ -24,7 +24,7 @@ MainWindow::MainWindow( QWidget* parent ) :
    /// Initialise widgets.
    QStandardItemModel* model = new QStandardItemModel( m_plotsListView );
    m_plotsListView->setModel( model );
-   m_plotsListView->setFixedWidth( 200 );
+   m_plotsListView->setFixedWidth( 300 );
 
    m_plotWidget = new DummyPlotWidget( this );
    m_plotWidget->setMinimumWidth( 400 );
@@ -42,7 +42,7 @@ MainWindow::MainWindow( QWidget* parent ) :
    centralWidget->setLayout( hLayout );
 
    hLayout->addLayout( vLayout );
-   hLayout->addWidget( m_plotWidget );
+   hLayout->addWidget( m_plotWidget, 1 );
 
    /// Make connections.
    connect( m_quitButton, SIGNAL( clicked() ), this, SLOT( quitClickedSlot() ) );

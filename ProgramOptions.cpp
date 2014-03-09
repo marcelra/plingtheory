@@ -14,7 +14,8 @@ ProgramOptions::ProgramOptions( int argc, char* argv[] ) :
    m_doRunTests( false ),
    m_doRunDevelopmentCode( false ),
    m_doCompareRootFiles( false ),
-   m_doProcessRootEvents( true ),
+   m_useRootInterface( false ),
+   m_useQtInterface( false ),
    m_doUseColorLogger( true ),
    m_rootFileNameOld( "" ),
    m_rootFileNameNew( "" ),
@@ -72,13 +73,21 @@ void ProgramOptions::parseArguments()
          m_doCompareRootFiles = true;
       }
       /// Short options
-      else if ( opt == "-b" )
+      else if ( opt == "-root" )
       {
-         m_doProcessRootEvents = false;
+         m_useRootInterface = true;
+         if ( m_useQtInterface )
+         {
+            throw ExceptionGeneral( "Both Qt and ROOT interface are requested, but these cannot be used together." );
+         }
       }
       else if ( opt == "-qt" )
       {
          m_useQtInterface = true;
+         if ( m_useRootInterface )
+         {
+            throw ExceptionGeneral( "Both Qt and ROOT interface are requested, but these cannot be used together." );
+         }
       }
       else if ( opt == "-r" )
       {
@@ -156,8 +165,7 @@ void ProgramOptions::printOptions( std::ostream& os )
    os << "compare <old> <new> : Compare root-files.\n";
    os << "\n";
    os << "Options:\n";
-   os << "-b                  : Do not enter the root event loop.\n";
-   os << "                      This causes the application to terminate directly (i.e. without showing graphs etc.).\n";
+   os << "-root               : Use ROOT interface.\n";
    os << "-qt                 : Use Qt interface.\n";
    os << "-o <filename>       : Write all log data to file with name <filename>.\n";
    os << "-r <filename>       : Save all root objects to file with name <filename>.\n";
@@ -183,11 +191,11 @@ bool ProgramOptions::doRunDevelopmentCode() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// doPocessRootEvents
+/// useRootInterface
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool ProgramOptions::doProcessRootEvents() const
+bool ProgramOptions::useRootInterface() const
 {
-   return m_doProcessRootEvents;
+   return m_useRootInterface;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

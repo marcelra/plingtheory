@@ -105,7 +105,10 @@ SOURCES += main.cpp \
     PcRectanglePaint.cpp \
     RegLargeDataCurve.cpp \
     PcMarkerPaint.cpp \
-    ScatterItem.cpp
+    ScatterItem.cpp \
+    IPlotFactory.cpp \
+    RootPlotFactory.cpp \
+    QtPlotFactory.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -207,7 +210,10 @@ HEADERS += \
     PcRectanglePaint.h \
     RegLargeDataCurve.h \
     PcMarkerPaint.h \
-    ScatterItem.h
+    ScatterItem.h \
+    IPlotFactory.h \
+    RootPlotFactory.h \
+    QtPlotFactory.h
 
 OTHER_FILES += \
     Todos.txt

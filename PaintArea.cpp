@@ -11,6 +11,8 @@
 #include <cassert>
 #include <limits>
 
+#include <QDebug>
+
 namespace Plotting
 {
 
@@ -23,8 +25,8 @@ PaintArea::PaintArea( QWidget* parent ) :
    m_paintCommands(),
    m_horizontalMouseWheel( true )
 {
-   m_dataRange = QRectF( QPointF( 0, 0 ), QPointF( 0, 0 ) );
-   QRectF initialViewPort( QPointF( -1, -1 ), QPointF( 1, 1 ) );
+   m_dataRange = QRectF( QPointF( -1, 1 ), QPointF( 1, -1 ) );
+   QRectF initialViewPort( QPointF( -1, 1 ), QPointF( 1, -1 ) );
    setViewPort( initialViewPort );
 }
 
@@ -120,7 +122,14 @@ void PaintArea::addPaintItem( const IPaintItem* paintItem )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void PaintArea::autoScale()
 {
-   m_viewPort = m_dataRange;
+   double yBorder = -0.1 * m_dataRange.height();
+   double xBorder = 0.1 * m_dataRange.width();
+
+   m_viewPort.setTop( m_dataRange.top() + yBorder );
+   m_viewPort.setBottom( m_dataRange.bottom() - yBorder );
+   m_viewPort.setLeft( m_dataRange.left() - xBorder );
+   m_viewPort.setRight( m_dataRange.right() + xBorder );
+
    emit viewPortChanged( m_viewPort );
 }
 

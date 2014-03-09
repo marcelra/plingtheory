@@ -156,4 +156,14 @@ class ExceptionOptionArgumentParsing : public BaseException
       const char* getType() const;
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// Exception raised when trying to plot an item when no plot is selected.
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class ExceptionNoPlotAvailable : public BaseException
+{
+   public:
+      ExceptionNoPlotAvailable();
+      const char* getType() const;
+};
+
 #endif // EXCEPTIONS_H

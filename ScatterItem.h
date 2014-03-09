@@ -2,11 +2,12 @@
 #define SCATTERITEM_H
 
 #include "IYVsXItem.h"
+#include "LineDrawAttr.h"
 
 namespace Plotting
 {
 
-class ScatterItem : public IYVsXItem // , public MarkerDrawAttr
+class ScatterItem : public IYVsXItem, public LineDrawAttr // , public MarkerDrawAttr
 {
    public:
       ScatterItem( const std::vector< double >& xData, const std::vector< double >& yData );

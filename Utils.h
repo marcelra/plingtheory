@@ -19,22 +19,22 @@ class Utils
       /**
        * Get minimum value of a vector.
        */
-      template <class T>
+      template< class T >
       static double getMinValue( const std::vector< T >& valueVec );
       /**
        * Get maximum value of a vector.
        */
-      template <class T>
+      template< class T >
       static double getMaxValue( const std::vector< T >& valueVec );
       /**
        * Get minimum value and position.
        */
-      template <class T>
+      template< class T >
       static double getMinValueAndIndex( const std::vector< T >& valueVec, size_t& index );
       /**
        * Get maximum value and position.
        */
-      template <class T>
+      template< class T >
       static double getMaxValueAndIndex( const std::vector< T >& valueVec, size_t& index );
 
       /**
@@ -53,12 +53,16 @@ class Utils
        * is not included in the vector.
        */
       static IndexVector createRange( size_t minIndex, size_t maxIndex );
+      static RealVector createRangeReal( size_t minIndex, size_t maxIndex );
+
+      template< class T >
+      static RealVector convertToRealVec( const std::vector< T >& vec );
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// getMinValue
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template <class T>
+template< class T >
 double Utils::getMinValue( const std::vector< T >& valueVec )
 {
    size_t dummy;
@@ -68,7 +72,7 @@ double Utils::getMinValue( const std::vector< T >& valueVec )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// getMinValue
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template <class T>
+template< class T >
 double Utils::getMaxValue( const std::vector< T >& valueVec )
 {
    size_t dummy;
@@ -78,7 +82,7 @@ double Utils::getMaxValue( const std::vector< T >& valueVec )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// getMinValueAndIndex
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template <class T>
+template< class T >
 double Utils::getMinValueAndIndex( const std::vector< T >& valueVec, size_t& index )
 {
    double result = std::numeric_limits< double >::max();
@@ -96,7 +100,7 @@ double Utils::getMinValueAndIndex( const std::vector< T >& valueVec, size_t& ind
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// getMaxValueAndIndex
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-template <class T>
+template< class T >
 double Utils::getMaxValueAndIndex( const std::vector< T >& valueVec, size_t& index )
 {
    double result = -std::numeric_limits< double >::max();
@@ -107,6 +111,20 @@ double Utils::getMaxValueAndIndex( const std::vector< T >& valueVec, size_t& ind
          index = i;
          result = valueVec[i];
       }
+   }
+   return result;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// convertToRealVec
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+template< class T >
+RealVector Utils::convertToRealVec( const std::vector< T >& vec )
+{
+   RealVector result( vec.size() );
+   for ( size_t i = 0; i < result.size(); ++ i )
+   {
+      result[ i ] = static_cast< double >( vec[ i ] );
    }
    return result;
 }

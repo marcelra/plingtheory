@@ -1,5 +1,6 @@
 #include "TestMath.h"
 
+#include "IPlotFactory.h"
 #include "Logger.h"
 #include "RootUtilities.h"
 #include "TestDataSupply.h"
@@ -87,12 +88,9 @@ void TestMath::testSampledMovingAverage()
    Math::SampledMovingAverage movAvgCalc( Math::SampledMovingAverage::createGaussianFilter( 41, 20 ) );
    const RealVector& movAvg = movAvgCalc.calculate( dataSet );
 
-   TGraph* grOriginal = RootUtilities::createGraph( dataSet );
-   TGraph* grMovAvg   = RootUtilities::createGraph( movAvg );
-
-   grOriginal->Draw( "AL" );
-   grMovAvg->Draw( "LSAME" );
-   grMovAvg->SetLineColor( kBlue );
+   gPlotFactory().createPlot( "testSampledMovingAverage/graph" );
+   gPlotFactory().createGraph( dataSet );
+   gPlotFactory().createGraph( movAvg, Qt::blue );
 
    for ( size_t i = 0; i < movAvg.size(); ++i )
    {

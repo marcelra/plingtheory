@@ -252,3 +252,17 @@ const char* ExceptionOptionArgumentParsing::getType() const
 {
    return "ExceptionOptionArgumentParsing";
 }
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// ExceptionNoPlotAvailable
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ExceptionNoPlotAvailable::ExceptionNoPlotAvailable() :
+   BaseException( "No plot is available to plot on." )
+{}
+
+const char* ExceptionNoPlotAvailable::getType() const
+{
+   return "ExceptionNoPlotSelected";
+}

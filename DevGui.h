@@ -5,6 +5,8 @@ class DevGui
 {
    public:
       static void execute();
+
+      static void devPlotFactory();
 };
 
 #endif // DEVGUI_H

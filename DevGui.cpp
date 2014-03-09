@@ -10,6 +10,8 @@
 #include "ScatterItem.h"
 #include "Plot2D.h"
 
+#include "IPlotFactory.h"
+
 void DevGui::execute()
 {
    Logger msg( "DevGui::execute" );
@@ -46,5 +48,26 @@ void DevGui::execute()
    plot2D->addItem( specItem );
    plot2D->addItem( scatter );
    plotsList.addPlot( "Fourier transform", plot2D );
+
+}
+
+void DevGui::devPlotFactory()
+{
+   // PlotInterface::IPlotFactory& plotFactory = PlotInterface::IPlotFactory::getInstance();
+   //std::cout << gPlotFactory << std::endl;
+   RealVector x( 100 );
+   RealVector y1( 100 );
+   RealVector y2( 100 );
+   for ( size_t i = 0; i < 100; ++i )
+   {
+      x[ i ] = i;
+      y1[ i ] = i*i;
+      y2[ i ] = 2*i - 0.5*i*i + 8000;
+   }
+
+   gPlotFactory().createPlot( "ROOT plot" );
+   gPlotFactory().createGraph( x, y1, Qt::black );
+   gPlotFactory().createGraph( x, y2, Qt::blue );
+
 
 }
