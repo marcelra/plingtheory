@@ -4,6 +4,7 @@
 namespace Plotting
 {
 
+/// Forward declares
 class PaintArea;
 
 class IPaintItem

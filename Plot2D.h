@@ -4,22 +4,19 @@
 #include <QWidget>
 #include <QMetaType>
 
+/// Forward declares
 class QGridLayout;
-class QHBoxLayout;
-class QScrollBar;
-class QVBoxLayout;
-class QWheelEvent;
 
 namespace Plotting
 {
 
+/// Forward declares in Plotting namespace
 class CurveItem;
 class GridItem;
 class IPaintItem;
 class PaintArea;
 class ScrollPaintArea;
-class XAxisPaintArea;
-class YAxisPaintArea;
+class AxisPaintArea;
 
 class Plot2D : public QWidget
 {
@@ -32,32 +29,29 @@ class Plot2D : public QWidget
       void addItem( const IPaintItem* item );
       void setEnableGrid( bool enableGrid );
 
-      // void wheelEvent( QWheelEvent* event );
-      // void mouseDoubleClickEvent( QMouseEvent* event );
+   public slots:
+      void setViewPort( const QRectF& viewPort );
 
    private slots:
-      void setViewPort( const QRectF& viewPort );
       void synchroniseViewPorts( const QRectF& viewPort );
 
    private:
-      QHBoxLayout*       m_horizontalLayout;
-      QVBoxLayout*       m_verticalLayoutYScroll;
-      QVBoxLayout*       m_verticalLayoutCanvas;
       QGridLayout*       m_gridLayout;
-      XAxisPaintArea*    m_xAxisPaintArea;
-      YAxisPaintArea*    m_yAxisPaintArea;
+
+   private:
+      AxisPaintArea*     m_xAxisPaintArea;
+      AxisPaintArea*     m_yAxisPaintArea;
       PaintArea*         m_graph;
       PaintArea*         m_empty;
       ScrollPaintArea*   m_xScroll;
       ScrollPaintArea*   m_yScroll;
 
+   private:
       GridItem*          m_gridItem;
-
-      bool               m_horizontalMouseWheel;
 };
 
 } /// namespace Plotting
 
-Q_DECLARE_METATYPE( Plotting::Plot2D* );
+Q_DECLARE_METATYPE( Plotting::Plot2D* )
 
 #endif // PLOT2D_H

@@ -94,7 +94,7 @@ void PaintArea::addPaintItem( const IPaintItem* paintItem )
       m_dataRange.setBottom( paintItem->getMinY() );
       m_dataRange.setTop( paintItem->getMaxY() );
    }
-   else
+   else /// TODO: for robustness: loop over all paint items and determine min/max.
    {
       if ( paintItem->getMinX() < m_dataRange.left() )
       {

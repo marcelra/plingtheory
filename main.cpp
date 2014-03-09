@@ -222,7 +222,6 @@ int main( int argc, char* argv[] )
 
          /// Finalisation
          bool doProcessRootEvents = programOptions->doProcessRootEvents();
-         delete programOptions;
 
          if ( doProcessRootEvents )
          {
@@ -251,6 +250,7 @@ int main( int argc, char* argv[] )
                }
             }
          }
+         delete programOptions;
       }
       catch ( const StopExecutionException& )
       {

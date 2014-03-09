@@ -20,6 +20,7 @@ class ScrollPaintArea : public PaintAreaBase
       void paintEventImpl( QPaintEvent* paintEvent );
       void mouseMoveEvent( QMouseEvent* event );
 
+   /// TODO: These virtual functions need docu...
    private:
       virtual QRectF getDataRangeRect() const = 0;
       virtual QRectF getViewRangeRect() const = 0;
