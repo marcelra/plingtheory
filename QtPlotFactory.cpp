@@ -2,11 +2,12 @@
 
 #include "AvailablePlotsList.h"
 #include "CurveItem.h"
-#include "ScatterItem.h"
 #include "Exceptions.h"
 #include "Plot2D.h"
 #include "RawPcmData.h"
 #include "RegLargeDataCurve.h"
+#include "ScatterItem.h"
+#include "StftPaintItem.h"
 #include "Utils.h"
 
 #include <cassert>
@@ -85,6 +86,18 @@ void QtPlotFactory::createScatter( const std::vector< double >& xData, const std
    Plotting::ScatterItem * item = new Plotting::ScatterItem( xData, yData );
    item->setLineColor( colour );
    item->setAntialiasing( true );
+   m_currentPlot->addItem( item );
+   m_plotItems.push_back( item );
+}
+
+void QtPlotFactory::createStftGraph( const WaveAnalysis::StftData& stftData )
+{
+   if ( !m_currentPlot )
+   {
+      ExceptionNoPlotAvailable();
+   }
+
+   Plotting::StftPaintItem* item = new Plotting::StftPaintItem( stftData );
    m_currentPlot->addItem( item );
    m_plotItems.push_back( item );
 }

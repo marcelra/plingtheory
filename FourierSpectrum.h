@@ -19,21 +19,24 @@ class FourierSpectrum : private ComplexVector
    public:
       /**
        * Constructor.
-       * @param fourierConfig: the configuration of the Fourier transform that created the spectrum
-       * @param first: starting iterator to the complex data
-       * @param last: end iteration to the complex data
+       * @param fourierConfig: the configuration of the Fourier transform that created the spectrum.
+       * @param first: starting iterator to the complex data.
+       * @param last: end iteration to the complex data.
        */
       FourierSpectrum( FourierConfig::CSPtr fourierConfig, const Complex* first, const Complex* last );
       /**
-       * Copy-constructor and assignment operator
+       * Copy-constructor and assignment operator.
        */
       FourierSpectrum( const FourierSpectrum& other );
       FourierSpectrum& operator=( const FourierSpectrum& other );
-
       /**
-       * Destructor
+       * Destructor.
        */
       virtual ~FourierSpectrum();
+      /**
+       * Clone method.
+       */
+      virtual FourierSpectrum* clone() const;
 
       using ComplexVector::at;
       using ComplexVector::operator[];

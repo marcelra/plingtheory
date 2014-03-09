@@ -27,6 +27,7 @@ class StftData
       /**
        * @class WindowLocation
        * @brief Helper class that remembers the window location of a STFT spectrum.
+       * @note Class relies on default implementation of copy constructor.
        */
       class WindowLocation
       {
@@ -48,6 +49,7 @@ class StftData
              * Get the center of the window.
              */
             size_t getCentre() const;
+
          private:
             size_t         m_first;       //! First sample on which the window is applied.
             size_t         m_last;        //! Last sample on which the window is applied.
@@ -62,6 +64,10 @@ class StftData
        * Destructor.
        */
       virtual ~StftData();
+      /**
+       * Copy constructor.
+       */
+      StftData( const StftData& other );
 
       /**
        * Get the total number of Fourier spectra produced.
@@ -114,10 +120,9 @@ class StftData
       FourierConfig::CSPtr                      m_config;            //! Settings of Fourier algorithm used
 
     /**
-     * Blocked copy-constructor and assignment operator (default implementation is not ok).
+     * Blocked assignment operator (default implementation is not ok).
      */
     private:
-      StftData( const StftData& other );
       StftData& operator=( const StftData& other );
 };
 

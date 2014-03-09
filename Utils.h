@@ -76,7 +76,7 @@ template< class T >
 double Utils::getMaxValue( const std::vector< T >& valueVec )
 {
    size_t dummy;
-   return getMinValueAndIndex( valueVec, dummy );
+   return getMaxValueAndIndex( valueVec, dummy );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

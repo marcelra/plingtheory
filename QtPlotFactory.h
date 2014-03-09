@@ -25,6 +25,7 @@ class QtPlotFactory : public IPlotFactory
       void drawPcmData( const RawPcmData& pcmData, const QColor& colour );
 
       void createScatter( const std::vector< double >& xData, const std::vector< double >& yData, const QColor& colour );
+      void createStftGraph( const WaveAnalysis::StftData& stftData );
 
    protected:
       QtPlotFactory();
