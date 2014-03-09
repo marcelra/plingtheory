@@ -8,7 +8,7 @@ namespace Plotting
 {
 
 PcSetDrawAttr::PcSetDrawAttr( QColor lineColor, double lineWidth, bool antialiasing ) :
-   m_pen( lineColor,lineWidth ),
+   m_pen( lineColor, lineWidth, Qt::SolidLine, Qt::FlatCap ),
    m_brush( Qt::NoBrush ),
    m_antialiasing( antialiasing )
 {}

@@ -117,4 +117,10 @@ int RootPlotFactory::rootColorFromQColor( const QColor& colour )
    return TColor::GetColor( (Float_t) colour.redF(), colour.greenF(), colour.blueF() );
 }
 
+void RootPlotFactory::createStftGraph( const WaveAnalysis::StftData& stftData )
+{
+   assert( &stftData );
+   assert( !"Not implemented" );
+}
+
 } /// namespace PlotInterface

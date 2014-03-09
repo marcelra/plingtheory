@@ -19,6 +19,7 @@ void PcLinePaint::execute( PaintArea& paintArea ) const
 {
    const QPointF& v0_transformed = paintArea.transformToCanvasCoordinates( m_v0 );
    const QPointF& v1_transformed = paintArea.transformToCanvasCoordinates( m_v1 );
+   // QLine line( v0_transformed.x(), v0_transformed.y(), v1_transformed.x(), v1_transformed.y() );
    QLineF line( v0_transformed, v1_transformed );
    paintArea.getPainter().drawLine( line );
 }

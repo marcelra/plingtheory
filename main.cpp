@@ -232,7 +232,7 @@ int main( int argc, char* argv[] )
          /// TODO: Temp for development of PlotFactory
          if ( programOptions->useRootInterface() || programOptions->useQtInterface() )
          {
-         //   DevGui::devPlotFactory();
+            DevGui::devPlotFactory();
          }
 
          /// Event loops.

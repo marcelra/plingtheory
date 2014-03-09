@@ -10,6 +10,7 @@ namespace WaveAnalysis
 /**
  * @class SrSpectrum
  * @brief Fourier spectrum with spectral reassignment corrections.
+ * @note Class relies on default implementation of copy-constructor.
  */
 class SrSpectrum : public FourierSpectrum
 {
@@ -21,6 +22,11 @@ class SrSpectrum : public FourierSpectrum
        * @param ftTimeRamp: the Fourier transform with the time-ramped window function.
        */
       SrSpectrum( const FourierSpectrum& ft, const FourierSpectrum& ftDerivative, const FourierSpectrum& ftTimeRamp );
+
+      /**
+       * Clone method.
+       */
+      SrSpectrum* clone() const;
 
       /**
        * Get the frequency of bin indexed by @param binIndex.

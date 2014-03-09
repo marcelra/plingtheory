@@ -108,7 +108,8 @@ SOURCES += main.cpp \
     ScatterItem.cpp \
     IPlotFactory.cpp \
     RootPlotFactory.cpp \
-    QtPlotFactory.cpp
+    QtPlotFactory.cpp \
+    StftPaintItem.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -213,7 +214,8 @@ HEADERS += \
     ScatterItem.h \
     IPlotFactory.h \
     RootPlotFactory.h \
-    QtPlotFactory.h
+    QtPlotFactory.h \
+    StftPaintItem.h
 
 OTHER_FILES += \
     Todos.txt

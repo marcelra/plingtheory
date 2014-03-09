@@ -13,6 +13,11 @@
 class Logger;
 class RawPcmData;
 
+namespace WaveAnalysis
+{
+class StftData;
+}
+
 namespace PlotInterface
 {
 
@@ -33,6 +38,7 @@ class IPlotFactory : SingletonBase
       virtual void drawPcmData( const RawPcmData& pcmData, const QColor& colour = Qt::black ) = 0;
 
       virtual void createScatter( const std::vector< double >& xData, const std::vector< double >& yData, const QColor& colour = Qt::black ) = 0;
+      virtual void createStftGraph( const WaveAnalysis::StftData& stftData ) = 0;
 
    protected:
       IPlotFactory( const std::string& concreteFactoryTypeName );
