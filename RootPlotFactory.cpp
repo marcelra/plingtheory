@@ -3,6 +3,7 @@
 #include "Exceptions.h"
 #include "Logger.h"
 #include "RootUtilities.h"
+#include "StftGraph.h"
 
 /// ROOT includes
 #include "TCanvas.h"
@@ -119,8 +120,8 @@ int RootPlotFactory::rootColorFromQColor( const QColor& colour )
 
 void RootPlotFactory::createStftGraph( const WaveAnalysis::StftData& stftData )
 {
-   assert( &stftData );
-   assert( !"Not implemented" );
+   Visualisation::StftGraph stftGraph( stftData );
+   m_currentCanvas = stftGraph.create();
 }
 
 } /// namespace PlotInterface

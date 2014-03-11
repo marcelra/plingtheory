@@ -30,7 +30,6 @@ class AccumArrayPeakAlgorithm
       double         m_sigmaFactor;
       bool           m_doMonitor;
       size_t         m_maxNumPeaks;
-
 };
 
 } /// FeatureAlgorithm

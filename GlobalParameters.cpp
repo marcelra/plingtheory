@@ -49,5 +49,5 @@ const std::string& GlobalParameters::getTestDataDir()
 }
 
 /// Convenience predefined test directories
-// std::string GlobalParameters::s_testDataDir = "/Users/marcelra/Dev/Suite_soundArchive/";
-std::string GlobalParameters::s_testDataDir = "/home/marcelra/mac/Dev/Suite_soundArchive/";
+std::string GlobalParameters::s_testDataDir = "/Users/marcelra/Dev/Suite_soundArchive/";
+// std::string GlobalParameters::s_testDataDir = "/home/marcelra/mac/Dev/Suite_soundArchive/";

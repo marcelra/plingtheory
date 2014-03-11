@@ -151,8 +151,8 @@ RawPcmData::Ptr TestDataSupply::generateChord( Synthesizer::IGenerator& generato
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 RawPcmData::Ptr TestDataSupply::getCurrentTestSample()
 {
-   // return generateSoundData();
-   return readSoundData();
+   return generateSoundData();
+   // return readSoundData();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -160,9 +160,9 @@ RawPcmData::Ptr TestDataSupply::getCurrentTestSample()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 RawPcmData::Ptr TestDataSupply::readSoundData()
 {
-   std::string fileName = "atc_intro.wav";
+   // std::string fileName = "atc_intro.wav";
    // std::string fileName = "Cscale.wav";
-   // std::string fileName = "monophDistGuitar.wav";
+   std::string fileName = "monophDistGuitar.wav";
    // std::string fileName = "monophDifficult.wav";
    // std::string fileName = "outcry.wav";
 

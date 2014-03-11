@@ -86,4 +86,14 @@ inline double operator*( const RealVector& x, const RealVector& y )
    return result;
 }
 
+inline double sum( const RealVector& x )
+{
+   double result = 0;
+   for ( size_t i = 0; i < x.size(); ++i )
+   {
+      result += x[ i ];
+   }
+   return result;
+}
+
 #endif // REALVECTOR_H

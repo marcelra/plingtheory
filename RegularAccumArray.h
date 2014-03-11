@@ -52,8 +52,8 @@ class RegularAccumArray : public IAccumArray
     */
    public:
       size_t getNumBins() const;
-      virtual double getMinX() const;
-      virtual double getMaxX() const;
+      double getMinX() const;
+      double getMaxX() const;
 
       double getBinContent( size_t iBin ) const;
       const TwoTuple& getBinEntries( size_t iBin ) const;
@@ -71,6 +71,9 @@ class RegularAccumArray : public IAccumArray
       const Bin& getMissedBin() const;
       const Bin& getUnderflowBin() const;
       const Bin& getOverflowBin() const;
+
+   public:
+      double getBinWidth() const;
 
    public:
       std::vector< Bin >      m_bins;
