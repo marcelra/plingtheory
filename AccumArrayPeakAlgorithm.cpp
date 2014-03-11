@@ -37,23 +37,12 @@ std::vector< Feature::Peak > AccumArrayPeakAlgorithm::execute( const Math::Regul
       TGraph* grData = RootUtilities::createGraph( dataContents );
       grData->Draw( "AL" );
       grData->SetLineColor( kGray + 2 );
-   }
-
-   std::vector< Feature::Peak > peaks = findPeaks( baselineSubtractedData, data );
-   for ( size_t iPeak = 0; iPeak < peaks.size(); ++iPeak )
-   {
-   }
-
-
-   if ( m_doMonitor )
-   {
-      // TGraph* grSmooth = RootUtilities::createGraph( smoothedData );
-      // grSmooth->Draw( "LSAME" );
-      // grSmooth->SetLineColor( kBlue );
-
       TGraph* grSub = RootUtilities::createGraph( baselineSubtractedData );
       grSub->Draw( "LSAME" );
    }
+
+   std::vector< Feature::Peak > peaks = findPeaks( baselineSubtractedData, data );
+
    return peaks;
 }
 
@@ -251,12 +240,16 @@ void AccumArrayPeakAlgorithm::dressPeaks( const Math::RegularAccumArray& data, c
 
    if ( m_doMonitor )
    {
-      size_t showPeak = 1;
+      size_t showPeak = 0;
       const Feature::Peak& peak = peaks[ showPeak ];
-      new TCanvas();
-      std::cout << "peak.getData() = " << peak.getData().size() << std::endl;
       msg << Msg::Info << peak.getData() << Msg::EndReq;
-      TGraph* gr = RootUtilities::createGraph( peak.getData() );
+
+      TGraph* gr = RootUtilities::createGraph( Utils::createRangeReal( peak.getLeftBoundIndex(), peak.getRightBoundIndex() ) * data.getBinWidth(), peak.getData() );
+
+      Logger msg( "AccumArrayPeakAlgorithm" );
+      msg << Msg::Info << "Peak centre is located at " << peak.getPosition() << Msg::EndReq;
+
+      new TCanvas();
       gr->Draw( "AL" );
 
       IndexVector range = Utils::createRange( peak.getLeftBoundIndex(), peak.getRightBoundIndex() );
@@ -266,8 +259,38 @@ void AccumArrayPeakAlgorithm::dressPeaks( const Math::RegularAccumArray& data, c
          Math::TwoTuple binTuple = data.getBinEntries( range[ i ] );
          allEntries.append( binTuple );
       }
+
+      std::map< double, size_t > distMap;
+      double totalWeight = 0;
+      for ( size_t iEntry = 0; iEntry < allEntries.getNumElements(); ++iEntry )
+      {
+         double dist = fabs( allEntries.getX( iEntry ) - peak.getPosition() );
+         distMap[ dist ] = iEntry;
+         totalWeight += allEntries.getY( iEntry );
+      }
+
+      double peakSurface = sum( peak.getData() );
+
+      double widthDef = 0.68 ; // peakSurface / exp( 1. );
+      double widthSeen = 0;
+      std::map< double, size_t >::const_iterator it = distMap.begin();
+      for ( ; ; ++it )
+      {
+         widthSeen += allEntries.getY( it->second );
+         if ( widthSeen > widthDef )
+         {
+            break;
+         }
+      }
+      double widthTooMuch = widthSeen - widthDef;
+      msg << Msg::Info << "widthTooMuch = " << widthTooMuch << ", widthDef = " << widthDef << Msg::EndReq;
+      // --it->first
+
+
       TGraph* gr2 = RootUtilities::createGraph( allEntries.getX(), allEntries.getY() );
-      gr2->Draw( "P" );
+      gr2->Draw( "PSAME" );
+
+
    }
 
 }
