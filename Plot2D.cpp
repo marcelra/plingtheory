@@ -73,7 +73,7 @@ Plot2D::Plot2D( QWidget* parent ) :
 
    /// Enable grid by default.
    setEnableGrid( true );
-   synchroniseViewPorts( m_graph->getViewPort() );
+   synchroniseViewPorts( m_graph->getViewport() );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -127,7 +127,7 @@ void Plot2D::addItem( const IPaintItem* item )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void Plot2D::setViewPort( const QRectF& viewPort )
 {
-  m_graph->setViewPort( viewPort );
+  m_graph->setViewport( viewPort );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -135,10 +135,10 @@ void Plot2D::setViewPort( const QRectF& viewPort )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void Plot2D::synchroniseViewPorts( const QRectF& viewPort )
 {
-   m_xScroll->setViewPort( viewPort );
-   m_yScroll->setViewPort( viewPort );
-   m_xAxisPaintArea->setViewPort( viewPort );
-   m_yAxisPaintArea->setViewPort( viewPort );
+   m_xScroll->setViewport( viewPort );
+   m_yScroll->setViewport( viewPort );
+   m_xAxisPaintArea->setViewport( viewPort );
+   m_yAxisPaintArea->setViewport( viewPort );
 }
 
 } /// namespace Plotting

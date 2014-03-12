@@ -16,7 +16,7 @@ ScrollPaintArea::ScrollPaintArea( QWidget* parent ) :
    m_dataMin( 0 ),
    m_dataMax( 0 )
 {
-   connect( this, SIGNAL( viewPortChanged( QRectF ) ), this, SLOT( viewPortChangedSlot( QRectF ) ) );
+   connect( this, SIGNAL( viewportChanged( QRectF ) ), this, SLOT( viewPortChangedSlot( QRectF ) ) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

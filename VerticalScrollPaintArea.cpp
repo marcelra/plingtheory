@@ -70,11 +70,11 @@ void VerticalScrollPaintArea::viewPortChangedSlot( const QRectF& newViewPort )
    /// Do not zoom out more than data range.
    if ( m_viewPortGraph.top() < m_dataMax )
    {
-      m_viewPort.setTop( m_dataMax );
+      m_viewport.setTop( m_dataMax );
    }
    if ( m_viewPortGraph.bottom() > m_dataMin )
    {
-      m_viewPort.setBottom( m_dataMin );
+      m_viewport.setBottom( m_dataMin );
    }
 }
 
@@ -88,15 +88,15 @@ void VerticalScrollPaintArea::updateViewPortGraphFromShift( const QPointF& shift
    m_viewPortGraph.setTop( m_viewPortGraph.top() + shift.y() );
    m_viewPortGraph.setBottom( m_viewPortGraph.bottom() + shift.y() );
 
-   if ( m_viewPortGraph.top() > m_viewPort.top() )
+   if ( m_viewPortGraph.top() > m_viewport.top() )
    {
-      m_viewPortGraph.setTop( m_viewPort.top() );
-      m_viewPortGraph.setBottom( m_viewPort.top() - oldHeight );
+      m_viewPortGraph.setTop( m_viewport.top() );
+      m_viewPortGraph.setBottom( m_viewport.top() - oldHeight );
    }
-   if ( m_viewPortGraph.bottom() < m_viewPort.bottom() )
+   if ( m_viewPortGraph.bottom() < m_viewport.bottom() )
    {
-      m_viewPortGraph.setTop( m_viewPort.bottom() + oldHeight );
-      m_viewPortGraph.setBottom( m_viewPort.bottom() );
+      m_viewPortGraph.setTop( m_viewport.bottom() + oldHeight );
+      m_viewPortGraph.setBottom( m_viewport.bottom() );
    }
 }
 
