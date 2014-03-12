@@ -4,6 +4,7 @@
 namespace Plotting
 {
 
+/// TODO: doc
 class ITwoDimPlotData
 {
    public:

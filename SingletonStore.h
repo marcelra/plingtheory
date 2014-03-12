@@ -7,6 +7,7 @@ class Logger;
 
 class SingletonBase;
 
+/// TODO: doc
 class SingletonStore
 {
    public:

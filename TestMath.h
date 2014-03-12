@@ -1,6 +1,7 @@
 #ifndef TESTMATH_H
 #define TESTMATH_H
 
+/// TODO: doc
 class TestMath
 {
    public:

@@ -8,6 +8,7 @@
 namespace Plotting
 {
 
+/// TODO: doc
 class PcMarkerPaint : public IPaintCommand
 {
    public:

@@ -50,7 +50,6 @@ SOURCES += main.cpp \
     WindowFunction.cpp \
     AlgorithmBase.cpp \
     StftGraph.cpp \
-    DevSpectralReassignment.cpp \
     WindowFuncDef.cpp \
     DynamicFourier.cpp \
     ResonanceMatrixVisualisation.cpp \
@@ -109,7 +108,10 @@ SOURCES += main.cpp \
     IPlotFactory.cpp \
     RootPlotFactory.cpp \
     QtPlotFactory.cpp \
-    StftPaintItem.cpp
+    StftPaintItem.cpp \
+    IPdf.cpp \
+    GaussPdf.cpp \
+    UniformPdf.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -157,7 +159,6 @@ HEADERS += \
     AlgorithmBase.h \
     IStorable.h \
     StftGraph.h \
-    DevSpectralReassignment.h \
     WindowFuncDef.h \
     DynamicFourier.h \
     ResonanceMatrixVisualisation.h \
@@ -215,7 +216,10 @@ HEADERS += \
     IPlotFactory.h \
     RootPlotFactory.h \
     QtPlotFactory.h \
-    StftPaintItem.h
+    StftPaintItem.h \
+    IPdf.h \
+    GaussPdf.h \
+    UniformPdf.h
 
 OTHER_FILES += \
     Todos.txt

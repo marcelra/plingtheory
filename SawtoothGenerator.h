@@ -6,6 +6,7 @@
 namespace Synthesizer
 {
 
+/// TODO: doc
 class SawtoothGenerator : public IGenerator
 {
    public:

@@ -24,6 +24,7 @@ namespace PlotInterface
 /**
  * @class IPlotFactory
  */
+/// TODO: doc
 class IPlotFactory : SingletonBase
 {
    public:

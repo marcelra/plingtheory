@@ -10,6 +10,7 @@ class QMouseEvent;
 namespace Plotting
 {
 
+/// TODO: doc
 class PaintAreaBase : public QWidget
 {
    Q_OBJECT

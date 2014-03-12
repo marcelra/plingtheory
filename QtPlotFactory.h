@@ -12,6 +12,7 @@ class IPaintItem;
 namespace PlotInterface
 {
 
+/// TODO: doc
 class QtPlotFactory : public IPlotFactory
 {
    public:

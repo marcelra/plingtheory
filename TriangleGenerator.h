@@ -7,9 +7,8 @@ namespace Synthesizer
 {
 
 /**
- * @class SawtoothGenerator
+ * @class TriangleGenerator
  * @brief Class that generates triangle waves
- * TODO: rename class to TriangleGenerator
  */
 class TriangleGenerator : public IGenerator
 {

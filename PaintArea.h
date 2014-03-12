@@ -9,6 +9,7 @@ namespace Plotting
 class IPaintItem;
 class IPaintCommand;
 
+/// TODO: doc
 class PaintArea : public PaintAreaBase
 {
    Q_OBJECT
