@@ -6,6 +6,7 @@
 namespace Plotting
 {
 
+/// TODO: doc
 class XAxisPaintArea : public AxisPaintArea
 {
    Q_OBJECT

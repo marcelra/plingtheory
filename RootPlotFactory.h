@@ -13,6 +13,7 @@ namespace PlotInterface
 /**
  * @class RootPlotFactory
  */
+/// TODO: doc
 class RootPlotFactory : public IPlotFactory
 {
    public:

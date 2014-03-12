@@ -7,6 +7,7 @@
 namespace Plotting
 {
 
+/// TODO: doc
 class ScatterItem : public IYVsXItem, public LineDrawAttr // , public MarkerDrawAttr
 {
    public:

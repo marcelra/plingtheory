@@ -18,6 +18,7 @@ class PaintArea;
 class ScrollPaintArea;
 class AxisPaintArea;
 
+/// TODO: doc
 class Plot2D : public QWidget
 {
    Q_OBJECT

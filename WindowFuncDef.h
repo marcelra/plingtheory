@@ -6,6 +6,7 @@
 namespace WaveAnalysis
 {
 
+/// TODO: doc
 class WindowFuncDef
 {
    public:

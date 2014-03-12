@@ -3,6 +3,7 @@
 
 #include <string>
 
+/// TODO: doc
 class SingletonBase
 {
    public:

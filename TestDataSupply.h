@@ -12,6 +12,7 @@ namespace Synthesizer
    class IGenerator;
 }
 
+/// TODO: doc
 class TestDataSupply
 {
    public:

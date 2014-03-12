@@ -6,6 +6,7 @@ namespace Plotting
 
 class PaintArea;
 
+/// TODO: doc
 class IPaintCommand
 {
    public:

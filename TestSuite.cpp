@@ -13,9 +13,10 @@ bool checkTodos = false;
 ////////////////////////////////////////////////////////////////////////////////
 void TestSuite::execute()
 {
-   singleTest();
+   // singleTest();
 
    runTestMath();
+   return;
 
    /// Utilities
    testFindMinima();

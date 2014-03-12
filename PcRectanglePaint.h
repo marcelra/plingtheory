@@ -10,6 +10,7 @@ class QPointF;
 namespace Plotting
 {
 
+/// TODO: doc
 class PcRectanglePaint : public IPaintCommand
 {
    public:

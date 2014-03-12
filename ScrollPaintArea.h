@@ -6,6 +6,7 @@
 namespace Plotting
 {
 
+/// TODO: doc
 class ScrollPaintArea : public PaintAreaBase
 {
    Q_OBJECT

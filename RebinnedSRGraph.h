@@ -14,6 +14,7 @@ namespace WaveAnalysis
 namespace Visualisation
 {
 
+/// TODO: doc
 class RebinnedSRGraph
 {
    public:

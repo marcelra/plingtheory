@@ -11,6 +11,7 @@ class QStandardItemModel;
 namespace Gui
 {
 
+/// TODO: doc
 class AvailablePlotsList : public SingletonBase
 {
    public:

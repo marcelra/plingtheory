@@ -9,6 +9,7 @@
 namespace Plotting
 {
 
+/// TODO: doc
 class PcSetDrawAttr : public IPaintCommand
 {
    public:

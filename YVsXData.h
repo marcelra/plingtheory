@@ -8,6 +8,7 @@
 namespace Plotting
 {
 
+/// TODO: doc
 class YVsXData : public ITwoDimPlotData
 {
    public:

@@ -11,6 +11,7 @@ namespace Plotting
 
 class AxisPaintArea;
 
+/// TODO: doc
 class GridItem : public IPaintItem, public LineDrawAttr
 {
    public:

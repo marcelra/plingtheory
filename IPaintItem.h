@@ -7,6 +7,7 @@ namespace Plotting
 /// Forward declares
 class PaintArea;
 
+/// TODO: doc
 class IPaintItem
 {
    public:

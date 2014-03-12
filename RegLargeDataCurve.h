@@ -7,6 +7,7 @@
 namespace Plotting
 {
 
+/// TODO: doc
 class RegLargeDataCurve : public IYVsXItem, public LineDrawAttr
 {
    public:

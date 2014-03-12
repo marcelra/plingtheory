@@ -7,6 +7,7 @@
 namespace Plotting
 {
 
+/// TODO: doc
 class CurveItem : public IYVsXItem, public LineDrawAttr
 {
    public:

@@ -14,6 +14,7 @@ class QPushButton;
 namespace Gui
 {
 
+/// TODO: doc
 class DummyPlotWidget : public QWidget
 {
    Q_OBJECT

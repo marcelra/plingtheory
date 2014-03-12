@@ -4,6 +4,7 @@
 namespace Math
 {
 
+/// TODO: doc
 class IWeightFunction
 {
    public:
@@ -13,6 +14,7 @@ class IWeightFunction
       virtual double getWeight( double x ) const = 0;
 };
 
+/// TODO: doc
 class GaussianWeightFunction
 {
    public:
