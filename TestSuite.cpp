@@ -82,7 +82,6 @@ void TestSuite::singleTest()
 #include "FocalTones.h"
 #include "AlgorithmBase.h"
 #include "StftGraph.h"
-#include "DevSpectralReassignment.h"
 #include "DynamicFourier.h"
 #include "ResonanceMatrixVisualisation.h"
 #include "FourierTransform.h"

@@ -8,31 +8,42 @@
 namespace Plotting
 {
 
-/// TODO: doc
+/**
+ * @class YVsXData
+ * @brief Class describing simple y vs x data in plots, suchs as curves and scatterplots.
+ */
 class YVsXData : public ITwoDimPlotData
 {
    public:
+      /**
+       * Constructor that initialises the data set.
+       */
       YVsXData( const std::vector< double >& xData, const std::vector< double >& yData );
-      virtual ~YVsXData();
 
+   /**
+    * Implementation of ITwoDimPlotData interface (@see ITwoDimPlotData).
+    */
    public:
       double getMinX() const;
       double getMaxX() const;
       double getMinY() const;
       double getMaxY() const;
 
+   /**
+    * Access data.
+    */
    public:
       const std::vector< double >& getX() const;
       const std::vector< double >& getY() const;
 
    private:
-      std::vector< double >      m_xData;
-      std::vector< double >      m_yData;
+      std::vector< double >      m_xData;       //! x data points
+      std::vector< double >      m_yData;       //! y data points
 
-      double                     m_xMin;
-      double                     m_xMax;
-      double                     m_yMin;
-      double                     m_yMax;
+      double                     m_xMin;        //! cached min x
+      double                     m_xMax;        //! cached max x
+      double                     m_yMin;        //! cached min y
+      double                     m_yMax;        //! cached max y
 };
 
 

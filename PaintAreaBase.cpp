@@ -32,13 +32,13 @@ QPointF PaintAreaBase::transformToCanvasCoordinates( const QPointF& point ) cons
 {
    QPointF result;
 
-   double scaleX = m_canvas.width() / m_viewPort.width();
-   double scaleY = - m_canvas.height() / m_viewPort.height();
+   double scaleX = m_canvas.width() / m_viewport.width();
+   double scaleY = - m_canvas.height() / m_viewport.height();
 
-   double shiftX = -m_viewPort.left();
+   double shiftX = -m_viewport.left();
 
    result.setX( ( point.x() + shiftX ) * scaleX );
-   result.setY( scaleY * ( m_viewPort.top() - point.y() ) );
+   result.setY( scaleY * ( m_viewport.top() - point.y() ) );
 
    return result;
 }
@@ -48,14 +48,14 @@ QPointF PaintAreaBase::transformToCanvasCoordinates( const QPointF& point ) cons
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 QPointF PaintAreaBase::transformToWorldCoordinates( const QPoint& point ) const
 {
-   double scaleX = m_viewPort.width() / m_canvas.width();
-   double scaleY = -m_viewPort.height() / m_canvas.height();
+   double scaleX = m_viewport.width() / m_canvas.width();
+   double scaleY = -m_viewport.height() / m_canvas.height();
 
-   double shiftX = m_viewPort.left();
+   double shiftX = m_viewport.left();
 
    QPointF result;
    result.setX( point.x() * scaleX + shiftX );
-   result.setY( -scaleY * point.y() + m_viewPort.top() );
+   result.setY( -scaleY * point.y() + m_viewport.top() );
 
    return result;
 }
@@ -92,18 +92,18 @@ void PaintAreaBase::setName( const QString& name )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// getViewPort
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-const QRectF& PaintAreaBase::getViewPort() const
+const QRectF& PaintAreaBase::getViewport() const
 {
-   return m_viewPort;
+   return m_viewport;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// setViewPort
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void PaintAreaBase::setViewPort( const QRectF& viewPort )
+void PaintAreaBase::setViewport( const QRectF& viewPort )
 {
-   m_viewPort = viewPort;
-   emit viewPortChanged( m_viewPort );
+   m_viewport = viewPort;
+   emit viewportChanged( m_viewport );
    update();
 }
 

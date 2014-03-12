@@ -13,12 +13,6 @@ YAxisPaintArea::YAxisPaintArea( QWidget* parent ) :
 {}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// destructor
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-YAxisPaintArea::~YAxisPaintArea()
-{}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// getNumPixelsAlongAxis
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int YAxisPaintArea::getNumsPixelsAlongAxis()
@@ -31,19 +25,26 @@ int YAxisPaintArea::getNumsPixelsAlongAxis()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void YAxisPaintArea::drawMajorTick( double tickValue )
 {
+   /// Obtain the painter on this paint area.
+   /// The YAxisPaintArea inherits a paint area base.
    QPainter& p = getPainter();
 
+   /// Define size of major ticks.
    size_t tickLength = 10;
 
+   /// Transform world-coordinates of tick position to canvas coordinates.
    QPointF tickPosCanvas = transformToCanvasCoordinates( QPointF( 0, tickValue ) );
    int tickPosY = tickPosCanvas.y();
 
+   /// Build the line on the canvas of tick.
    QLineF tickLine( QPointF( m_canvas.right(), tickPosY ), QPointF( m_canvas.right() - tickLength, tickPosY ) );
 
+   /// Draw the line.
    p.setPen( QPen( QBrush( Qt::black ), 2 ) );
    p.setRenderHint( QPainter::Antialiasing, true );
    p.drawLine( tickLine );
 
+   /// Render the label.
    QString label = QString( "%1" ).arg( tickValue );
 
    QFont font;
@@ -52,7 +53,6 @@ void YAxisPaintArea::drawMajorTick( double tickValue )
 
    p.save();
    p.translate( QPointF( m_canvas.right() + 1 - tickLength, tickPosY ) );
-   // p.rotate( 45 );
 
    QRectF textRectMax( QPoint( -110, -10 ), QSize( 100, 20 ) );
    p.drawText( textRectMax, Qt::AlignRight | Qt::AlignVCenter, label );
@@ -94,7 +94,7 @@ void YAxisPaintArea::drawAxisLine()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 double YAxisPaintArea::getMin() const
 {
-   return getViewPort().bottom();
+   return getViewport().bottom();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -102,7 +102,7 @@ double YAxisPaintArea::getMin() const
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 double YAxisPaintArea::getMax() const
 {
-   return getViewPort().top();
+   return getViewport().top();
 }
 
 } /// namespace Plotting

@@ -7,6 +7,9 @@
 namespace Plotting
 {
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// constructor
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 YVsXData::YVsXData( const std::vector< double >& xData, const std::vector< double >& yData ) :
    m_xData( xData ),
    m_yData( yData ),
@@ -38,8 +41,5 @@ YVsXData::YVsXData( const std::vector< double >& xData, const std::vector< doubl
       }
    }
 }
-
-YVsXData::~YVsXData()
-{}
 
 } /// namespace Plotting

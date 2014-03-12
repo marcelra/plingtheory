@@ -6,7 +6,11 @@
 namespace Plotting
 {
 
-/// TODO: doc
+/**
+ * @class XAxisPaintArea
+ * @brief Class deriving from AxisPaintArea with implementation for drawing an x-axis. See for more detailed documentation
+ * @see YAxisPaintArea and @see AxisPaintArea.
+ */
 class XAxisPaintArea : public AxisPaintArea
 {
    Q_OBJECT
