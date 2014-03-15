@@ -11,12 +11,6 @@ VerticalScrollPaintArea::VerticalScrollPaintArea( QWidget* parent ) :
 {}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// destructor
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-VerticalScrollPaintArea::~VerticalScrollPaintArea()
-{}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// getDataRangeRect
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 QRectF VerticalScrollPaintArea::getDataRangeRect() const
@@ -38,8 +32,8 @@ QRectF VerticalScrollPaintArea::getDataRangeRect() const
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 QRectF VerticalScrollPaintArea::getViewRangeRect() const
 {
-   QPointF viewMinCanvas = transformToCanvasCoordinates( m_viewPortGraph.topLeft() );
-   QPointF viewMaxCanvas = transformToCanvasCoordinates( m_viewPortGraph.bottomRight() );
+   QPointF viewMinCanvas = transformToCanvasCoordinates( m_viewportGraph.topLeft() );
+   QPointF viewMaxCanvas = transformToCanvasCoordinates( m_viewportGraph.bottomRight() );
 
    QRect viewRect( m_canvas );
    viewRect.setTop( viewMinCanvas.y() );
@@ -61,18 +55,18 @@ QRectF VerticalScrollPaintArea::getViewRangeRect() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// viewPortChangedSlot
+/// viewportChangedSlot
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void VerticalScrollPaintArea::viewPortChangedSlot( const QRectF& newViewPort )
+void VerticalScrollPaintArea::viewportChangedSlot( const QRectF& newViewportOfGraph )
 {
-   m_viewPortGraph = newViewPort;
+   m_viewportGraph = newViewportOfGraph;
 
    /// Do not zoom out more than data range.
-   if ( m_viewPortGraph.top() < m_dataMax )
+   if ( m_viewportGraph.top() < m_dataMax )
    {
       m_viewport.setTop( m_dataMax );
    }
-   if ( m_viewPortGraph.bottom() > m_dataMin )
+   if ( m_viewportGraph.bottom() > m_dataMin )
    {
       m_viewport.setBottom( m_dataMin );
    }
@@ -81,22 +75,22 @@ void VerticalScrollPaintArea::viewPortChangedSlot( const QRectF& newViewPort )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// updateViewPortGraphFromShift
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void VerticalScrollPaintArea::updateViewPortGraphFromShift( const QPointF& shift )
+void VerticalScrollPaintArea::updateViewportGraphFromShift( const QPointF& shift )
 {
-   double oldHeight = -m_viewPortGraph.height();
+   double oldHeight = -m_viewportGraph.height();
 
-   m_viewPortGraph.setTop( m_viewPortGraph.top() + shift.y() );
-   m_viewPortGraph.setBottom( m_viewPortGraph.bottom() + shift.y() );
+   m_viewportGraph.setTop( m_viewportGraph.top() + shift.y() );
+   m_viewportGraph.setBottom( m_viewportGraph.bottom() + shift.y() );
 
-   if ( m_viewPortGraph.top() > m_viewport.top() )
+   if ( m_viewportGraph.top() > m_viewport.top() )
    {
-      m_viewPortGraph.setTop( m_viewport.top() );
-      m_viewPortGraph.setBottom( m_viewport.top() - oldHeight );
+      m_viewportGraph.setTop( m_viewport.top() );
+      m_viewportGraph.setBottom( m_viewport.top() - oldHeight );
    }
-   if ( m_viewPortGraph.bottom() < m_viewport.bottom() )
+   if ( m_viewportGraph.bottom() < m_viewport.bottom() )
    {
-      m_viewPortGraph.setTop( m_viewport.bottom() + oldHeight );
-      m_viewPortGraph.setBottom( m_viewport.bottom() );
+      m_viewportGraph.setTop( m_viewport.bottom() + oldHeight );
+      m_viewportGraph.setBottom( m_viewport.bottom() );
    }
 }
 

@@ -11,12 +11,6 @@ HorizontalScrollPaintArea::HorizontalScrollPaintArea( QWidget* parent ) :
 {}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// destructor
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-HorizontalScrollPaintArea::~HorizontalScrollPaintArea()
-{}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// getDataRangeRect
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 QRectF HorizontalScrollPaintArea::getDataRangeRect() const
@@ -38,8 +32,8 @@ QRectF HorizontalScrollPaintArea::getDataRangeRect() const
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 QRectF HorizontalScrollPaintArea::getViewRangeRect() const
 {
-   QPointF viewMinCanvas = transformToCanvasCoordinates( m_viewPortGraph.topLeft() );
-   QPointF viewMaxCanvas = transformToCanvasCoordinates( m_viewPortGraph.bottomRight() );
+   QPointF viewMinCanvas = transformToCanvasCoordinates( m_viewportGraph.topLeft() );
+   QPointF viewMaxCanvas = transformToCanvasCoordinates( m_viewportGraph.bottomRight() );
 
    QRectF viewRect( m_canvas );
    viewRect.setLeft( viewMinCanvas.x() );
@@ -59,16 +53,16 @@ QRectF HorizontalScrollPaintArea::getViewRangeRect() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// viewPortChangedSlot
+/// viewportChangedSlot
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void HorizontalScrollPaintArea::viewPortChangedSlot( const QRectF& newViewPort )
+void HorizontalScrollPaintArea::viewportChangedSlot( const QRectF& newViewportOfGraph )
 {
-   m_viewPortGraph = newViewPort;
-   if ( m_viewPortGraph.left() > m_dataMin )
+   m_viewportGraph = newViewportOfGraph;
+   if ( m_viewportGraph.left() > m_dataMin )
    {
       m_viewport.setLeft( m_dataMin );
    }
-   if ( m_viewPortGraph.right() < m_dataMax )
+   if ( m_viewportGraph.right() < m_dataMax )
    {
       m_viewport.setRight( m_dataMax );
    }
@@ -77,21 +71,21 @@ void HorizontalScrollPaintArea::viewPortChangedSlot( const QRectF& newViewPort )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// updateViewPortGraphFromShift
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void HorizontalScrollPaintArea::updateViewPortGraphFromShift( const QPointF& shift )
+void HorizontalScrollPaintArea::updateViewportGraphFromShift( const QPointF& shift )
 {
-   double oldWidth = m_viewPortGraph.width();
-   m_viewPortGraph.setLeft( m_viewPortGraph.left() + shift.x() );
-   m_viewPortGraph.setRight( m_viewPortGraph.right() + shift.x() );
+   double oldWidth = m_viewportGraph.width();
+   m_viewportGraph.setLeft( m_viewportGraph.left() + shift.x() );
+   m_viewportGraph.setRight( m_viewportGraph.right() + shift.x() );
 
-   if ( m_viewPortGraph.left() < m_viewport.left() )
+   if ( m_viewportGraph.left() < m_viewport.left() )
    {
-      m_viewPortGraph.setLeft( m_viewport.left() );
-      m_viewPortGraph.setRight( m_viewport.left() + oldWidth );
+      m_viewportGraph.setLeft( m_viewport.left() );
+      m_viewportGraph.setRight( m_viewport.left() + oldWidth );
    }
-   if ( m_viewPortGraph.right() > m_viewport.right() )
+   if ( m_viewportGraph.right() > m_viewport.right() )
    {
-      m_viewPortGraph.setLeft( m_viewport.right() - oldWidth );
-      m_viewPortGraph.setRight( m_viewport.right() );
+      m_viewportGraph.setLeft( m_viewport.right() - oldWidth );
+      m_viewportGraph.setRight( m_viewport.right() );
    }
 }
 

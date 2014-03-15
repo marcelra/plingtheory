@@ -155,20 +155,20 @@ void PaintArea::addPaintCommand( const IPaintCommand* paintCommand )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void PaintArea::wheelEvent( QWheelEvent* event )
 {
-   const QPointF& viewPortCenter = transformToWorldCoordinates( event->pos() );
-   const QRectF& viewPort = getViewport();
+   const QPointF& viewportCenter = transformToWorldCoordinates( event->pos() );
+   const QRectF& viewport = getViewport();
 
    if ( m_horizontalMouseWheel )
    {
-      double newWidth = viewPort.width();
+      double newWidth = viewport.width();
       newWidth *= event->delta() > 0 ? 0.75 : 1.25;
 
-      QRectF newViewPort( viewPort );
+      QRectF newViewPort( viewport );
 
-      double x = viewPortCenter.x() - viewPort.left();
-      double viewPortShift = x - x / viewPort.width() * newWidth;
+      double x = viewportCenter.x() - viewport.left();
+      double viewportShift = x - x / viewport.width() * newWidth;
 
-      newViewPort.setLeft( viewPort.left() + viewPortShift );
+      newViewPort.setLeft( viewport.left() + viewportShift );
       newViewPort.setWidth( newWidth );
 
       setViewport( newViewPort );
@@ -176,13 +176,13 @@ void PaintArea::wheelEvent( QWheelEvent* event )
    }
    else
    {
-      double newHeight = viewPort.height();
+      double newHeight = viewport.height();
       newHeight *= event->delta() > 0 ? 0.75 : 1.25;
 
-      QRectF newViewPort( viewPort );
+      QRectF newViewPort( viewport );
 
-      double y = viewPortCenter.y();
-      double newTop = newHeight/viewPort.height() * newViewPort.top() + y * ( 1.0 - newHeight/viewPort.height() );
+      double y = viewportCenter.y();
+      double newTop = newHeight/viewport.height() * newViewPort.top() + y * ( 1.0 - newHeight/viewport.height() );
 
       newViewPort.setTop( newTop );
       newViewPort.setBottom( newTop + newHeight );
@@ -220,14 +220,14 @@ void PaintArea::mouseMoveEvent( QMouseEvent* event )
    const QPointF& shiftOfViewport = transformToWorldCoordinates( event->pos() ) - transformToWorldCoordinates( *m_oldMousePos );
 
    /// Modify current viewport.
-   QRectF viewPort = getViewport();
-   viewPort.setLeft( viewPort.left() - shiftOfViewport.x() );
-   viewPort.setRight( viewPort.right() - shiftOfViewport.x() );
-   viewPort.setTop( viewPort.top() - shiftOfViewport.y() );
-   viewPort.setBottom( viewPort.bottom() - shiftOfViewport.y() );
+   QRectF viewport = getViewport();
+   viewport.setLeft( viewport.left() - shiftOfViewport.x() );
+   viewport.setRight( viewport.right() - shiftOfViewport.x() );
+   viewport.setTop( viewport.top() - shiftOfViewport.y() );
+   viewport.setBottom( viewport.bottom() - shiftOfViewport.y() );
 
    /// Apply new viewport.
-   setViewport( viewPort );
+   setViewport( viewport );
 
    /// Update mouse position.
    *m_oldMousePos = event->pos();

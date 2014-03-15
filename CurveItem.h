@@ -7,14 +7,26 @@
 namespace Plotting
 {
 
-/// TODO: doc
+/**
+ * @class CurveItem
+ * @brief PaintItem for displaying curves (i.e. graphs with lines).
+ */
 class CurveItem : public IYVsXItem, public LineDrawAttr
 {
    public:
+      /**
+       * Constructor.
+       */
       CurveItem( const std::vector< double >& xData, const std::vector< double >& yData );
+      /**
+       * Destructor.
+       */
       virtual ~CurveItem();
 
    private:
+      /**
+       * @see PaintItem.
+       */
       void generatePlotCommands( PaintArea* paintArea ) const;
 
 };

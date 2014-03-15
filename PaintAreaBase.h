@@ -45,7 +45,7 @@ class PaintAreaBase : public QWidget
       /**
        * Sets viewport @param viewport (see @note about viewport's height).
        */
-      void setViewport( const QRectF& viewPort );
+      void setViewport( const QRectF& viewport );
       /**
        * Gets the viewport (see @note about viewport's height).
        */
