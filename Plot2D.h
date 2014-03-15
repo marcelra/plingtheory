@@ -31,10 +31,10 @@ class Plot2D : public QWidget
       void setEnableGrid( bool enableGrid );
 
    public slots:
-      void setViewPort( const QRectF& viewPort );
+      void setViewPort( const QRectF& viewport );
 
    private slots:
-      void synchroniseViewPorts( const QRectF& viewPort );
+      void synchroniseViewPorts( const QRectF& viewport );
 
    private:
       QGridLayout*       m_gridLayout;

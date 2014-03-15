@@ -6,22 +6,33 @@
 namespace Plotting
 {
 
-/// TODO: doc
+/**
+ * @class VerticalScrollPaintArea
+ * @brief Implements a scroll area for vertical scrolling, oriented along the y-axis.
+ */
 class VerticalScrollPaintArea : public ScrollPaintArea
 {
    Q_OBJECT
 
    public:
+      /**
+       * Constructor.
+       */
       VerticalScrollPaintArea( QWidget* parent = 0 );
-      virtual ~VerticalScrollPaintArea();
 
+   /**
+    * @see ScrollPaintArea interface for docuemtation.
+    */
    private:
       QRectF getDataRangeRect() const;
       QRectF getViewRangeRect() const;
-      void updateViewPortGraphFromShift( const QPointF& shift );
+      void updateViewportGraphFromShift( const QPointF& shift );
 
+   /**
+    * @see ScrollPaintArea interface for docuemtation.
+    */
    private slots:
-      virtual void viewPortChangedSlot( const QRectF& newViewPort );
+      virtual void viewportChangedSlot( const QRectF& newViewportOfGraph );
 };
 
 } /// namespace Plotting

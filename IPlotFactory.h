@@ -7,9 +7,6 @@
 
 #include <QColor>
 
-/// TODO: remove when all virtual functions are implemented.
-#include <cassert>
-
 class Logger;
 class RawPcmData;
 
@@ -23,16 +20,28 @@ namespace PlotInterface
 
 /**
  * @class IPlotFactory
+ * @brief Abstract factory pattern for building plots. The concrete plot factory has to be initialised before it can be used.
+ *
+ * New plots are created using the createPlot method. This creates a totally new plot. Plot items can be added by calling
+ * subsequently any of the dedicated methods.
  */
-/// TODO: doc
 class IPlotFactory : SingletonBase
 {
    public:
+      /**
+       * Access singleton instance.
+       */
       static IPlotFactory& getInstance();
 
    public:
+      /**
+       * Create new two dimensional plot canvas.
+       */
       virtual void createPlot( const std::string& name ) = 0;
 
+   /**
+    * Create different types of plots.
+    */
    public:
       virtual void createGraph( const std::vector< double >& yData, const QColor& colour = Qt::black );
       virtual void createGraph( const std::vector< double >& xData, const std::vector< double >& yData, const QColor& colour = Qt::black ) = 0;
@@ -42,15 +51,24 @@ class IPlotFactory : SingletonBase
       virtual void createStftGraph( const WaveAnalysis::StftData& stftData ) = 0;
 
    protected:
+      /**
+       * Create the factory. @param concreateFactoryTypeName is needed for unique registration in the singleton store.
+       */
       IPlotFactory( const std::string& concreteFactoryTypeName );
+      /**
+       * Virtual destructor.
+       */
       virtual ~IPlotFactory();
 
    protected:
+      /**
+       * Access the logger.
+       */
       Logger& getLogger() const;
-      static IPlotFactory*    s_instance;
+      static IPlotFactory*    s_instance;       //! Singleton instance.
 
    private:
-      mutable Logger*         m_logger;
+      mutable Logger*         m_logger;         //! the logger should be instantiated by the derived class in the constructor.
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -67,6 +85,9 @@ inline Logger& IPlotFactory::getLogger() const
 
 } /// PlotInterface
 
+/**
+ * Access plot factory without too much typing.
+ */
 inline PlotInterface::IPlotFactory& gPlotFactory()
 {
    return PlotInterface::IPlotFactory::getInstance();

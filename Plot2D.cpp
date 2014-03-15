@@ -64,11 +64,11 @@ Plot2D::Plot2D( QWidget* parent ) :
 
    /// Make connections.
    bool isConnected;
-   isConnected = connect( m_graph, SIGNAL( viewPortChanged( QRectF ) ), this, SLOT( synchroniseViewPorts( QRectF ) ) );
+   isConnected = connect( m_graph, SIGNAL( viewportChanged( QRectF ) ), this, SLOT( synchroniseViewPorts( QRectF ) ) );
    assert( isConnected );
-   isConnected = connect( m_xScroll, SIGNAL( viewPortFromScroll( QRectF ) ), this, SLOT( setViewPort( QRectF ) ) );
+   isConnected = connect( m_xScroll, SIGNAL( viewportFromScroll( QRectF ) ), this, SLOT( setViewPort( QRectF ) ) );
    assert( isConnected );
-   isConnected = connect( m_yScroll, SIGNAL( viewPortFromScroll( QRectF ) ), this, SLOT( setViewPort( QRectF ) ) );
+   isConnected = connect( m_yScroll, SIGNAL( viewportFromScroll( QRectF ) ), this, SLOT( setViewPort( QRectF ) ) );
    assert( isConnected );
 
    /// Enable grid by default.
@@ -113,7 +113,7 @@ void Plot2D::setEnableGrid( bool enableGrid )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void Plot2D::addItem( const IPaintItem* item )
 {
-   item->paintOn( m_graph );
+   m_graph->addPaintItem( item );
 
    m_graph->autoScale();
    const QRectF& dataRange = m_graph->getDataRange();
@@ -125,20 +125,20 @@ void Plot2D::addItem( const IPaintItem* item )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// setViewPort
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void Plot2D::setViewPort( const QRectF& viewPort )
+void Plot2D::setViewPort( const QRectF& viewport )
 {
-  m_graph->setViewport( viewPort );
+  m_graph->setViewport( viewport );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// synchroniseViewPorts
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void Plot2D::synchroniseViewPorts( const QRectF& viewPort )
+void Plot2D::synchroniseViewPorts( const QRectF& viewport )
 {
-   m_xScroll->setViewport( viewPort );
-   m_yScroll->setViewport( viewPort );
-   m_xAxisPaintArea->setViewport( viewPort );
-   m_yAxisPaintArea->setViewport( viewPort );
+   m_xScroll->setViewport( viewport );
+   m_yScroll->setViewport( viewport );
+   m_xAxisPaintArea->setViewport( viewport );
+   m_yAxisPaintArea->setViewport( viewport );
 }
 
 } /// namespace Plotting
