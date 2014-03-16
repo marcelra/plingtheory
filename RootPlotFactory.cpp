@@ -85,7 +85,7 @@ bool RootPlotFactory::checkIsNewCanvas()
    {
       return true;
    }
-   if ( m_currentCanvas->GetListOfPrimitives()->At( 0 )->ClassName() == "TFrame" )
+   if ( m_currentCanvas->GetListOfPrimitives()->At( 0 )->ClassName() == TString( "TFrame" ) )
    {
       return false;
    }

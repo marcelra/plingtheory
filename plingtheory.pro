@@ -111,7 +111,9 @@ SOURCES += main.cpp \
     StftPaintItem.cpp \
     IPdf.cpp \
     GaussPdf.cpp \
-    UniformPdf.cpp
+    UniformPdf.cpp \
+    KernelPdf.cpp \
+    IThread.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -138,7 +140,6 @@ HEADERS += \
     SquareGenerator.h \
     MultiChannelRawPcmData.h \
     NoteList.h \
-    FourierNoteFilter.h \
     SineEnvelopeGenerator.h \
     FftwAlgorithm.h \
     ObjectPool.h \
@@ -219,7 +220,9 @@ HEADERS += \
     StftPaintItem.h \
     IPdf.h \
     GaussPdf.h \
-    UniformPdf.h
+    UniformPdf.h \
+    KernelPdf.h \
+    IThread.h
 
 OTHER_FILES += \
     Todos.txt
@@ -227,7 +230,7 @@ OTHER_FILES += \
 
 ### BOOST
 macx: LIBS += -L/usr/local/lib/devTools/boost_1_50_0/lib -lboost_filesystem -lboost_system
-linux: LIBS += -L/usr/local/lib/ -lboost_filesystem -lboost_system
+linux: LIBS += -L/usr/local/lib/ -lboost_filesystem -lboost_system -lboost_thread
 #INCLUDEPATH += /Users/marcelra/devTools/boost_1_50_0/
 #DEPENDPATH += /Users/marcelra/devTools/boost_1_50_0/stage
 

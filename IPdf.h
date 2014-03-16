@@ -2,6 +2,7 @@
 #define IPDF_H
 
 #include <cstddef>
+#include <memory>
 
 namespace Math
 {
@@ -13,16 +14,15 @@ namespace Math
 class IPdf
 {
    public:
+      typedef std::auto_ptr< IPdf > Ptr;
+      typedef std::auto_ptr< const IPdf > CPtr;
+
+   public:
       /**
        * Virtual destructor for interface class.
        */
       virtual ~IPdf();
 
-      /**
-       * Evaluate density at point @param x without checking if @param x is element of (x_min, x_max). In general it can
-       * return garbage outside the defined region.
-       */
-      virtual double eval( double x ) const = 0;
       /**
        * Evaluate density at point @param x. Returns zero outside bounds.
        */
@@ -31,15 +31,19 @@ class IPdf
        * Get probability that value is between @param x0 and @param x1.
        */
       virtual double getProbability( double x0, double x1 ) const = 0;
+      /**
+       * Get the integral from -inf to @param x.
+       */
+      virtual double getIntegral( double x ) const = 0;
 
       /**
        * Get minimum bound.
        */
-      virtual double getMinX() const = 0;
+      virtual double getMinX() const;
       /**
        * Get maximum bound.
        */
-      virtual double getMaxX() const = 0;
+      virtual double getMaxX() const;
 };
 
 } /// namespace Math

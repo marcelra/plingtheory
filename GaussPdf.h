@@ -22,12 +22,9 @@ class GaussPdf : public IPdf
     * IPdf interface (@see IPdf).
     */
    public:
-      double eval( double x ) const;
       double getDensity( double x ) const;
-      double getProbability( double x1, double x2 ) const;
-
-      double getMinX() const;
-      double getMaxX() const;
+      double getProbability( double x0, double x1 ) const;
+      double getIntegral( double x ) const;
 
    public:
       /**
@@ -49,7 +46,8 @@ class GaussPdf : public IPdf
     * m_norm * exp( m_argFac * ( x - mu )^2 )
     */
    private:
-      double      m_argFac;
+      double      m_gaussArgFac;
+      double      m_erfArgFac;
       double      m_norm;
 };
 
