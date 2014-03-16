@@ -1,12 +1,13 @@
 #include "IThread.h"
 
-#include <cassert>
-#include <functional>
+#include "Logger.h"
 
+/// boost includes
 #include <boost/chrono.hpp>
 #include <boost/thread.hpp>
 
-#include "Logger.h"
+/// STL includes
+#include <cassert>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// constructor
@@ -74,6 +75,7 @@ void IThread::join()
    }
    getLogger() << Msg::Verbose << "Needed " << nPolls << " poll" << (nPolls != 1 ? "s" : "") <<
                   " of " << m_pollTimeMilliSeconds << " milliseconds before thread was finished." << Msg::EndReq;
+   getLogger() << Msg::Verbose << "Leaving IThread::join." << Msg::EndReq;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -89,7 +91,7 @@ void IThread::waitNextPoll()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void IThread::run()
 {
-   for ( size_t i = 0; i < 1000; ++i )
+   for ( size_t i = 0; i < 10000; ++i )
    {
       getLogger() << Msg::Verbose << "i = " << i << ": cos( i ) = " << cos( i ) << Msg::EndReq;
    }

@@ -229,7 +229,7 @@ OTHER_FILES += \
 
 
 ### BOOST
-macx: LIBS += -L/usr/local/lib/devTools/boost_1_50_0/lib -lboost_filesystem -lboost_system
+macx: LIBS += -L/usr/local/lib/devTools/boost_1_50_0/lib -lboost_filesystem -lboost_system -lboost_thread
 linux: LIBS += -L/usr/local/lib/ -lboost_filesystem -lboost_system -lboost_thread
 #INCLUDEPATH += /Users/marcelra/devTools/boost_1_50_0/
 #DEPENDPATH += /Users/marcelra/devTools/boost_1_50_0/stage
