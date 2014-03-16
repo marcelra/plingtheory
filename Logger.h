@@ -16,6 +16,9 @@
  * loggerInstance << Msg::<Level> << <My message> << Msg::EndReq;
  * this will format the output like:
  * TheLoggerName         LEVEL     MyMessage
+ *
+ * The Logger is sort of thread safe. A mutex lock is created when logger << Msg::<Level> is called. This lock is lifted when
+ * logger << Msg::EndReq is called. If the EndReq log commands is forgotten, a deadlock can occur.
  */
 class Logger
 {

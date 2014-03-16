@@ -19,9 +19,9 @@ class UniformPdf : public IPdf
     * Interface implementation of IPdf (@see IPdf).
     */
    public:
-      double eval( double x ) const;
       double getDensity( double x ) const;
       double getProbability( double x0, double x1 ) const;
+      double getIntegral( double x ) const;
 
    public:
       double getMinX() const;

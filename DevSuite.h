@@ -22,6 +22,9 @@ class DevSuite
    public:
       static void devFourierPeakFinder1();
 
+      static void testPdf();
+      static void devThread();
+
 };
 
 #endif // DEVSUITE_H

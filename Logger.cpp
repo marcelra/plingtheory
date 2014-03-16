@@ -5,6 +5,14 @@
 
 #include <iostream>
 
+#include <boost/thread.hpp>
+
+namespace
+{
+boost::mutex loggerMutex;
+boost::mutex::scoped_lock* loggerLock = 0;
+} /// anonymous namespace
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Logger constructor
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -40,6 +48,8 @@ void Logger::setThreshold( Msg::LogLevel threshold )
 template <>
 Logger& Logger::operator<<( const Msg::LogLevel& logLevel )
 {
+   loggerLock = new boost::mutex::scoped_lock( loggerMutex );
+
    m_currentLevel = logLevel;
 
    if ( m_currentLevel <= m_threshold )
@@ -73,6 +83,7 @@ Logger& Logger::operator<<( const Msg::LogCommand& logCommand )
             m_stream << std::endl;
             m_currentLevel = Msg::Never;
          }
+         delete loggerLock;
          break;
       default:
          assert( false );

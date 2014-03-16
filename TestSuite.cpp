@@ -16,7 +16,6 @@ void TestSuite::execute()
    // singleTest();
 
    runTestMath();
-   return;
 
    /// Utilities
    testFindMinima();

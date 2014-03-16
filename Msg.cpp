@@ -77,3 +77,8 @@ const char* Msg::colorCode( Msg::LogLevel logLevel )
       return "";
    }
 }
+
+std::string Msg::fmtPlural( size_t n, const std::string& singular, const std::string& plural )
+{
+   return n==1 ? singular : plural;
+}

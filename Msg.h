@@ -38,6 +38,12 @@ class Msg
        */
       static const char* strRep( Msg::LogLevel logLevel );
       static const char* colorCode( Msg::LogLevel logLevel );
+
+      /**
+       * Format string plural or singular depending on argument.
+       * E.g. call with fmtPlural( n, "argument", "arguments" ), will only format "argument" (instead of "arguments") if n is equal to 1.
+       */
+      static std::string fmtPlural( size_t n, const std::string& singular, const std::string& plural );
 };
 
 #endif // MSG_H
