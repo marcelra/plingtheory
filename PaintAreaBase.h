@@ -1,9 +1,10 @@
 #ifndef PAINTAREABASE_H
 #define PAINTAREABASE_H
 
-#include <cassert>
-
 #include <QWidget>
+
+#include <cassert>
+#include <memory>
 
 class QMouseEvent;
 
@@ -86,11 +87,11 @@ class PaintAreaBase : public QWidget
       virtual void paintEventImpl( QPaintEvent* event ) = 0;
 
    protected:
-      QString     m_name;
-      QRectF      m_viewport;
-      QRect       m_canvas;
-      QPainter*   m_painter;
-      QPoint*     m_oldMousePos;
+      QString                    m_name;
+      QRectF                     m_viewport;
+      QRect                      m_canvas;
+      QPainter*                  m_painter;
+      std::auto_ptr< QPoint >    m_oldMousePos;
 };
 
 
