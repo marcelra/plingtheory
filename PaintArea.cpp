@@ -2,6 +2,7 @@
 
 #include "IPaintCommand.h"
 #include "IPaintItem.h"
+#include "GridItem.h"
 
 #include <QPainter>
 #include <QPaintEvent>
@@ -21,8 +22,7 @@ namespace Plotting
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 PaintArea::PaintArea( QWidget* parent ) :
    PaintAreaBase( parent ),
-   m_paintItems(),
-   m_paintCommands(),
+   m_gridItem( 0 ),
    m_horizontalMouseWheel( true )
 {
    m_dataRange = QRectF( QPointF( -1, 1 ), QPointF( 1, -1 ) );
@@ -57,6 +57,12 @@ void PaintArea::generatePaintCommands()
 {
    /// Clear all existing paint commands.
    clearPaintCommands();
+
+   /// Generate commands from grid item first.
+   if ( m_gridItem )
+   {
+      m_gridItem->generatePlotCommands( this );
+   }
 
    /// Let the paint items generate paint commands.
    for ( size_t iPaintItem = 0; iPaintItem < m_paintItems.size(); ++iPaintItem )
@@ -257,5 +263,14 @@ void PaintArea::removePaintItem( const IPaintItem* paintItem )
       }
    }
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// addGridItem
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void PaintArea::setGridItem( const GridItem* gridItem )
+{
+   m_gridItem = gridItem;
+}
+
 
 } /// namespace Plotting

@@ -91,7 +91,7 @@ void Plot2D::setEnableGrid( bool enableGrid )
    if ( enableGrid && !m_gridItem )
    {
       m_gridItem = new GridItem( *m_xAxisPaintArea, *m_yAxisPaintArea );
-      m_graph->addPaintItem( m_gridItem );
+      m_graph->setGridItem( m_gridItem );
       m_gridItem->setLineColor( QColor( 220, 220, 220 ) );
       m_gridItem->setLineWidth( 1 );
       update();
@@ -100,7 +100,7 @@ void Plot2D::setEnableGrid( bool enableGrid )
    {
       if ( m_gridItem )
       {
-         m_graph->removePaintItem( m_gridItem );
+         m_graph->setGridItem( 0 );
          delete m_gridItem;
          m_gridItem = 0;
          update();

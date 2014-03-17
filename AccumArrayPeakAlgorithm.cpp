@@ -1,6 +1,8 @@
 #include "AccumArrayPeakAlgorithm.h"
 
+#include "GaussPdf.h"
 #include "IPlotFactory.h"
+#include "KernelPdf.h"
 #include "Logger.h"
 #include "RootUtilities.h"
 #include "SampledMovingAverage.h"
@@ -10,6 +12,7 @@
 
 #include <cmath>
 #include <iostream>
+#include <sstream>
 
 namespace FeatureAlgorithm
 {
@@ -150,7 +153,16 @@ std::vector< Feature::Peak > AccumArrayPeakAlgorithm::findPeaks( const RealVecto
    std::vector< Feature::Peak > peaks;
 
    /// Between two minima there is one maximum.
-   const std::vector< size_t >& minPositionVec = Utils::findMinima( baselineSubtractedData );
+   const std::vector< size_t >& minPositionVecRaw = Utils::findMinima( baselineSubtractedData );
+
+   /// TODO: find more elegant solution for this.
+   std::vector< size_t > minPositionVec;
+   minPositionVec.push_back( 0 );
+   for ( size_t i = 0; i < minPositionVecRaw.size(); ++i )
+   {
+      minPositionVec.push_back( minPositionVecRaw[ i ] );
+   }
+   minPositionVec.push_back( baselineSubtractedData.size() - 1 );
 
    /// No peaks can be found.
    if ( minPositionVec.size() < 2 )
@@ -217,8 +229,9 @@ void AccumArrayPeakAlgorithm::dressPeaks( const Math::RegularAccumArray& data, c
    Logger msg( "AccumArrayPeakAlgorithm" );
    for ( size_t iPeak = 0; iPeak < peaks.size(); ++iPeak )
    {
+      Feature::Peak& peak = peaks[ iPeak ];
       /// Do position weighting in peak bin.
-      size_t binIndexPos = peaks[ iPeak ].getPositionIndex();
+      size_t binIndexPos = peak.getPositionIndex();
       const Math::TwoTuple& entries = data.getBinEntries( binIndexPos );
       double weightedPos = 0;
       double totalWeight = 0;
@@ -228,14 +241,15 @@ void AccumArrayPeakAlgorithm::dressPeaks( const Math::RegularAccumArray& data, c
          totalWeight += entries.getY()[ iEntry ];
       }
       weightedPos /= totalWeight;
-      peaks[ iPeak ].setPosition( weightedPos );
+      peak.setPosition( weightedPos );
 
       /// Set peak data.
-      IndexVector indexVec = Utils::createRange( peaks[ iPeak ].getLeftBoundIndex(), peaks[ iPeak ].getRightBoundIndex() );
+      IndexVector indexVec = Utils::createRange( peak.getLeftBoundIndex(), peak.getRightBoundIndex() );
       msg << Msg::Verbose << indexVec << Msg::EndReq;
       const RealVector& peakData = Utils::createSelection( baselineSubtractedData, indexVec );
       msg << Msg::Verbose << "peakData = " << peakData << Msg::EndReq;
-      peaks[ iPeak ].setData( peakData );
+      peak.setData( peakData );
+      peak.setBounds( data.getBin( peak.getLeftBoundIndex() ).getMinX(), data.getBin( peak.getRightBoundIndex() ).getMaxX() );
    }
 
    for ( size_t iPeak = 1; iPeak < peaks.size() - 1; ++iPeak )
@@ -246,51 +260,73 @@ void AccumArrayPeakAlgorithm::dressPeaks( const Math::RegularAccumArray& data, c
 
    if ( m_doMonitor )
    {
-      size_t showPeak = 0;
-      const Feature::Peak& peak = peaks[ showPeak ];
-      msg << Msg::Info << peak.getData() << Msg::EndReq;
-
-      gPlotFactory().createPlot( "AAPA/DressPeak" );
-      gPlotFactory().createGraph( Utils::createRangeReal( peak.getLeftBoundIndex(), peak.getRightBoundIndex() ) * data.getBinWidth(), peak.getData() );
-
-      Logger msg( "AccumArrayPeakAlgorithm" );
-      msg << Msg::Info << "Peak centre is located at " << peak.getPosition() << Msg::EndReq;
-
-      IndexVector range = Utils::createRange( peak.getLeftBoundIndex(), peak.getRightBoundIndex() );
-      Math::TwoTuple allEntries;
-      for ( size_t i = 0; i < range.size(); ++i )
+      for ( size_t showPeak = 0; showPeak < peaks.size(); ++showPeak )
       {
-         Math::TwoTuple binTuple = data.getBinEntries( range[ i ] );
-         allEntries.append( binTuple );
-      }
+         const Feature::Peak& peak = peaks[ showPeak ];
+         msg << Msg::Info << peak.getData() << Msg::EndReq;
 
-      std::map< double, size_t > distMap;
-      double totalWeight = 0;
-      for ( size_t iEntry = 0; iEntry < allEntries.getNumElements(); ++iEntry )
-      {
-         double dist = fabs( allEntries.getX( iEntry ) - peak.getPosition() );
-         distMap[ dist ] = iEntry;
-         totalWeight += allEntries.getY( iEntry );
-      }
+         Logger msg( "AccumArrayPeakAlgorithm" );
+         msg << Msg::Info << "Peak centre is located at " << peak.getPosition() << Msg::EndReq;
 
-      double peakSurface = sum( peak.getData() );
-
-      double widthDef = 0.68 ; // peakSurface / exp( 1. );
-      double widthSeen = 0;
-      std::map< double, size_t >::const_iterator it = distMap.begin();
-      for ( ; it != distMap.end(); ++it )
-      {
-         widthSeen += allEntries.getY( it->second );
-         if ( widthSeen > widthDef )
+         IndexVector range = Utils::createRange( peak.getLeftBoundIndex(), peak.getRightBoundIndex() );
+         Math::TwoTuple allEntries;
+         for ( size_t i = 0; i < range.size(); ++i )
          {
-            break;
+            Math::TwoTuple binTuple = data.getBinEntries( range[ i ] );
+            allEntries.append( binTuple );
          }
-      }
-      double widthTooMuch = widthSeen - widthDef;
-      msg << Msg::Info << "widthTooMuch = " << widthTooMuch << ", widthDef = " << widthDef << Msg::EndReq;
-      // --it->first
 
-      gPlotFactory().createScatter( allEntries.getX(), allEntries.getY() );
+         RealVector peakCentreX( 1, peak.getPosition() );
+         RealVector peakCentreY( 1, peak.getProminence() );
+
+         std::map< double, size_t > distMap;
+         double totalWeight = 0;
+         for ( size_t iEntry = 0; iEntry < allEntries.getNumElements(); ++iEntry )
+         {
+            double dist = fabs( allEntries.getX( iEntry ) - peak.getPosition() );
+            distMap[ dist ] = iEntry;
+            totalWeight += allEntries.getY( iEntry );
+         }
+
+         Math::KernelPdf dataKernel( Math::IPdf::CPtr( new Math::GaussPdf( 0, 5 ) ), allEntries.getX(), allEntries.getY() );
+
+         size_t nEvalPdf = 100;
+         RealVector evalPdfVec( nEvalPdf );
+         RealVector xVec( nEvalPdf );
+         double x = peak.getLeftBound();
+         double step = ( peak.getRightBound() - peak.getLeftBound() ) / nEvalPdf;
+         for ( size_t i = 0; i < nEvalPdf; ++i )
+         {
+            evalPdfVec[ i ] = dataKernel.getDensity( x );
+            xVec[ i ] = x;
+            x+= step;
+         }
+
+         double peakSurface = sum( peak.getData() );
+
+         double widthDef = 0.68 ; // peakSurface / exp( 1. );
+         double widthSeen = 0;
+         std::map< double, size_t >::const_iterator it = distMap.begin();
+         for ( ; it != distMap.end(); ++it )
+         {
+            widthSeen += allEntries.getY( it->second );
+            if ( widthSeen > widthDef )
+            {
+               break;
+            }
+         }
+         double widthTooMuch = widthSeen - widthDef;
+         msg << Msg::Info << "widthTooMuch = " << widthTooMuch << ", widthDef = " << widthDef << Msg::EndReq;
+         // --it->first
+
+         std::ostringstream plotName;
+         plotName << "AAPA/DressPeak" << showPeak;
+         gPlotFactory().createPlot( plotName.str() );
+         gPlotFactory().createGraph( Utils::createRangeReal( peak.getLeftBoundIndex(), peak.getRightBoundIndex() ) * data.getBinWidth(), peak.getData() );
+         gPlotFactory().createScatter( allEntries.getX(), allEntries.getY() );
+         gPlotFactory().createGraph( xVec, evalPdfVec );
+         gPlotFactory().createScatter( peakCentreX, peakCentreY, Qt::red );
+      }
    }
 
 }
