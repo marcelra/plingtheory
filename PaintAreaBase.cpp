@@ -114,10 +114,9 @@ void PaintAreaBase::setViewport( const QRectF& viewport )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void PaintAreaBase::mouseReleaseEvent( QMouseEvent* event )
 {
-   if ( m_oldMousePos )
+   if ( m_oldMousePos.get() )
    {
-      delete m_oldMousePos;
-      m_oldMousePos = 0;
+      m_oldMousePos.reset( 0 );
    }
    event->accept();
 }

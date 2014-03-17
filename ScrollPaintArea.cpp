@@ -73,9 +73,9 @@ void ScrollPaintArea::paintEventImpl( QPaintEvent* paintEvent )
 void ScrollPaintArea::mouseMoveEvent( QMouseEvent* event )
 {
    /// Store old mouse pos if it does not exist.
-   if ( !m_oldMousePos )
+   if ( !m_oldMousePos.get() )
    {
-      m_oldMousePos = new QPoint( event->pos() );
+      m_oldMousePos.reset( new QPoint( event->pos() ) );
       event->accept();
       return;
    }
@@ -90,7 +90,7 @@ void ScrollPaintArea::mouseMoveEvent( QMouseEvent* event )
    emit viewportFromScroll( m_viewportGraph );
 
    /// Update mouse position.
-   *m_oldMousePos = event->pos();
+   m_oldMousePos.reset( new QPoint( event->pos() ) );
 
    /// Set event handled.
    event->accept();
