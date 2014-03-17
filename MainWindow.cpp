@@ -46,7 +46,7 @@ MainWindow::MainWindow( QWidget* parent ) :
 
    /// Make connections.
    connect( m_quitButton, SIGNAL( clicked() ), this, SLOT( quitClickedSlot() ) );
-   connect( m_plotsListView, SIGNAL( clicked( QModelIndex ) ), this, SLOT( plotSelectedSlot( QModelIndex ) ) );
+   connect( m_plotsListView, SIGNAL( activated(QModelIndex) ), this, SLOT( plotSelectedSlot( QModelIndex ) ) );
 
    buildPlotList();
 }
