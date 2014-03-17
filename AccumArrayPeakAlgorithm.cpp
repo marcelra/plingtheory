@@ -33,13 +33,6 @@ std::vector< Feature::Peak > AccumArrayPeakAlgorithm::execute( const Math::Regul
    const RealVector& dataContents = data.getAllBinContents();
    const RealVector& baselineSubtractedData = subtractBaseline( smoothedData, dataContents );
 
-   if ( m_doMonitor )
-   {
-      gPlotFactory().createPlot( "AAPA/DataSet" );
-      gPlotFactory().createGraph( dataContents, Qt::gray );
-      gPlotFactory().createGraph( baselineSubtractedData, Qt::black );
-   }
-
    std::vector< Feature::Peak > peaks = findPeaks( baselineSubtractedData, data );
 
    return peaks;
@@ -105,6 +98,13 @@ RealVector AccumArrayPeakAlgorithm::subtractBaseline( const RealVector& smoothed
       TGraph* grMin = RootUtilities::createGraph( minPosReal, minima );
       grMin->Draw( "LSAME" );
       grMin->SetLineColor( kRed );
+   }
+
+   if ( m_doMonitor )
+   {
+      gPlotFactory().createPlot( "AAPA/DataSubtraction" );
+      gPlotFactory().createGraph( originalData, Qt::gray );
+      gPlotFactory().createGraph( subtractedData, Qt::black );
    }
 
    /// Return result.
