@@ -3,6 +3,10 @@
 
 #include "PaintAreaBase.h"
 
+#include <QPixmap>
+
+#include <memory>
+
 namespace Plotting
 {
 
@@ -27,6 +31,8 @@ class PaintArea : public PaintAreaBase
       void mouseDoubleClickEvent( QMouseEvent* event );
 
       void mouseMoveEvent( QMouseEvent* event );
+      void mousePressEvent( QMouseEvent* event );
+      void mouseReleaseEvent( QMouseEvent* event );
 
    public:
       void removePaintItem( const IPaintItem* paintItem );
@@ -42,7 +48,7 @@ class PaintArea : public PaintAreaBase
 
    private:
       std::vector< const IPaintItem* >  m_paintItems;
-      const IPaintItem*                 m_gridItem;
+      const GridItem*                   m_gridItem;
 
    protected:
       void paintEventImpl( QPaintEvent* event );
@@ -52,6 +58,10 @@ class PaintArea : public PaintAreaBase
       std::vector< const IPaintCommand* >  m_paintCommands;
 
       bool        m_horizontalMouseWheel;
+
+      std::auto_ptr< QPoint >  m_zoomAreaStart;
+      std::auto_ptr< QPoint >  m_zoomAreaEnd;
+      QPixmap                  m_grabbedWidget;
 
 };
 

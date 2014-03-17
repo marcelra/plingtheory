@@ -4,6 +4,8 @@
 #include <QPainter>
 #include <QPaintEvent>
 
+#include <QDebug>
+
 namespace Plotting
 {
 
