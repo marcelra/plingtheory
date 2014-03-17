@@ -6,6 +6,7 @@
 namespace Plotting
 {
 
+class GridItem;
 class IPaintItem;
 class IPaintCommand;
 
@@ -30,6 +31,7 @@ class PaintArea : public PaintAreaBase
    public:
       void removePaintItem( const IPaintItem* paintItem );
       void addPaintItem( const IPaintItem* paintItem );
+      void setGridItem( const GridItem* gridItem );
       void clearAllPaintItems();
 
       void autoScale();
@@ -40,6 +42,7 @@ class PaintArea : public PaintAreaBase
 
    private:
       std::vector< const IPaintItem* >  m_paintItems;
+      const IPaintItem*                 m_gridItem;
 
    protected:
       void paintEventImpl( QPaintEvent* event );

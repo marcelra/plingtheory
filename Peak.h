@@ -71,6 +71,10 @@ class Peak
        * Set left and right bound indices.
        */
       void setBoundIndices( size_t leftIndex, size_t rightIndex );
+      /**
+       * Set bounds in x-axis coordinates.
+       */
+      void setBounds( double xLeft, double xRight );
 
       /**
        * Set peak data.
@@ -86,6 +90,8 @@ class Peak
        */
       size_t getLeftBoundIndex() const;
       size_t getRightBoundIndex() const;
+      double getLeftBound() const;
+      double getRightBound() const;
 
       /**
        * Set links to neighbouring peak.
@@ -105,6 +111,8 @@ class Peak
       size_t                m_positionIndex;   //! Position of peak in data set
       size_t                m_leftBoundIndex;  //! Index of left bound
       size_t                m_rightBoundIndex; //! Index of right bound
+      double                m_leftBound;       //! Left bound
+      double                m_rightBound;      //! Right bound
       double                m_position;        //! Position of centre of peak
       double                m_prominence;      //! Prominence of peak
       double                m_width;           //! Width at half prominence
@@ -140,6 +148,16 @@ inline double Peak::getWidth() const
 inline double Peak::getPedestal() const
 {
    return m_pedestal;
+}
+
+inline double Peak::getLeftBound() const
+{
+   return m_leftBound;
+}
+
+inline double Peak::getRightBound() const
+{
+   return m_rightBound;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
