@@ -13,9 +13,8 @@ void DevSuite::execute()
    // devFourierTemplates();
    // devSamples();
 
-   // devPeakFinder2();
+   devPeakFinder2();
    // testPdf();
-   devThread();
 
    /// PARKED
    // devSidelobeSubtraction();
@@ -56,6 +55,7 @@ void DevSuite::execute()
 #include "KernelPdf.h"
 #include "IPlotFactory.h"
 #include "IThread.h"
+#include "UniformPdf.h"
 
 #include <functional>
 
@@ -83,11 +83,23 @@ RealVector evalFuncToVector( const T& func, double xMin, double xMax, size_t nPo
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void DevSuite::testPdf()
 {
-   size_t nPoints = 1000;
+   Logger msg( "testPdf" );
+   msg << Msg::Info << "Running testPdf..." << Msg::EndReq;
+
+   size_t nPoints = 5000;
 
    Math::GaussPdf gauss( 0, 1 );
 
    const RealVector& result = evalFuncToVector( std::bind1st( std::mem_fun( &Math::GaussPdf::getDensity ), &gauss ), -10, 10, nPoints );
+
+   double integralApprox = 0;
+   double deltaX = 20.0 / nPoints;
+   for ( size_t i = 0; i < result.size(); ++i )
+   {
+      integralApprox += result[ i ] * deltaX;
+   }
+   msg << Msg::Info << "Integral = " << integralApprox << Msg::EndReq;
+
 
    gPlotFactory().createPlot( "testPdf/GaussPdf" );
    gPlotFactory().createGraph( result );
@@ -99,35 +111,20 @@ void DevSuite::testPdf()
       sampling[ i ] = gRandom->Uniform( -100, 100 );
    }
 
-   Math::KernelPdf kern( Math::IPdf::CPtr( new Math::GaussPdf( 0, 5 ) ), sampling );
+   Math::UniformPdf uniform( -100, 100 );
+   const RealVector& uniformGraph = evalFuncToVector( std::bind1st( std::mem_fun( &Math::UniformPdf::getDensity ), &uniform ), -200, 200, nPoints );
+
+   Math::KernelPdf kern( Math::IPdf::CPtr( new Math::GaussPdf( 0, 25 ) ), sampling );
 
    const RealVector& resultKern = evalFuncToVector( std::bind1st( std::mem_fun( &Math::KernelPdf::getDensity ), &kern ), -200, 200, nPoints );
    std::cout << resultKern.size() << std::endl;
 
    gPlotFactory().createPlot( "testPdf/KernelPdf" );
    gPlotFactory().createGraph( resultKern );
+   gPlotFactory().createGraph( uniformGraph, Qt::red );
 
    //  fillVectorWithFunctionValues( -10, 10, std::bind1st( G
    // RealVector
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// devThread
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void DevSuite::devThread()
-{
-   Logger msg( "devThread" );
-   msg << Msg::Info << "Running devThread..." << Msg::EndReq;
-
-   IThread thread( "testThread" );
-   thread.start();
-
-   msg << Msg::Info << "This message comes from outside the thread." << Msg::EndReq;
-   msg << Msg::Info << "About to join the thread..." << Msg::EndReq;
-
-   thread.join();
-
-   msg << Msg::Info << "The thread has been joined." << Msg::EndReq;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

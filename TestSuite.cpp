@@ -14,7 +14,6 @@ bool checkTodos = false;
 void TestSuite::execute()
 {
    // singleTest();
-
    runTestMath();
 
    /// Utilities
@@ -28,6 +27,7 @@ void TestSuite::execute()
    /// Infrastucture
    testObjectPool();
    testAlgorithmFramework();
+   testThreading();
 
    /// Generators
    testEnvelope();
@@ -91,6 +91,7 @@ void TestSuite::singleTest()
 #include "SawtoothGenerator.h"
 #include "StftData.h"
 #include "SpectralReassignmentTransform.h"
+#include "IThread.h"
 
 #include "TLine.h"
 #include "TH2F.h"
@@ -170,12 +171,29 @@ void TestSuite::testAlgorithmFramework()
 
    AlgorithmBase alg( "AlgBase", "Test" );
    alg.execute();
-
 }
 
-////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// testThreading
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void TestSuite::testThreading()
+{
+   Logger msg( "testThread" );
+   msg << Msg::Info << "Running testThread..." << Msg::EndReq;
+
+   IThread thread( "testThread" );
+   thread.start();
+
+   msg << Msg::Info << "This message comes from outside the thread." << Msg::EndReq;
+   msg << Msg::Info << "About to join the thread..." << Msg::EndReq;
+
+   thread.join();
+   msg << Msg::Info << "The thread has been joined." << Msg::EndReq;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// testEffectTrianglizer
-////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void TestSuite::testEffectTrianglizer()
 {
    Logger msg("testEffectTrianglizer");
