@@ -27,8 +27,8 @@ MainWindow::MainWindow( QWidget* parent ) :
    m_plotsListView->setFixedWidth( 300 );
 
    m_plotWidget = new DummyPlotWidget( this );
-   m_plotWidget->setMinimumWidth( 400 );
-   m_plotWidget->setMinimumHeight( 400 );
+   m_plotWidget->setMinimumWidth( 800 );
+   m_plotWidget->setMinimumHeight( 600 );
 
    /// Set layout.
    QWidget* centralWidget = new QWidget( this );
@@ -75,8 +75,8 @@ void MainWindow::plotSelectedSlot( QModelIndex index )
    m_plotWidget = item->data().value< Plotting::Plot2D* >();
    layout->addWidget( m_plotWidget, 1 );
    m_plotWidget->show();
-   m_plotWidget->setMinimumWidth( 400 );
-   m_plotWidget->setMinimumHeight( 400 );
+   m_plotWidget->setMinimumWidth( 800 );
+   m_plotWidget->setMinimumHeight( 600 );
 }
 
 void MainWindow::buildPlotList()
