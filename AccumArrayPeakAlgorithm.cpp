@@ -50,8 +50,8 @@ RealVector AccumArrayPeakAlgorithm::subtractBaseline( const RealVector& smoothed
    const std::vector< size_t >& minPositionVec = Utils::findMinima( smoothedData );
 
    size_t rightPosIndex = 1;
-   size_t leftPos = minPositionVec[ 0 ];
-   size_t rightPos = minPositionVec[ 1 ];
+   size_t leftPos = 0;
+   size_t rightPos = minPositionVec[ 0 ];
    double leftMin = smoothedData[ leftPos ];
    double rightMin = smoothedData[ rightPos ];
 
@@ -74,6 +74,7 @@ RealVector AccumArrayPeakAlgorithm::subtractBaseline( const RealVector& smoothed
       if ( i > rightPos )
       {
          ++rightPosIndex;
+
          std::cout << "Right pos index = " << rightPosIndex << ", total size = " << minPositionVec.size() << std::endl;
          leftPos = rightPos;
          if ( rightPosIndex < minPositionVec.size() )
@@ -93,18 +94,21 @@ RealVector AccumArrayPeakAlgorithm::subtractBaseline( const RealVector& smoothed
 
    if ( m_doMonitor )
    {
-      const RealVector& minima = Utils::createSelection( smoothedData, minPositionVec );
-      RealVector minPosReal( minPositionVec.begin(), minPositionVec.end() );
-      TGraph* grMin = RootUtilities::createGraph( minPosReal, minima );
-      grMin->Draw( "LSAME" );
-      grMin->SetLineColor( kRed );
-   }
+      IndexVector allMinPos( 1, 0 );
+      for ( size_t i = 0; i < minPositionVec.size(); ++i )
+      {
+         allMinPos.push_back( minPositionVec[ i ] );
+      }
+      allMinPos.push_back( smoothedData.size() - 1 );
 
-   if ( m_doMonitor )
-   {
+      const RealVector& minima = Utils::createSelection( smoothedData, allMinPos );
+
+      RealVector minPosReal( allMinPos.begin(), allMinPos.end() );
+
       gPlotFactory().createPlot( "AAPA/DataSubtraction" );
       gPlotFactory().createGraph( originalData, Qt::gray );
       gPlotFactory().createGraph( subtractedData, Qt::black );
+      gPlotFactory().createGraph( minPosReal, minima, Qt::red );
    }
 
    /// Return result.
@@ -190,15 +194,15 @@ std::vector< Feature::Peak > AccumArrayPeakAlgorithm::findPeaks( const RealVecto
 
    if ( m_doMonitor )
    {
+      RealVector peakPositions( peaks.size() );
+      RealVector peakHeights( peaks.size() );
       for ( size_t iPeak = 0; iPeak < peaks.size(); ++iPeak )
       {
          double thisPeakPos = peaks[ iPeak ].getPositionIndex();
-
-         TLine* l = new TLine( thisPeakPos, 0, thisPeakPos, 1e10 );
-         l->SetLineWidth( 1 );
-         l->SetLineColor( kGray );
-         l->Draw( "SAME" );
+         peakPositions[ iPeak] = thisPeakPos;
+         peakHeights[ iPeak ] = peaks[ iPeak ].getProminence();
       }
+      gPlotFactory().createScatter( peakPositions, peakHeights, Qt::red );
    }
 
    dressPeaks( data, baselineSubtractedData, peaks );
@@ -246,13 +250,11 @@ void AccumArrayPeakAlgorithm::dressPeaks( const Math::RegularAccumArray& data, c
       const Feature::Peak& peak = peaks[ showPeak ];
       msg << Msg::Info << peak.getData() << Msg::EndReq;
 
-      TGraph* gr = RootUtilities::createGraph( Utils::createRangeReal( peak.getLeftBoundIndex(), peak.getRightBoundIndex() ) * data.getBinWidth(), peak.getData() );
+      gPlotFactory().createPlot( "AAPA/DressPeak" );
+      gPlotFactory().createGraph( Utils::createRangeReal( peak.getLeftBoundIndex(), peak.getRightBoundIndex() ) * data.getBinWidth(), peak.getData() );
 
       Logger msg( "AccumArrayPeakAlgorithm" );
       msg << Msg::Info << "Peak centre is located at " << peak.getPosition() << Msg::EndReq;
-
-      new TCanvas();
-      gr->Draw( "AL" );
 
       IndexVector range = Utils::createRange( peak.getLeftBoundIndex(), peak.getRightBoundIndex() );
       Math::TwoTuple allEntries;
@@ -276,7 +278,7 @@ void AccumArrayPeakAlgorithm::dressPeaks( const Math::RegularAccumArray& data, c
       double widthDef = 0.68 ; // peakSurface / exp( 1. );
       double widthSeen = 0;
       std::map< double, size_t >::const_iterator it = distMap.begin();
-      for ( ; ; ++it )
+      for ( ; it != distMap.end(); ++it )
       {
          widthSeen += allEntries.getY( it->second );
          if ( widthSeen > widthDef )
@@ -288,11 +290,7 @@ void AccumArrayPeakAlgorithm::dressPeaks( const Math::RegularAccumArray& data, c
       msg << Msg::Info << "widthTooMuch = " << widthTooMuch << ", widthDef = " << widthDef << Msg::EndReq;
       // --it->first
 
-
-      TGraph* gr2 = RootUtilities::createGraph( allEntries.getX(), allEntries.getY() );
-      gr2->Draw( "PSAME" );
-
-
+      gPlotFactory().createScatter( allEntries.getX(), allEntries.getY() );
    }
 
 }
