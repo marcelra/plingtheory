@@ -1,5 +1,7 @@
 #include "KernelPdf.h"
 
+#include <cmath>
+
 namespace Math
 {
 
@@ -8,6 +10,7 @@ KernelPdf::KernelPdf( IPdf::CPtr kernel, const RealVector& sampling ) :
    m_sampling( sampling ),
    m_weights( sampling.size(), 1.0 / m_sampling.size() )
 {
+   assert( fabs( sum( m_weights ) - 1 ) < 1e-16 );
 }
 
 KernelPdf::KernelPdf( IPdf::CPtr kernel, const RealVector& sampling, const RealVector& weights ) :

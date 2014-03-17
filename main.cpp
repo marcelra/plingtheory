@@ -103,6 +103,13 @@ const ProgramOptions* initialiseApplication( int argc, char* argv[] )
 
       DBG_MSG( "Global logger initialised; message threshold is " << Msg::strRep( threshold ) );
 
+      /// Handle interrupt signal
+      struct sigaction sigIntHandler;
+      sigIntHandler.sa_handler = &handleSIGINT;
+      sigemptyset( &sigIntHandler.sa_mask );
+      sigIntHandler.sa_flags = 0;
+      sigaction( SIGINT, &sigIntHandler, 0 );
+
       /// Setup ROOT
       if ( programOptions->useRootInterface() )
       {
@@ -110,12 +117,6 @@ const ProgramOptions* initialiseApplication( int argc, char* argv[] )
 
          PlotInterface::RootPlotFactory::initialise();
 
-         /// Handle interrupt signal
-         struct sigaction sigIntHandler;
-         sigIntHandler.sa_handler = &handleSIGINT;
-         sigemptyset( &sigIntHandler.sa_mask );
-         sigIntHandler.sa_flags = 0;
-         sigaction( SIGINT, &sigIntHandler, 0 );
       }
 
       if ( programOptions->useQtInterface() )

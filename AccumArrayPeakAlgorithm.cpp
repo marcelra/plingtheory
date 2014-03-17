@@ -1,5 +1,6 @@
 #include "AccumArrayPeakAlgorithm.h"
 
+#include "IPlotFactory.h"
 #include "Logger.h"
 #include "RootUtilities.h"
 #include "SampledMovingAverage.h"
@@ -34,11 +35,9 @@ std::vector< Feature::Peak > AccumArrayPeakAlgorithm::execute( const Math::Regul
 
    if ( m_doMonitor )
    {
-      TGraph* grData = RootUtilities::createGraph( dataContents );
-      grData->Draw( "AL" );
-      grData->SetLineColor( kGray + 2 );
-      TGraph* grSub = RootUtilities::createGraph( baselineSubtractedData );
-      grSub->Draw( "LSAME" );
+      gPlotFactory().createPlot( "AAPA/DataSet" );
+      gPlotFactory().createGraph( dataContents, Qt::gray );
+      gPlotFactory().createGraph( baselineSubtractedData, Qt::black );
    }
 
    std::vector< Feature::Peak > peaks = findPeaks( baselineSubtractedData, data );
