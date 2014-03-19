@@ -13,8 +13,8 @@ void DevSuite::execute()
    // devFourierTemplates();
    // devSamples();
 
-   devPeakFinder2();
-   // testPdf();
+   // devPeakFinder2();
+   testPdf();
 
    /// PARKED
    // devSidelobeSubtraction();
@@ -56,6 +56,8 @@ void DevSuite::execute()
 #include "IPlotFactory.h"
 #include "IThread.h"
 #include "UniformPdf.h"
+#include "RealMemFunction.h"
+#include "IRealFunction.h"
 
 #include <functional>
 
@@ -64,8 +66,7 @@ void DevSuite::execute()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "DevSuite.parked.cpp"
 
-template < class T >
-RealVector evalFuncToVector( const T& func, double xMin, double xMax, size_t nPoints )
+RealVector evalFuncToVector( const Math::IRealFunction& func, double xMin, double xMax, size_t nPoints )
 {
    RealVector result( nPoints );
    double step = ( xMax - xMin ) / ( nPoints - 1 );
@@ -90,7 +91,9 @@ void DevSuite::testPdf()
 
    Math::GaussPdf gauss( 0, 1 );
 
-   const RealVector& result = evalFuncToVector( std::bind1st( std::mem_fun( &Math::GaussPdf::getDensity ), &gauss ), -10, 10, nPoints );
+   Math::IRealFunction::Ptr func( new Math::RealMemFunction< Math::GaussPdf >( &Math::GaussPdf::getDensity, &gauss ) );
+
+   const RealVector& result = evalFuncToVector( *func, -10, 10, nPoints );
 
    double integralApprox = 0;
    double deltaX = 20.0 / nPoints;
@@ -112,18 +115,21 @@ void DevSuite::testPdf()
    }
 
    Math::UniformPdf uniform( -100, 100 );
-   const RealVector& uniformGraph = evalFuncToVector( std::bind1st( std::mem_fun( &Math::UniformPdf::getDensity ), &uniform ), -200, 200, nPoints );
+
+   func.reset( new Math::RealMemFunction< Math::UniformPdf >( &Math::UniformPdf::getDensity, &uniform ) );
+   const RealVector& uniformGraph = evalFuncToVector( *func, -200, 200, nPoints );
 
    Math::KernelPdf kern( Math::IPdf::CPtr( new Math::GaussPdf( 0, 25 ) ), sampling );
 
-   const RealVector& resultKern = evalFuncToVector( std::bind1st( std::mem_fun( &Math::KernelPdf::getDensity ), &kern ), -200, 200, nPoints );
+   func.reset( new Math::RealMemFunction< Math::KernelPdf >( &Math::KernelPdf::getDensity, &kern ) );
+   const RealVector& resultKern = evalFuncToVector( *func, -200, 200, nPoints );
    std::cout << resultKern.size() << std::endl;
 
    gPlotFactory().createPlot( "testPdf/KernelPdf" );
    gPlotFactory().createGraph( resultKern );
    gPlotFactory().createGraph( uniformGraph, Qt::red );
 
-   //  fillVectorWithFunctionValues( -10, 10, std::bind1st( G
+   // fillVectorWithFunctionValues( -10, 10, std::bind1st( G
    // RealVector
 }
 
