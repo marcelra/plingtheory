@@ -113,7 +113,10 @@ SOURCES += main.cpp \
     GaussPdf.cpp \
     UniformPdf.cpp \
     KernelPdf.cpp \
-    IThread.cpp
+    IThread.cpp \
+    IRealFunction.cpp \
+    RealFunctionPtr.cpp \
+    RealMemFunction.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -222,7 +225,10 @@ HEADERS += \
     GaussPdf.h \
     UniformPdf.h \
     KernelPdf.h \
-    IThread.h
+    IThread.h \
+    IRealFunction.h \
+    RealFunctionPtr.h \
+    RealMemFunction.h
 
 OTHER_FILES += \
     Todos.txt
