@@ -16,8 +16,9 @@ class IRealFunction
       virtual ~IRealFunction();
 
       virtual double operator()( double x ) const = 0;
+      virtual IRealFunction* clone() const = 0;
 
-      RealVector eval( const RealVector& argVec ) const;
+      RealVector evalMany( const RealVector& argVec ) const;
 };
 
 } /// namespace Math

@@ -12,6 +12,7 @@ class RealFunctionPtr : public IRealFunction
       RealFunctionPtr( double ( *func )( double ) );
 
       double operator()( double x ) const;
+      RealFunctionPtr* clone() const;
 
    private:
       double ( *m_func )( double );

@@ -116,7 +116,9 @@ SOURCES += main.cpp \
     IThread.cpp \
     IRealFunction.cpp \
     RealFunctionPtr.cpp \
-    RealMemFunction.cpp
+    RealMemFunction.cpp \
+    IRealFuncWithDerivative.cpp \
+    ComposedRealFuncWithDerivative.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -228,7 +230,9 @@ HEADERS += \
     IThread.h \
     IRealFunction.h \
     RealFunctionPtr.h \
-    RealMemFunction.h
+    RealMemFunction.h \
+    IRealFuncWithDerivative.h \
+    ComposedRealFuncWithDerivative.h
 
 OTHER_FILES += \
     Todos.txt
