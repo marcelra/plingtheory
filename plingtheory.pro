@@ -118,7 +118,8 @@ SOURCES += main.cpp \
     RealFunctionPtr.cpp \
     RealMemFunction.cpp \
     IRealFuncWithDerivative.cpp \
-    ComposedRealFuncWithDerivative.cpp
+    ComposedRealFuncWithDerivative.cpp \
+    NewtonSolver1D.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -232,7 +233,8 @@ HEADERS += \
     RealFunctionPtr.h \
     RealMemFunction.h \
     IRealFuncWithDerivative.h \
-    ComposedRealFuncWithDerivative.h
+    ComposedRealFuncWithDerivative.h \
+    NewtonSolver1D.h
 
 OTHER_FILES += \
     Todos.txt
