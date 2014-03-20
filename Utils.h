@@ -53,8 +53,20 @@ class Utils
        * is not included in the vector.
        */
       static IndexVector createRange( size_t minIndex, size_t maxIndex );
+      /**
+       * @see createRange (integer variant). Works identically, but does not include the maxIndex.
+       */
       static RealVector createRangeReal( size_t minIndex, size_t maxIndex );
 
+      /**
+       * Create a set @param nElements between @param min and @param max. @param min and @param max are both included.
+       * The latter imposes the condition that nSteps >= 2.
+       */
+      static RealVector createRangeReal( double min, double max, size_t nSteps );
+
+      /**
+       * Converts a templated vector to a RealVector.
+       */
       template< class T >
       static RealVector convertToRealVec( const std::vector< T >& vec );
 };

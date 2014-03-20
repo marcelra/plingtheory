@@ -23,6 +23,7 @@ class DevSuite
       static void devFourierPeakFinder1();
 
       static void testPdf();
+      static void devRealFunction();
 
 };
 

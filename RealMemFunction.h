@@ -13,6 +13,7 @@ class RealMemFunction : public IRealFunction
       RealMemFunction( double ( T::*memberFunc )( double ) const, const T* instance );
 
       double operator()( double x ) const;
+      RealMemFunction* clone() const;
 
    private:
       double (T::*m_memberFunc )( double ) const;
@@ -39,6 +40,15 @@ template < typename T >
 inline double RealMemFunction< T >::operator()( double x ) const
 {
    return ( m_instance->*m_memberFunc )( x );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// clone
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+template < typename T >
+RealMemFunction< T >* RealMemFunction< T >::clone() const
+{
+   return new RealMemFunction< T >( *this );
 }
 
 } /// namespace Math

@@ -120,3 +120,21 @@ RealVector Utils::createRangeReal( size_t minIndex, size_t maxIndex )
    return result;
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// createRangeReal
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+RealVector Utils::createRangeReal( double min, double max, size_t nSteps )
+{
+   assert( nSteps >= 2 );
+   RealVector result( nSteps );
+
+   double step = ( max - min ) / ( nSteps - 1 );
+   double x = min;
+   for ( size_t i = 0; i < nSteps; ++i )
+   {
+      result[ i ] = x;
+      x+= step;
+   }
+   return result;
+}
+

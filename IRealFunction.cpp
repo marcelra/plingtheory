@@ -1,5 +1,7 @@
 #include "IRealFunction.h"
 
+#include <iostream>
+
 namespace Math
 {
 
@@ -12,7 +14,7 @@ IRealFunction::~IRealFunction()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// eval
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-RealVector IRealFunction::eval( const RealVector& argVec ) const
+RealVector IRealFunction::evalMany( const RealVector& argVec ) const
 {
    RealVector result( argVec.size() );
    for ( size_t i = 0; i < argVec.size(); ++i )

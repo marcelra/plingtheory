@@ -14,7 +14,8 @@ void DevSuite::execute()
    // devSamples();
 
    // devPeakFinder2();
-   testPdf();
+   // testPdf();
+   devRealFunction();
 
    /// PARKED
    // devSidelobeSubtraction();
@@ -58,6 +59,7 @@ void DevSuite::execute()
 #include "UniformPdf.h"
 #include "RealMemFunction.h"
 #include "IRealFunction.h"
+#include "ComposedRealFuncWithDerivative.h"
 
 #include <functional>
 
@@ -80,6 +82,32 @@ RealVector evalFuncToVector( const Math::IRealFunction& func, double xMin, doubl
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// devRealFunction
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void DevSuite::devRealFunction()
+{
+   Logger msg( "devRealFunction" );
+   msg << Msg::Info << "Running devRealFunction..." << Msg::EndReq;
+
+   size_t nPoints = 5000;
+   double min = -10;
+   double max = 10;
+   const RealVector& xEval = Utils::createRangeReal( min, max, nPoints );
+
+   Math::GaussPdf gaussPdf( 0, 1 );
+   Math::RealMemFunction< Math::GaussPdf > integral( &Math::GaussPdf::getIntegral, &gaussPdf );
+   Math::RealMemFunction< Math::GaussPdf > density( &Math::GaussPdf::getDensity, &gaussPdf );
+   Math::ComposedRealFuncWithDerivative pdfAsFunc( integral, density );
+
+   const RealVector& yIntegral = pdfAsFunc.evalMany( xEval );
+   const RealVector& yDensity = pdfAsFunc.evalDerivMany( xEval );
+
+   gPlotFactory().createPlot( "RealFunction/GaussPdf" );
+   gPlotFactory().createGraph( xEval, yIntegral );
+   gPlotFactory().createGraph( xEval, yDensity );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// testPdf
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void DevSuite::testPdf()
@@ -89,23 +117,23 @@ void DevSuite::testPdf()
 
    size_t nPoints = 5000;
 
+   const RealVector xEval = Utils::createRangeReal( -10, 10, nPoints );
+
    Math::GaussPdf gauss( 0, 1 );
 
    Math::IRealFunction::Ptr func( new Math::RealMemFunction< Math::GaussPdf >( &Math::GaussPdf::getDensity, &gauss ) );
+   const RealVector& gaussEval = func->evalMany( xEval );
 
-   const RealVector& result = evalFuncToVector( *func, -10, 10, nPoints );
+   gPlotFactory().createPlot( "testPdf/GaussPdf" );
+   gPlotFactory().createGraph( xEval, gaussEval );
 
    double integralApprox = 0;
    double deltaX = 20.0 / nPoints;
-   for ( size_t i = 0; i < result.size(); ++i )
+   for ( size_t i = 0; i < gaussEval.size(); ++i )
    {
-      integralApprox += result[ i ] * deltaX;
+      integralApprox += gaussEval[ i ] * deltaX;
    }
    msg << Msg::Info << "Integral = " << integralApprox << Msg::EndReq;
-
-
-   gPlotFactory().createPlot( "testPdf/GaussPdf" );
-   gPlotFactory().createGraph( result );
 
    size_t nGauss = 2000;
    RealVector sampling( nGauss );
@@ -114,23 +142,19 @@ void DevSuite::testPdf()
       sampling[ i ] = gRandom->Uniform( -100, 100 );
    }
 
-   Math::UniformPdf uniform( -100, 100 );
+   const RealVector& xEvalKern = Utils::createRangeReal( -200, 200, nPoints );
 
+   Math::UniformPdf uniform( -100, 100 );
    func.reset( new Math::RealMemFunction< Math::UniformPdf >( &Math::UniformPdf::getDensity, &uniform ) );
-   const RealVector& uniformGraph = evalFuncToVector( *func, -200, 200, nPoints );
+   const RealVector& uniformEval = func->evalMany( xEvalKern );
 
    Math::KernelPdf kern( Math::IPdf::CPtr( new Math::GaussPdf( 0, 25 ) ), sampling );
-
    func.reset( new Math::RealMemFunction< Math::KernelPdf >( &Math::KernelPdf::getDensity, &kern ) );
-   const RealVector& resultKern = evalFuncToVector( *func, -200, 200, nPoints );
-   std::cout << resultKern.size() << std::endl;
+   const RealVector& kernEval = func->evalMany( xEvalKern );
 
    gPlotFactory().createPlot( "testPdf/KernelPdf" );
-   gPlotFactory().createGraph( resultKern );
-   gPlotFactory().createGraph( uniformGraph, Qt::red );
-
-   // fillVectorWithFunctionValues( -10, 10, std::bind1st( G
-   // RealVector
+   gPlotFactory().createGraph( xEvalKern, kernEval );
+   gPlotFactory().createGraph( xEvalKern, uniformEval, Qt::red );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
