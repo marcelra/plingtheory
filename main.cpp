@@ -104,9 +104,12 @@ const ProgramOptions* initialiseApplication( int argc, char* argv[] )
       }
       else
       {
-         initGlobalLogger( programOptions->getLogLevel(), programOptions->doUseColorLogger(), programOptions->getLogFileName() );
+         initGlobalLogger( programOptions->getLogLevel(),
+                           reinterpret_cast< const void* >( &programOptions->getLoggerInspectMap() ),
+                           programOptions->doUseColorLogger(),
+                           programOptions->getLogFileName() );
       }
-      Msg::LogLevel threshold = GlobalLogParameters::getInstance().getThreshold();
+      Msg::LogLevel threshold = GlobalLogParameters::getInstance().getThreshold( 0 );
 
       DBG_MSG( "Global logger initialised; message threshold is " << Msg::strRep( threshold ) );
 

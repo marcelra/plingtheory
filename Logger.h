@@ -27,7 +27,7 @@ class Logger
    public:
       /**
        * Constructor
-       * @param name: the name of the logger (will be displayed in log messages)
+       * @param name: the name of the logger (will be displayed in log messages).
        */
       Logger( const std::string& name );
 
@@ -37,15 +37,25 @@ class Logger
       Logger( const Logger& other );
 
       /**
-       * Stream operator
+       * Destructor.
+       */
+      ~Logger();
+
+      /**
+       * Stream operator.
        */
       template < class T >
       Logger& operator<<( const T& x );
 
       /**
-       * Set threshold for this logger instance to @param threshold
+       * Set threshold for this logger instance to @param threshold.
        */
       void setThreshold( Msg::LogLevel threshold );
+
+      /**
+       * Get Logger ID
+       */
+      LoggerId getLoggerId() const;
 
       /**
        * Get the name of the logger.
@@ -60,14 +70,16 @@ class Logger
        */
       void formatInField( const std::string& message, size_t lengthOfField );
 
+   private:
+      static LoggerId         s_loggerId;              //! Counts the number of logger instantiations
+      LoggerId                m_loggerId;              //! The ID of the current logger
+
+   private:
       std::string             m_name;                  //! the name of the logger
       std::ostream&           m_stream;                //! the ostream (usually std::cout)
       Msg::LogLevel           m_currentLevel;          //! importance level of current message
       Msg::LogLevel           m_threshold;             //! threshold for displayed messages
 
-   private:
-      static LoggerId         s_loggerId;              //! Counts the number of logger instantiations.
-      LoggerId                m_loggerId;              //! The ID of the current logger.
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -95,8 +107,8 @@ Logger& Logger::operator<<( const Msg::LogCommand& logCommand );
 /// Access global Logger.
 Logger& gLog();
 
-/// Initialise global logger
-void initGlobalLogger( int threshold, bool doUseColors, const std::string& fileName );
+/// Initialise global logger (void ptr is used to keep include section clean)
+void initGlobalLogger( int threshold, const void* inspectMapPtr, bool doUseColors, const std::string& fileName );
 void initRegressionLogger( const std::string& fileName );
 
 /// Close the global logger

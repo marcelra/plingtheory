@@ -5,6 +5,7 @@
 
 #include <memory>
 
+/// TODO: Remove LoggerClientId from this class.
 typedef size_t LoggerClientId;
 
 class Logger;

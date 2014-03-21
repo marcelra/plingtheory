@@ -9,19 +9,27 @@
 
 namespace
 {
-boost::mutex loggerMutex;
-boost::mutex::scoped_lock* loggerLock = 0;
+/// Remove?
+// boost::mutex loggerMutex;
+// boost::mutex::scoped_lock* loggerLock = 0;
 } /// anonymous namespace
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Logger constructor
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 Logger::Logger( const std::string& name ) :
+   m_loggerId( s_loggerId++ ),
    m_name( name ),
    m_stream( GlobalLogParameters::getInstance().getStream() ),
    m_currentLevel( Msg::Never ),
-   m_threshold( GlobalLogParameters::getInstance().getThreshold() ),
-   m_loggerId( s_loggerId++ )
+   m_threshold( GlobalLogParameters::getInstance().getThreshold( m_loggerId ) )
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// Logger destructor
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Logger::~Logger()
 {
 }
 
@@ -33,7 +41,9 @@ Logger::Logger( const Logger& other ) :
   m_stream( other.m_stream ),
   m_currentLevel( Msg::Never ),
   m_threshold( other.m_threshold )
-{}
+{
+   assert( false );
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// setThreshold
@@ -42,7 +52,10 @@ void Logger::setThreshold( Msg::LogLevel threshold )
 {
    if ( !GlobalLogParameters::getInstance().doOverrideLocalThresholds() )
    {
-      this->m_threshold = threshold;
+      if ( !GlobalLogParameters::getInstance().isInspected( m_loggerId ) )
+      {
+         this->m_threshold = threshold;
+      }
    }
 }
 
@@ -52,7 +65,7 @@ void Logger::setThreshold( Msg::LogLevel threshold )
 template <>
 Logger& Logger::operator<<( const Msg::LogLevel& logLevel )
 {
-   loggerLock = new boost::mutex::scoped_lock( loggerMutex );
+   // loggerLock = new boost::mutex::scoped_lock( loggerMutex );
 
    m_currentLevel = logLevel;
 
@@ -95,7 +108,7 @@ Logger& Logger::operator<<( const Msg::LogCommand& logCommand )
             m_stream << std::endl;
             m_currentLevel = Msg::Never;
          }
-         delete loggerLock;
+         // delete loggerLock;
          break;
       default:
          assert( false );
@@ -197,7 +210,7 @@ Logger& gLog()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// initGlobalLogger
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void initGlobalLogger( int threshold, bool doUseColors, const std::string& fileName )
+void initGlobalLogger( int threshold, const void* inspectMap, bool doUseColors, const std::string& fileName )
 {
    assert( !gp_gLog );
    GlobalLogParameters& globalLogPars = const_cast< GlobalLogParameters& >( GlobalLogParameters::getInstance() );
@@ -210,6 +223,8 @@ void initGlobalLogger( int threshold, bool doUseColors, const std::string& fileN
    {
       globalLogPars.openFileStream( fileName );
    }
+
+   globalLogPars.setInspectMap( *reinterpret_cast< const GlobalLogParameters::InspectMap* >( inspectMap ) );
 
    gp_gLog = new Logger( "gLog" );
 }
@@ -251,4 +266,12 @@ void closeGlobalLogger()
 const std::string& Logger::getName() const
 {
    return m_name;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// getLoggerId
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+LoggerId Logger::getLoggerId() const
+{
+   return m_loggerId;
 }

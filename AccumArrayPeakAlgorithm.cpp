@@ -231,7 +231,7 @@ std::vector< Feature::Peak > AccumArrayPeakAlgorithm::findPeaks( const RealVecto
 void AccumArrayPeakAlgorithm::dressPeaks( const Math::RegularAccumArray& data, const RealVector& baselineSubtractedData, std::vector< Feature::Peak >& peaks ) const
 {
    Logger msg( "AccumArrayPeakAlgorithm" );
-   msg.setThreshold( Msg::Always );
+   // msg.setThreshold( Msg::Always );
 
    for ( size_t iPeak = 0; iPeak < peaks.size(); ++iPeak )
    {
@@ -268,13 +268,13 @@ void AccumArrayPeakAlgorithm::dressPeaks( const Math::RegularAccumArray& data, c
    {
       for ( size_t showPeak = 0; showPeak < peaks.size(); ++showPeak )
       {
-         LoggerClient logSession( "PeakDressing" );
-         logSession.setLoggerThreshold( Msg::Error );
-         logSession.setLoggerThreshold( Msg::Info, 1 );
+         // Logger logSession( "PeakDressing" );
+         // logSession.setLoggerThreshold( Msg::Error );
+         // logSession.setLoggerThreshold( Msg::Info, 1 );
 
          const Feature::Peak& peak = peaks[ showPeak ];
 
-         Logger& msg = logSession.getLogger();
+         Logger msg( "PeakDressing" );
          msg << Msg::Info << "Dressing peak " << showPeak << Msg::EndReq;
          msg << Msg::Debug << "Peak centre is located at " << peak.getPosition() << Msg::EndReq;
          msg << Msg::Debug << peak.getData() << Msg::EndReq;
@@ -326,9 +326,9 @@ void AccumArrayPeakAlgorithm::dressPeaks( const Math::RegularAccumArray& data, c
          Math::NewtonSolver1D solveLeftWidth( funcWDeriv, m_peakWidthSurfFrac );
          Math::NewtonSolver1D solveRightWidth( funcWDeriv, 1 - m_peakWidthSurfFrac );
 
-         if ( logSession.getLoggerClientId() == 16 )
+         if ( msg.getLoggerId() == 16 )
          {
-            solveLeftWidth.setLoggerThreshold( Msg::Verbose );
+            // solveLeftWidth.setLoggerThreshold( Msg::Verbose );
             const RealVector& xEval = Utils::createRangeReal( peak.getLeftBound(), peak.getRightBound(), 500 );
             const RealVector& yEvalInt = funcWDeriv.evalMany( xEval );
             const RealVector& yEvalDens = funcWDeriv.evalDerivMany( xEval );
@@ -341,7 +341,7 @@ void AccumArrayPeakAlgorithm::dressPeaks( const Math::RegularAccumArray& data, c
 
          if ( !resultLeft.isConverged() )
          {
-            msg << Msg::Warning << "Width solver did not converge! LogClientId = " << logSession.getLoggerClientId() << Msg::EndReq;
+            msg << Msg::Warning << "Width solver did not converge!" << Msg::EndReq;
          }
 
          double minWidthX = resultLeft.getSolution();
