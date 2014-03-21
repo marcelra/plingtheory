@@ -81,7 +81,7 @@ void DevSuite::devNewtonSolver1D()
    Math::RealMemFunction< Math::GaussPdf > density( &Math::GaussPdf::getDensity, &gaussPdf );
    Math::ComposedRealFuncWithDerivative pdfAsFunc( integral, density );
 
-   Math::NewtonSolver1D newtonSolver( pdfAsFunc, 0.95 );
+   Math::NewtonSolver1D newtonSolver( 0, pdfAsFunc, 0.95 );
    Math::NewtonSolver1D::Result result = newtonSolver.solve( 0, 100 );
    msg << Msg::Info << "Solution = " << result.getSolution() << Msg::EndReq;
 
@@ -204,7 +204,7 @@ void DevSuite::devPeakFinder2()
    // TH1F* hist = data.createHistogram();
    // hist->Draw();
 
-   FeatureAlgorithm::AccumArrayPeakAlgorithm peakAlg;
+   FeatureAlgorithm::AccumArrayPeakAlgorithm peakAlg( 0 );
    peakAlg.setDoMonitor( true );
    const std::vector< Feature::Peak>& peaks = peakAlg.execute( data );
    return;

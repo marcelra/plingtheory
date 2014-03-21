@@ -23,7 +23,8 @@ namespace FeatureAlgorithm
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// constructor
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-AccumArrayPeakAlgorithm::AccumArrayPeakAlgorithm()
+AccumArrayPeakAlgorithm::AccumArrayPeakAlgorithm( const AlgorithmBase* parent ) :
+   AlgorithmBase( "AccumArrayPeakAlgorithm", parent )
 {
    m_smoothFraction = 1 / 100.;
    m_sigmaFactor = 1;
@@ -323,8 +324,8 @@ void AccumArrayPeakAlgorithm::dressPeaks( const Math::RegularAccumArray& data, c
          Math::RealMemFunction< Math::KernelPdf > surfDeriv( &Math::KernelPdf::getDensity, &dataKernel );
          Math::ComposedRealFuncWithDerivative funcWDeriv( surface, surfDeriv );
 
-         Math::NewtonSolver1D solveLeftWidth( funcWDeriv, m_peakWidthSurfFrac );
-         Math::NewtonSolver1D solveRightWidth( funcWDeriv, 1 - m_peakWidthSurfFrac );
+         Math::NewtonSolver1D solveLeftWidth( this, funcWDeriv, m_peakWidthSurfFrac );
+         Math::NewtonSolver1D solveRightWidth( this, funcWDeriv, 1 - m_peakWidthSurfFrac );
 
          if ( msg.getLoggerId() == 16 )
          {

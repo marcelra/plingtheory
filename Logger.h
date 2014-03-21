@@ -53,6 +53,11 @@ class Logger
       void setThreshold( Msg::LogLevel threshold );
 
       /**
+       * Sets a common prefix for all the messages from this logger.
+       */
+      void setMessagePrefix( const std::string& prefix );
+
+      /**
        * Get Logger ID
        */
       LoggerId getLoggerId() const;
@@ -76,6 +81,7 @@ class Logger
 
    private:
       std::string             m_name;                  //! the name of the logger
+      std::string             m_prefix;                //! prefix for all messages
       std::ostream&           m_stream;                //! the ostream (usually std::cout)
       Msg::LogLevel           m_currentLevel;          //! importance level of current message
       Msg::LogLevel           m_threshold;             //! threshold for displayed messages

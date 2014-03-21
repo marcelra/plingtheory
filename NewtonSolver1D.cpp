@@ -10,8 +10,8 @@ namespace Math
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// constructor
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-NewtonSolver1D::NewtonSolver1D( const IRealFuncWithDerivative& function, double value ) :
-   LoggerClient( "NewtonSolver1D" ),
+NewtonSolver1D::NewtonSolver1D( const AlgorithmBase* parent, const IRealFuncWithDerivative& function, double value ) :
+   AlgorithmBase( "NewtonSolver1D", parent ),
    m_func( function ),
    m_tolerance( 1e-12 ),
    m_value( value )

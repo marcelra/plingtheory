@@ -1,6 +1,7 @@
 #ifndef ACCUMARRAYPEAKALGORITHM_H
 #define ACCUMARRAYPEAKALGORITHM_H
 
+#include "AlgorithmBase.h"
 #include "Peak.h"
 #include "RegularAccumArray.h"
 
@@ -9,10 +10,10 @@
 namespace FeatureAlgorithm
 {
 
-class AccumArrayPeakAlgorithm
+class AccumArrayPeakAlgorithm : public AlgorithmBase
 {
    public:
-      AccumArrayPeakAlgorithm();
+      AccumArrayPeakAlgorithm( const AlgorithmBase* parent );
 
       std::vector< Feature::Peak > execute( const Math::RegularAccumArray& data ) const;
 

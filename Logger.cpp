@@ -89,6 +89,8 @@ Logger& Logger::operator<<( const Msg::LogLevel& logLevel )
          loggerIdMsg << m_loggerId;
          formatInField( loggerIdMsg.str(), idFieldWidth );
       }
+
+      m_stream << m_prefix;
    }
 
    return *this;
@@ -274,4 +276,12 @@ const std::string& Logger::getName() const
 LoggerId Logger::getLoggerId() const
 {
    return m_loggerId;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// setMessagePrefix
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void Logger::setMessagePrefix( const std::string& prefix )
+{
+   m_prefix = prefix;
 }
