@@ -97,6 +97,7 @@ Logger& gLog();
 
 /// Initialise global logger
 void initGlobalLogger( int threshold, bool doUseColors, const std::string& fileName );
+void initRegressionLogger( const std::string& fileName );
 
 /// Close the global logger
 void closeGlobalLogger();
