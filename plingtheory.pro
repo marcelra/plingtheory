@@ -46,7 +46,6 @@ SOURCES += main.cpp \
     RealVector.cpp \
     LineSearchObjective.cpp \
     Utils.cpp \
-    AlgorithmExceptions.cpp \
     WindowFunction.cpp \
     AlgorithmBase.cpp \
     StftGraph.cpp \
@@ -162,7 +161,6 @@ HEADERS += \
     RealVector.h \
     LineSearchObjective.h \
     Utils.h \
-    AlgorithmExceptions.h \
     WindowFunction.h \
     AlgorithmBase.h \
     IStorable.h \

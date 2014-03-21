@@ -328,7 +328,7 @@ void AccumArrayPeakAlgorithm::dressPeaks( const Math::RegularAccumArray& data, c
 
          if ( msg.getLoggerId() == 16 )
          {
-            // solveLeftWidth.setLoggerThreshold( Msg::Verbose );
+            solveLeftWidth.getLogger().setThreshold( Msg::Verbose );
             const RealVector& xEval = Utils::createRangeReal( peak.getLeftBound(), peak.getRightBound(), 500 );
             const RealVector& yEvalInt = funcWDeriv.evalMany( xEval );
             const RealVector& yEvalDens = funcWDeriv.evalDerivMany( xEval );

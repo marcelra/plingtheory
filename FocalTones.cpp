@@ -1,6 +1,6 @@
 #include "FocalTones.h"
 
-#include "AlgorithmExceptions.h"
+#include "Exceptions.h"
 #include "Logger.h"
 #include "Peak.h"
 #include "Tone.h"
@@ -143,7 +143,7 @@ void FocalTones::execute()
    }
    if ( m_iteration > 100 )
    {
-      throw AlgorithmTooManyIterations( "FocalTones", m_iteration );
+      throw ExceptionGeneral( "Focal tones did not converge" );
    }
 
    size_t nHarmonicMax = 20;

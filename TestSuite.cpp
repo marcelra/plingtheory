@@ -26,7 +26,6 @@ void TestSuite::execute()
 
    /// Infrastucture
    testObjectPool();
-   testAlgorithmFramework();
    testThreading();
 
    /// Generators
@@ -159,18 +158,6 @@ void TestSuite::testObjectPool()
       }
       msg << Msg::Info << "TestObject.i = " << to->i << " (should be 42). " << Msg::EndReq;
    }
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// testAlgorithmFramework
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void TestSuite::testAlgorithmFramework()
-{
-   Logger msg ( "testAlgorithmFramework" );
-   msg << Msg::Info << "Running testAlgorithmFramework..." << Msg::EndReq;
-
-   AlgorithmBase alg( "AlgBase", "Test" );
-   alg.execute();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
