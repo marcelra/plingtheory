@@ -17,6 +17,7 @@ ProgramOptions::ProgramOptions( int argc, char* argv[] ) :
    m_useRootInterface( false ),
    m_useQtInterface( false ),
    m_doUseColorLogger( true ),
+   m_useRegressionLogConfig( false ),
    m_rootFileNameOld( "" ),
    m_rootFileNameNew( "" ),
    m_logFileName( "" ),
@@ -126,6 +127,10 @@ void ProgramOptions::parseArguments()
          }
          m_dataDir = dir;
       }
+      else if ( opt.find( "--regression" ) == 0 )
+      {
+         m_useRegressionLogConfig = true;
+      }
       else if ( opt == "-v" )
       {
          ++it;
@@ -170,6 +175,7 @@ void ProgramOptions::printOptions( std::ostream& os )
    os << "-o <filename>       : Write all log data to file with name <filename>.\n";
    os << "-r <filename>       : Save all root objects to file with name <filename>.\n";
    os << "-v <level>          : Verbosity level of logger. Range [0,6]: 0 is least verbose, 6 is maximally verbose.\n";
+   os << "--regression        : Configures the logger for regression output comparison.\n";
    os << "--datadir=<datadir> : Directory in which to look for files that are used by test functions.\n";
    os.flush();
 }
@@ -275,11 +281,19 @@ StringList::const_iterator ProgramOptions::safeAdvanceIter( StringList::const_it
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// getUseQtInterface
+/// useQtInterface
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool ProgramOptions::useQtInterface() const
 {
    return m_useQtInterface;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// doUseRegressionLogConfig
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+bool ProgramOptions::doUseRegressionLogConfig() const
+{
+   return m_useRegressionLogConfig;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

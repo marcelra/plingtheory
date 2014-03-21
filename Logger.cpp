@@ -40,7 +40,10 @@ Logger::Logger( const Logger& other ) :
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void Logger::setThreshold( Msg::LogLevel threshold )
 {
-   this->m_threshold = threshold;
+   if ( !GlobalLogParameters::getInstance().doOverrideLocalThresholds() )
+   {
+      this->m_threshold = threshold;
+   }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -66,9 +69,13 @@ Logger& Logger::operator<<( const Msg::LogLevel& logLevel )
       {
          m_stream << "\033[0m";
       }
-      std::stringstream loggerIdMsg;
-      loggerIdMsg << m_loggerId;
-      formatInField( loggerIdMsg.str(), idFieldWidth );
+
+      if ( GlobalLogParameters::getInstance().doDisplayLoggerIds() )
+      {
+         std::stringstream loggerIdMsg;
+         loggerIdMsg << m_loggerId;
+         formatInField( loggerIdMsg.str(), idFieldWidth );
+      }
    }
 
    return *this;
@@ -192,21 +199,37 @@ Logger& gLog()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void initGlobalLogger( int threshold, bool doUseColors, const std::string& fileName )
 {
-   if ( !gp_gLog )
+   assert( !gp_gLog );
+   GlobalLogParameters& globalLogPars = const_cast< GlobalLogParameters& >( GlobalLogParameters::getInstance() );
+
+   assert( threshold >= Msg::Always && threshold <= Msg::Verbose );
+   globalLogPars.setThreshold( static_cast< Msg::LogLevel >( threshold ) );
+
+   globalLogPars.setUseColors( doUseColors );
+   if ( fileName != "" )
    {
-      GlobalLogParameters& globalLogPars = const_cast< GlobalLogParameters& >( GlobalLogParameters::getInstance() );
-
-      assert( threshold >= Msg::Always && threshold <= Msg::Verbose );
-      globalLogPars.setThreshold( static_cast< Msg::LogLevel >( threshold ) );
-
-      globalLogPars.setUseColors( doUseColors );
-      if ( fileName != "" )
-      {
-         globalLogPars.openFileStream( fileName );
-      }
-
-      gp_gLog = new Logger( "gLog" );
+      globalLogPars.openFileStream( fileName );
    }
+
+   gp_gLog = new Logger( "gLog" );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// initRegressionLogger
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void initRegressionLogger( const std::string& fileName )
+{
+   assert( !gp_gLog );
+   GlobalLogParameters& globalLogPars = const_cast< GlobalLogParameters& >( GlobalLogParameters::getInstance() );
+
+   globalLogPars.setRegressionConfig();
+
+   if ( fileName != "" )
+   {
+      globalLogPars.openFileStream( fileName );
+   }
+
+   gp_gLog = new Logger( "gLog" );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

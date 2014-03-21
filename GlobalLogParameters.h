@@ -22,6 +22,10 @@ class GlobalLogParameters
        * Set global threshold.
        */
       void setThreshold( Msg::LogLevel m_threshold );
+      /**
+       * Use predefined configuration for regression.
+       */
+      void setRegressionConfig();
 
       /**
        * Set use colors.
@@ -57,6 +61,14 @@ class GlobalLogParameters
        */
       bool getUseColors() const;
       /**
+       * Returns whether or not to display the logger ids.
+       */
+      bool doDisplayLoggerIds() const;
+      /**
+       * Override local logger threshold. This means that all logger instances will use the global logger threshold.
+       */
+      bool doOverrideLocalThresholds() const;
+      /**
        * Gets the ostream to write to.
        */
       std::ostream& getStream() const;
@@ -70,16 +82,17 @@ class GlobalLogParameters
       static GlobalLogParameters*    s_theInstance;     //! Singleton instance
    private:
 
-      size_t                m_nameFieldWidth;      //! Width of the name field
-      size_t                m_levelFieldWidth;     //! Width of the level field
-      size_t                m_loggerIdFieldWidth;  //! Width of the logger id field
-      size_t                m_spacerWidth;         //! Number of spaces between fields
-      Msg::LogLevel         m_threshold;           //! Global threshold
-      bool                  m_useColors;           //! Flag whether or not to display colors
-      bool                  m_displayLoggerId;     //! Flag to indicate whether or not to display the logger ID
+      size_t                m_nameFieldWidth;         //! Width of the name field
+      size_t                m_levelFieldWidth;        //! Width of the level field
+      size_t                m_loggerIdFieldWidth;     //! Width of the logger id field
+      size_t                m_spacerWidth;            //! Number of spaces between fields
+      Msg::LogLevel         m_threshold;              //! Global threshold
+      bool                  m_useColors;              //! Flag whether or not to display colors
+      bool                  m_displayLoggerId;        //! Flag to indicate whether or not to display the logger ID
+      bool                  m_overrideLocalThresholds;//! Override logger instance thresholds
 
-      mutable std::ostream* m_stream;              //! Stream to terminal window
-      mutable std::fstream* m_fstream;             //! Stream to file
+      mutable std::ostream* m_stream;                 //! Stream to terminal window
+      mutable std::fstream* m_fstream;                //! Stream to file
 };
 
 #endif // GLOBALLOGPARAMETERS_H

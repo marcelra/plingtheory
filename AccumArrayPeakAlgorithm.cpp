@@ -231,6 +231,8 @@ std::vector< Feature::Peak > AccumArrayPeakAlgorithm::findPeaks( const RealVecto
 void AccumArrayPeakAlgorithm::dressPeaks( const Math::RegularAccumArray& data, const RealVector& baselineSubtractedData, std::vector< Feature::Peak >& peaks ) const
 {
    Logger msg( "AccumArrayPeakAlgorithm" );
+   msg.setThreshold( Msg::Always );
+
    for ( size_t iPeak = 0; iPeak < peaks.size(); ++iPeak )
    {
       Feature::Peak& peak = peaks[ iPeak ];
@@ -323,6 +325,17 @@ void AccumArrayPeakAlgorithm::dressPeaks( const Math::RegularAccumArray& data, c
 
          Math::NewtonSolver1D solveLeftWidth( funcWDeriv, m_peakWidthSurfFrac );
          Math::NewtonSolver1D solveRightWidth( funcWDeriv, 1 - m_peakWidthSurfFrac );
+
+         if ( logSession.getLoggerClientId() == 16 )
+         {
+            solveLeftWidth.setLoggerThreshold( Msg::Verbose );
+            const RealVector& xEval = Utils::createRangeReal( peak.getLeftBound(), peak.getRightBound(), 500 );
+            const RealVector& yEvalInt = funcWDeriv.evalMany( xEval );
+            const RealVector& yEvalDens = funcWDeriv.evalDerivMany( xEval );
+            gPlotFactory().createPlot( "Prob" );
+            gPlotFactory().createGraph( xEval, yEvalInt );
+            gPlotFactory().createGraph( xEval, yEvalDens );
+         }
          Math::NewtonSolver1D::Result resultLeft = solveLeftWidth.solve( startValueSolver, 100 );
          Math::NewtonSolver1D::Result resultRight = solveRightWidth.solve( startValueSolver, 100 );
 
