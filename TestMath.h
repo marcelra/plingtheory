@@ -16,6 +16,9 @@ class TestMath
       static void testTwoTuple();
       static void testRegularAccumArray();
 
+   private:
+      static void testNewtonSolver1D();
+
 };
 
 #endif // TESTMATH_H

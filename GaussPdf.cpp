@@ -14,7 +14,7 @@ GaussPdf::GaussPdf( double mu, double sigma ) :
    m_sigma( sigma ),
    m_gaussArgFac( -0.5 / ( sigma * sigma ) ),
    m_erfArgFac( 1.0 / ( sqrt( 2.0 ) * sigma ) ),
-   m_norm( 1.0 / ( sigma * sqrt( M_2_PI ) ) )
+   m_norm(  1 / sqrt( 2 * M_PI ) / sigma )
 {}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

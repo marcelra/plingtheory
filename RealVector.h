@@ -24,6 +24,12 @@ double operator*( const RealVector& x, const RealVector& y );
 
 RealVector operator*=( const RealVector& x, double lambda );
 
+/**
+ * Modify vector
+ */
+void scale( RealVector& x, double lambda );
+void normalise( RealVector& x );
+
 RealVector calcDerivative( const RealVector& x );
 bool isEqual( const RealVector& x, const RealVector& y );
 
@@ -97,11 +103,5 @@ inline double sum( const RealVector& x )
    }
    return result;
 }
-
-inline RealVector operator*=( const RealVector& x, double lambda )
-{
-   return x*lambda;
-}
-
 
 #endif // REALVECTOR_H

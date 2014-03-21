@@ -13,6 +13,12 @@ class DevSuite
       static void devFourierTemplates();
       static void devSamples();
 
+   /**
+    * Math
+    */
+   public:
+      static void testPdf();
+
    /// Parked.
    public:
       static void devSidelobeSubtraction();
@@ -21,10 +27,6 @@ class DevSuite
    /// Parked and interesting.
    public:
       static void devFourierPeakFinder1();
-
-      static void testPdf();
-      static void devRealFunction();
-
 };
 
 #endif // DEVSUITE_H

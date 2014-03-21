@@ -5,7 +5,11 @@
 #include "RootUtilities.h"
 #include "TestDataSupply.h"
 
+#include "ComposedRealFuncWithDerivative.h"
+#include "GaussPdf.h"
 #include "GradDescOptimiser.h"
+#include "NewtonSolver1D.h"
+#include "RealMemFunction.h"
 #include "SampledMovingAverage.h"
 #include "TwoDimExampleObjective.h"
 
@@ -291,6 +295,36 @@ void TestMath::testRegularAccumArray()
 
    /// Test done.
    msg << Msg::Info << "Test done." << Msg::EndReq;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// testNewtonSolver1D
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void TestMath::testNewtonSolver1D()
+{
+   Logger msg( "testNewtonSolver1D" );
+   msg << Msg::Info << "Running testNewtonSolver1D..." << Msg::EndReq;
+
+   size_t nPoints = 5000;
+   double min = -10;
+   double max = 10;
+   const RealVector& xEval = Utils::createRangeReal( min, max, nPoints );
+
+   Math::GaussPdf gaussPdf( 0, 1 );
+   Math::RealMemFunction< Math::GaussPdf > integral( &Math::GaussPdf::getIntegral, &gaussPdf );
+   Math::RealMemFunction< Math::GaussPdf > density( &Math::GaussPdf::getDensity, &gaussPdf );
+   Math::ComposedRealFuncWithDerivative pdfAsFunc( integral, density );
+
+   const RealVector& yIntegral = pdfAsFunc.evalMany( xEval );
+   const RealVector& yDensity = pdfAsFunc.evalDerivMany( xEval );
+
+   gPlotFactory().createPlot( "RealFunction/GaussPdf" );
+   gPlotFactory().createGraph( xEval, yIntegral );
+   gPlotFactory().createGraph( xEval, yDensity );
+
+   Math::NewtonSolver1D solver( pdfAsFunc, 0.3 );
+   Math::NewtonSolver1D::Result result = solver.solve( 2, 100 );
+   msg << Msg::Info << "NewtonSolver1D foound result: " << result.getSolution() << Msg::EndReq;
 }
 
 
