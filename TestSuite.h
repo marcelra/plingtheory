@@ -21,7 +21,6 @@ class TestSuite
        * Infrastructure
        */
       static void testObjectPool();
-      static void testAlgorithmFramework();
       static void testThreading();
 
       /**
