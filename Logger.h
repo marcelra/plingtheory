@@ -8,6 +8,8 @@
 
 #include "RealVector.h"
 
+typedef size_t LoggerId;
+
 /**
  * @class Logger
  * @brief Class that provides pretty print messages
@@ -27,7 +29,7 @@ class Logger
        * Constructor
        * @param name: the name of the logger (will be displayed in log messages)
        */
-      Logger( const std::string& m_name );
+      Logger( const std::string& name );
 
       /**
        * Copy constructor
@@ -43,7 +45,12 @@ class Logger
       /**
        * Set threshold for this logger instance to @param threshold
        */
-      void setThreshold( Msg::LogLevel m_threshold );
+      void setThreshold( Msg::LogLevel threshold );
+
+      /**
+       * Get the name of the logger.
+       */
+      const std::string& getName() const;
 
    private:
       /**
@@ -57,6 +64,10 @@ class Logger
       std::ostream&           m_stream;                //! the ostream (usually std::cout)
       Msg::LogLevel           m_currentLevel;          //! importance level of current message
       Msg::LogLevel           m_threshold;             //! threshold for displayed messages
+
+   private:
+      static LoggerId         s_loggerId;              //! Counts the number of logger instantiations.
+      LoggerId                m_loggerId;              //! The ID of the current logger.
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
