@@ -1,13 +1,14 @@
 #ifndef NEWTONSOLVER1D_H
 #define NEWTONSOLVER1D_H
 
+#include "AlgorithmBase.h"
 #include "LoggerClient.h"
 #include "IRealFuncWithDerivative.h"
 
 namespace Math
 {
 
-class NewtonSolver1D : public LoggerClient
+class NewtonSolver1D : public AlgorithmBase
 {
    public:
       class Result
@@ -36,7 +37,7 @@ class NewtonSolver1D : public LoggerClient
       };
 
    public:
-      NewtonSolver1D( const IRealFuncWithDerivative& function, double value = 0 );
+      NewtonSolver1D( const AlgorithmBase* parent, const IRealFuncWithDerivative& function, double value = 0 );
 
       void setTolerance( double tolerance );
 
