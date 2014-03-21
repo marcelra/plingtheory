@@ -2,7 +2,9 @@
 #define GLOBALLOGPARAMETERS_H
 
 #include "Msg.h"
-#include "SingletonBase.h"
+
+/// TODO: try use forward declare?
+#include <map>
 
 /**
  * @class GlobalLogParameters
@@ -39,7 +41,7 @@ class GlobalLogParameters
       /**
        * Get global threshold.
        */
-      const Msg::LogLevel& getThreshold() const;
+      const Msg::LogLevel& getThreshold( size_t loggerId ) const;
       /**
        * Get the field width in which the name is displayed.
        */
@@ -73,6 +75,20 @@ class GlobalLogParameters
        */
       std::ostream& getStream() const;
 
+      /**
+       * Logger ID versus LogLevel.
+       */
+      typedef std::map< size_t, Msg::LogLevel > InspectMap;
+
+      /**
+       * Set verbosity for particular logger IDs.
+       */
+      void setInspectMap( const InspectMap& inspectMap );
+      /**
+       * Is this logger instance inspected?
+       */
+      bool isInspected( size_t loggerId ) const;
+
    private:
       /**
        * Constructor
@@ -91,8 +107,10 @@ class GlobalLogParameters
       bool                  m_displayLoggerId;        //! Flag to indicate whether or not to display the logger ID
       bool                  m_overrideLocalThresholds;//! Override logger instance thresholds
 
-      mutable std::ostream* m_stream;                 //! Stream to terminal window
-      mutable std::fstream* m_fstream;                //! Stream to file
+      mutable std::ostream* m_stream;                  //! Stream to terminal window
+      mutable std::fstream* m_fstream;                 //! Stream to file
+
+      std::map< size_t, Msg::LogLevel > m_inspectMap; //! Logger ID vs. LogLevel. Overrides of global log level.
 };
 
 #endif // GLOBALLOGPARAMETERS_H

@@ -82,7 +82,6 @@ void DevSuite::devNewtonSolver1D()
    Math::ComposedRealFuncWithDerivative pdfAsFunc( integral, density );
 
    Math::NewtonSolver1D newtonSolver( pdfAsFunc, 0.95 );
-   newtonSolver.setLoggerThreshold( Msg::Verbose );
    Math::NewtonSolver1D::Result result = newtonSolver.solve( 0, 100 );
    msg << Msg::Info << "Solution = " << result.getSolution() << Msg::EndReq;
 

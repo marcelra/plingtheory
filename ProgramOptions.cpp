@@ -98,7 +98,7 @@ void ProgramOptions::parseArguments()
       else if ( opt == "-o" )
       {
          m_doUseColorLogger = false;
-         ++it;
+         it = safeAdvanceIter( it, m_argList, "-o" );
          m_logFileName = *it;
       }
       /// Long options
@@ -133,7 +133,7 @@ void ProgramOptions::parseArguments()
       }
       else if ( opt == "-v" )
       {
-         ++it;
+         it = safeAdvanceIter( it, m_argList, "-v" );
          std::string arg = *it;
          int logLevel = atoi( arg.c_str() );
          if ( logLevel < 0 || logLevel > 6 )
@@ -141,6 +141,21 @@ void ProgramOptions::parseArguments()
             throw ExceptionOptionArgumentParsing( "-v" );
          }
          m_logLevel = logLevel;
+      }
+      else if ( opt == "-i" )
+      {
+         std::string arg;
+         it = safeAdvanceIter( it, m_argList, "-i" );
+         arg = *it;
+         int logId = atoi( arg.c_str() );
+         it = safeAdvanceIter( it, m_argList, "-i" );
+         arg = *it;
+         int logLevel = atoi( arg.c_str() );
+         if ( logLevel < 0 || logLevel > 6 )
+         {
+            throw ExceptionOptionArgumentParsing( "-i" );
+         }
+         m_inspectLogIds[ logId ] = static_cast< Msg::LogLevel >( logLevel );
       }
       else
       {
@@ -175,8 +190,10 @@ void ProgramOptions::printOptions( std::ostream& os )
    os << "-o <filename>       : Write all log data to file with name <filename>.\n";
    os << "-r <filename>       : Save all root objects to file with name <filename>.\n";
    os << "-v <level>          : Verbosity level of logger. Range [0,6]: 0 is least verbose, 6 is maximally verbose.\n";
+   os << "-i <id> <level>     : Inspect messages from logger with id <id> at verbosity <level>.\n";
    os << "--regression        : Configures the logger for regression output comparison.\n";
    os << "--datadir=<datadir> : Directory in which to look for files that are used by test functions.\n";
+   os << "\n\n";
    os.flush();
 }
 
@@ -295,6 +312,16 @@ bool ProgramOptions::doUseRegressionLogConfig() const
 {
    return m_useRegressionLogConfig;
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// getLoggerInspectMap
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+const std::map< size_t, Msg::LogLevel >& ProgramOptions::getLoggerInspectMap() const
+{
+   return m_inspectLogIds;
+}
+
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Singleton instance

@@ -1,8 +1,11 @@
 #ifndef PROGRAMOPTIONS_H
 #define PROGRAMOPTIONS_H
 
-#include <string>
+#include "Msg.h"
+
 #include <list>
+#include <map>
+#include <string>
 
 typedef std::list< std::string > StringList;
 
@@ -40,6 +43,8 @@ class ProgramOptions
       const std::string&   getRootFileOutput() const;
       int                  getLogLevel() const;
 
+      const std::map< size_t, Msg::LogLevel >& getLoggerInspectMap() const;
+
    private:
       void parseArguments();
       StringList::const_iterator safeAdvanceIter( StringList::const_iterator, const StringList& list, const std::string& currentOption ) const;
@@ -55,17 +60,20 @@ class ProgramOptions
       bool              m_doCompareRootFiles;
 
    private:
-      bool              m_useRootInterface;
-      bool              m_useQtInterface;
-      bool              m_doUseColorLogger;
-      bool              m_doSaveRootObjects;
-      bool              m_useRegressionLogConfig;
-      std::string       m_rootFileNameOld;
-      std::string       m_rootFileNameNew;
-      std::string       m_logFileName;
-      std::string       m_dataDir;
-      std::string       m_rootFileOutput;
-      int               m_logLevel;
+      bool                    m_useRootInterface;
+      bool                    m_useQtInterface;
+      bool                    m_doUseColorLogger;
+      bool                    m_doSaveRootObjects;
+      bool                    m_useRegressionLogConfig;
+      std::string             m_rootFileNameOld;
+      std::string             m_rootFileNameNew;
+      std::string             m_logFileName;
+      std::string             m_dataDir;
+      std::string             m_rootFileOutput;
+      int                     m_logLevel;
+
+      std::map< size_t, Msg::LogLevel > m_inspectLogIds;
+
 };
 
 #endif // PROGRAMOPTIONS_H
