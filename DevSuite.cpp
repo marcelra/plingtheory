@@ -14,6 +14,7 @@ void DevSuite::execute()
    // devSamples();
 
    devPeakFinder2();
+   // devNewtonSolver1D();
 
    /// Can move to test functions
    // testPdf();
@@ -69,6 +70,24 @@ void DevSuite::execute()
 /// Parked code fragments
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "DevSuite.parked.cpp"
+
+void DevSuite::devNewtonSolver1D()
+{
+   Logger msg( "devNewtonSolver1D" );
+   msg << Msg::Info << "Running devNewtonSolver1D..." << Msg::EndReq;
+
+   Math::GaussPdf gaussPdf( 0, 1 );
+   Math::RealMemFunction< Math::GaussPdf > integral( &Math::GaussPdf::getIntegral, &gaussPdf );
+   Math::RealMemFunction< Math::GaussPdf > density( &Math::GaussPdf::getDensity, &gaussPdf );
+   Math::ComposedRealFuncWithDerivative pdfAsFunc( integral, density );
+
+   Math::NewtonSolver1D newtonSolver( pdfAsFunc, 0.95 );
+   newtonSolver.setLoggerThreshold( Msg::Verbose );
+   Math::NewtonSolver1D::Result result = newtonSolver.solve( 0, 100 );
+   msg << Msg::Info << "Solution = " << result.getSolution() << Msg::EndReq;
+
+   return;
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// testPdf

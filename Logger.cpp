@@ -20,7 +20,8 @@ Logger::Logger( const std::string& name ) :
    m_name( name ),
    m_stream( GlobalLogParameters::getInstance().getStream() ),
    m_currentLevel( Msg::Never ),
-   m_threshold( GlobalLogParameters::getInstance().getThreshold() )
+   m_threshold( GlobalLogParameters::getInstance().getThreshold() ),
+   m_loggerId( s_loggerId++ )
 {
 }
 
@@ -56,6 +57,7 @@ Logger& Logger::operator<<( const Msg::LogLevel& logLevel )
    {
       size_t nameFieldWidth = GlobalLogParameters::getInstance().getNameFieldWidth();
       size_t levelFieldWidth = GlobalLogParameters::getInstance().getLevelFieldWidth();
+      size_t idFieldWidth = GlobalLogParameters::getInstance().getLoggerIdFieldWidth();
 
       formatInField( m_name, nameFieldWidth );
       m_stream << Msg::colorCode( m_currentLevel );
@@ -64,6 +66,9 @@ Logger& Logger::operator<<( const Msg::LogLevel& logLevel )
       {
          m_stream << "\033[0m";
       }
+      std::stringstream loggerIdMsg;
+      loggerIdMsg << m_loggerId;
+      formatInField( loggerIdMsg.str(), idFieldWidth );
    }
 
    return *this;
@@ -160,6 +165,12 @@ void Logger::formatInField( const std::string& message, size_t lengthOfField )
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// Static members
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+LoggerId Logger::s_loggerId = 0;
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Global logger
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -209,4 +220,12 @@ void closeGlobalLogger()
       delete gp_gLog;
       gp_gLog = 0;
    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// getName
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+const std::string& Logger::getName() const
+{
+   return m_name;
 }

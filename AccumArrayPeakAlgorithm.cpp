@@ -82,7 +82,7 @@ RealVector AccumArrayPeakAlgorithm::subtractBaseline( const RealVector& smoothed
       {
          ++rightPosIndex;
 
-         std::cout << "Right pos index = " << rightPosIndex << ", total size = " << minPositionVec.size() << std::endl;
+         // std::cout << "Right pos index = " << rightPosIndex << ", total size = " << minPositionVec.size() << std::endl;
          leftPos = rightPos;
          if ( rightPosIndex < minPositionVec.size() )
          {
@@ -264,15 +264,18 @@ void AccumArrayPeakAlgorithm::dressPeaks( const Math::RegularAccumArray& data, c
 
    if ( m_doMonitor )
    {
-      msg << Msg::Info << "Dressing peaks..." << Msg::EndReq;
       for ( size_t showPeak = 0; showPeak < peaks.size(); ++showPeak )
       {
-         const Feature::Peak& peak = peaks[ showPeak ];
-         msg << Msg::Info << peak.getData() << Msg::EndReq;
+         LoggerClient logSession( "PeakDressing" );
+         logSession.setLoggerThreshold( Msg::Error );
+         logSession.setLoggerThreshold( Msg::Info, 1 );
 
-         Logger msg( "AccumArrayPeakAlgorithm" );
+         const Feature::Peak& peak = peaks[ showPeak ];
+
+         Logger& msg = logSession.getLogger();
          msg << Msg::Info << "Dressing peak " << showPeak << Msg::EndReq;
-         msg << Msg::Info << "Peak centre is located at " << peak.getPosition() << Msg::EndReq;
+         msg << Msg::Debug << "Peak centre is located at " << peak.getPosition() << Msg::EndReq;
+         msg << Msg::Debug << peak.getData() << Msg::EndReq;
 
          IndexVector range = Utils::createRange( peak.getLeftBoundIndex(), peak.getRightBoundIndex() );
          Math::TwoTuple allEntries;
@@ -322,6 +325,12 @@ void AccumArrayPeakAlgorithm::dressPeaks( const Math::RegularAccumArray& data, c
          Math::NewtonSolver1D solveRightWidth( funcWDeriv, 1 - m_peakWidthSurfFrac );
          Math::NewtonSolver1D::Result resultLeft = solveLeftWidth.solve( startValueSolver, 100 );
          Math::NewtonSolver1D::Result resultRight = solveRightWidth.solve( startValueSolver, 100 );
+
+         if ( !resultLeft.isConverged() )
+         {
+            msg << Msg::Warning << "Width solver did not converge! LogClientId = " << logSession.getLoggerClientId() << Msg::EndReq;
+         }
+
          double minWidthX = resultLeft.getSolution();
          double maxWidthX = resultRight.getSolution();
 
@@ -334,8 +343,8 @@ void AccumArrayPeakAlgorithm::dressPeaks( const Math::RegularAccumArray& data, c
          RealVector rightWidthMarkerY( 2, 10 );
          rightWidthMarkerY[0] = 0;
 
-         msg << Msg::Info << "probLeft = " << probLeft << ", probRight = " << probRight << Msg::EndReq;
-         msg << Msg::Info << "minWidthX = " << minWidthX << ", maxWidthX = " << maxWidthX << Msg::EndReq;
+         msg << Msg::Verbose << "probLeft = " << probLeft << ", probRight = " << probRight << Msg::EndReq;
+         msg << Msg::Verbose << "minWidthX = " << minWidthX << ", maxWidthX = " << maxWidthX << Msg::EndReq;
 
          std::ostringstream plotName;
          plotName << "AAPA/DressPeak" << showPeak;

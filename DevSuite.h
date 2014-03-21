@@ -18,6 +18,7 @@ class DevSuite
     */
    public:
       static void testPdf();
+      static void devNewtonSolver1D();
 
    /// Parked.
    public:
