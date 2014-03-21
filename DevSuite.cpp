@@ -13,9 +13,10 @@ void DevSuite::execute()
    // devFourierTemplates();
    // devSamples();
 
-   // devPeakFinder2();
+   devPeakFinder2();
+
+   /// Can move to test functions
    // testPdf();
-   devRealFunction();
 
    /// PARKED
    // devSidelobeSubtraction();
@@ -68,49 +69,6 @@ void DevSuite::execute()
 /// Parked code fragments
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "DevSuite.parked.cpp"
-
-RealVector evalFuncToVector( const Math::IRealFunction& func, double xMin, double xMax, size_t nPoints )
-{
-   RealVector result( nPoints );
-   double step = ( xMax - xMin ) / ( nPoints - 1 );
-   double x = xMin;
-   for ( size_t i = 0; i < nPoints; ++i )
-   {
-      result[ i ] = func( x );
-      x += step;
-   }
-   return result;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// devRealFunction
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void DevSuite::devRealFunction()
-{
-   Logger msg( "devRealFunction" );
-   msg << Msg::Info << "Running devRealFunction..." << Msg::EndReq;
-
-   size_t nPoints = 5000;
-   double min = -10;
-   double max = 10;
-   const RealVector& xEval = Utils::createRangeReal( min, max, nPoints );
-
-   Math::GaussPdf gaussPdf( 0, 1 );
-   Math::RealMemFunction< Math::GaussPdf > integral( &Math::GaussPdf::getIntegral, &gaussPdf );
-   Math::RealMemFunction< Math::GaussPdf > density( &Math::GaussPdf::getDensity, &gaussPdf );
-   Math::ComposedRealFuncWithDerivative pdfAsFunc( integral, density );
-
-   const RealVector& yIntegral = pdfAsFunc.evalMany( xEval );
-   const RealVector& yDensity = pdfAsFunc.evalDerivMany( xEval );
-
-   gPlotFactory().createPlot( "RealFunction/GaussPdf" );
-   gPlotFactory().createGraph( xEval, yIntegral );
-   gPlotFactory().createGraph( xEval, yDensity );
-
-   Math::NewtonSolver1D solver( pdfAsFunc, 0.3 );
-   Math::NewtonSolver1D::Result result = solver.solve( 2, 100 );
-   msg << Msg::Info << "NewtonSolver1D foound result: " << result.getSolution() << Msg::EndReq;
-}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// testPdf
@@ -211,6 +169,9 @@ void DevSuite::devRebinSRSpec()
 
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// devPeakFinder2
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void DevSuite::devPeakFinder2()
 {
    Logger msg( "devPeakFinder2" );
@@ -428,7 +389,6 @@ void DevSuite::devSamples()
       size_t tEnd = samplingInfo.convertSecsToSamples( 0.50 ) + i;
       size_t tRestart = samplingInfo.convertSecsToSamples( 1.0 ) + i;
       double phaseAdd = M_PI / ( tEnd - tStart );
-
 
       for ( ; i < tStart && i < numSamples ; ++i )
       {

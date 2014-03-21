@@ -2,6 +2,8 @@
 
 #include <cmath>
 
+#include <iostream>
+
 namespace Math
 {
 
@@ -20,7 +22,7 @@ KernelPdf::KernelPdf( IPdf::CPtr kernel, const RealVector& sampling, const RealV
 {
    assert( weights.size() == sampling.size() );
    double norm = 1.0 / sum( m_weights );
-   m_weights *= norm;
+   scale( m_weights, norm );
 }
 
 double KernelPdf::getDensity( double x ) const

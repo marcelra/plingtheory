@@ -28,6 +28,7 @@ class AccumArrayPeakAlgorithm
    private:
       double         m_smoothFraction;
       double         m_sigmaFactor;
+      double         m_peakWidthSurfFrac;
       bool           m_doMonitor;
       size_t         m_maxNumPeaks;
 };

@@ -23,8 +23,8 @@ class KernelPdf : public IPdf
 
    private:
       IPdf::CPtr           m_kernel;
-      const RealVector     m_sampling;
-      const RealVector     m_weights;
+      RealVector           m_sampling;
+      RealVector           m_weights;
 };
 
 } /// namespace Math

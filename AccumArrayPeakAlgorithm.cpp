@@ -1,9 +1,12 @@
 #include "AccumArrayPeakAlgorithm.h"
 
+#include "ComposedRealFuncWithDerivative.h"
 #include "GaussPdf.h"
 #include "IPlotFactory.h"
 #include "KernelPdf.h"
 #include "Logger.h"
+#include "NewtonSolver1D.h"
+#include "RealMemFunction.h"
 #include "RootUtilities.h"
 #include "SampledMovingAverage.h"
 
@@ -25,6 +28,7 @@ AccumArrayPeakAlgorithm::AccumArrayPeakAlgorithm()
    m_smoothFraction = 1 / 100.;
    m_sigmaFactor = 1;
    m_maxNumPeaks = 10;
+   m_peakWidthSurfFrac = 0.1;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -260,12 +264,14 @@ void AccumArrayPeakAlgorithm::dressPeaks( const Math::RegularAccumArray& data, c
 
    if ( m_doMonitor )
    {
+      msg << Msg::Info << "Dressing peaks..." << Msg::EndReq;
       for ( size_t showPeak = 0; showPeak < peaks.size(); ++showPeak )
       {
          const Feature::Peak& peak = peaks[ showPeak ];
          msg << Msg::Info << peak.getData() << Msg::EndReq;
 
          Logger msg( "AccumArrayPeakAlgorithm" );
+         msg << Msg::Info << "Dressing peak " << showPeak << Msg::EndReq;
          msg << Msg::Info << "Peak centre is located at " << peak.getPosition() << Msg::EndReq;
 
          IndexVector range = Utils::createRange( peak.getLeftBoundIndex(), peak.getRightBoundIndex() );
@@ -288,7 +294,7 @@ void AccumArrayPeakAlgorithm::dressPeaks( const Math::RegularAccumArray& data, c
             totalWeight += allEntries.getY( iEntry );
          }
 
-         Math::KernelPdf dataKernel( Math::IPdf::CPtr( new Math::GaussPdf( 0, 5 ) ), allEntries.getX(), allEntries.getY() );
+         Math::KernelPdf dataKernel( Math::IPdf::CPtr( new Math::GaussPdf( 0, 1 ) ), allEntries.getX(), allEntries.getY() );
 
          size_t nEvalPdf = 100;
          RealVector evalPdfVec( nEvalPdf );
@@ -302,22 +308,34 @@ void AccumArrayPeakAlgorithm::dressPeaks( const Math::RegularAccumArray& data, c
             x+= step;
          }
 
-         double peakSurface = sum( peak.getData() );
+         double peakMaxWidth = peak.getRightBound() - peak.getLeftBound();
+         double probLeft = dataKernel.getIntegral( peak.getLeftBound() );
+         double probRight = 1 - dataKernel.getIntegral( peak.getRightBound() );
 
-         double widthDef = 0.68 ; // peakSurface / exp( 1. );
-         double widthSeen = 0;
-         std::map< double, size_t >::const_iterator it = distMap.begin();
-         for ( ; it != distMap.end(); ++it )
-         {
-            widthSeen += allEntries.getY( it->second );
-            if ( widthSeen > widthDef )
-            {
-               break;
-            }
-         }
-         double widthTooMuch = widthSeen - widthDef;
-         msg << Msg::Info << "widthTooMuch = " << widthTooMuch << ", widthDef = " << widthDef << Msg::EndReq;
-         // --it->first
+         double startValueSolver = peak.getLeftBound() + peakMaxWidth / 2;
+
+         Math::RealMemFunction< Math::KernelPdf > surface( &Math::KernelPdf::getIntegral, &dataKernel );
+         Math::RealMemFunction< Math::KernelPdf > surfDeriv( &Math::KernelPdf::getDensity, &dataKernel );
+         Math::ComposedRealFuncWithDerivative funcWDeriv( surface, surfDeriv );
+
+         Math::NewtonSolver1D solveLeftWidth( funcWDeriv, m_peakWidthSurfFrac );
+         Math::NewtonSolver1D solveRightWidth( funcWDeriv, 1 - m_peakWidthSurfFrac );
+         Math::NewtonSolver1D::Result resultLeft = solveLeftWidth.solve( startValueSolver, 100 );
+         Math::NewtonSolver1D::Result resultRight = solveRightWidth.solve( startValueSolver, 100 );
+         double minWidthX = resultLeft.getSolution();
+         double maxWidthX = resultRight.getSolution();
+
+         double width = maxWidthX - minWidthX;
+
+         RealVector leftWidthMarkerX( 2, minWidthX );
+         RealVector rightWidthMarkerX( 2, maxWidthX );
+         RealVector leftWidthMarkerY( 2, 10 );
+         leftWidthMarkerY[0] = 0;
+         RealVector rightWidthMarkerY( 2, 10 );
+         rightWidthMarkerY[0] = 0;
+
+         msg << Msg::Info << "probLeft = " << probLeft << ", probRight = " << probRight << Msg::EndReq;
+         msg << Msg::Info << "minWidthX = " << minWidthX << ", maxWidthX = " << maxWidthX << Msg::EndReq;
 
          std::ostringstream plotName;
          plotName << "AAPA/DressPeak" << showPeak;
@@ -326,6 +344,8 @@ void AccumArrayPeakAlgorithm::dressPeaks( const Math::RegularAccumArray& data, c
          gPlotFactory().createScatter( allEntries.getX(), allEntries.getY() );
          gPlotFactory().createGraph( xVec, evalPdfVec );
          gPlotFactory().createScatter( peakCentreX, peakCentreY, Qt::red );
+         // gPlotFactory().createGraph( leftWidthMarkerX, leftWidthMarkerY, Qt::blue );
+         // gPlotFactory().createGraph( rightWidthMarkerX, rightWidthMarkerY, Qt::blue );
       }
    }
 

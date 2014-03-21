@@ -53,6 +53,11 @@ void AxisPaintArea::updateTicks()
    double min = getMin();
    double max = getMax();
 
+   if ( ( max - min ) < 1e-10 )
+   {
+      max = min + 1e-10;
+   }
+
    size_t numTicksMax = getNumsPixelsAlongAxis() / m_minDistMajTicks;
    double scale = max - min;
 
