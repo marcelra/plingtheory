@@ -81,8 +81,8 @@ void DevSuite::devNewtonSolver1D()
    Math::RealMemFunction< Math::GaussPdf > density( &Math::GaussPdf::getDensity, &gaussPdf );
    Math::ComposedRealFuncWithDerivative pdfAsFunc( integral, density );
 
-   Math::NewtonSolver1D newtonSolver( 0, pdfAsFunc, 0.95 );
-   Math::NewtonSolver1D::Result result = newtonSolver.solve( 0, 100 );
+   Math::NewtonSolver1D newtonSolver;
+   Math::NewtonSolver1D::Result result = newtonSolver.solve( pdfAsFunc, 0.95, 0 );
    msg << Msg::Info << "Solution = " << result.getSolution() << Msg::EndReq;
 
    return;

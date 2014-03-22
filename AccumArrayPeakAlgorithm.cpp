@@ -1,5 +1,6 @@
 #include "AccumArrayPeakAlgorithm.h"
 
+#include "BisectionSolver1D.h"
 #include "ComposedRealFuncWithDerivative.h"
 #include "GaussPdf.h"
 #include "IPlotFactory.h"
@@ -83,7 +84,6 @@ RealVector AccumArrayPeakAlgorithm::subtractBaseline( const RealVector& smoothed
       {
          ++rightPosIndex;
 
-         // std::cout << "Right pos index = " << rightPosIndex << ", total size = " << minPositionVec.size() << std::endl;
          leftPos = rightPos;
          if ( rightPosIndex < minPositionVec.size() )
          {
@@ -267,12 +267,8 @@ void AccumArrayPeakAlgorithm::dressPeaks( const Math::RegularAccumArray& data, c
 
    if ( m_doMonitor )
    {
-      for ( size_t showPeak = 0; showPeak < peaks.size(); ++showPeak )
+      for ( size_t showPeak = 0; showPeak < peaks.size()-1; ++showPeak )
       {
-         // Logger logSession( "PeakDressing" );
-         // logSession.setLoggerThreshold( Msg::Error );
-         // logSession.setLoggerThreshold( Msg::Info, 1 );
-
          const Feature::Peak& peak = peaks[ showPeak ];
 
          Logger msg( "PeakDressing" );
@@ -324,21 +320,14 @@ void AccumArrayPeakAlgorithm::dressPeaks( const Math::RegularAccumArray& data, c
          Math::RealMemFunction< Math::KernelPdf > surfDeriv( &Math::KernelPdf::getDensity, &dataKernel );
          Math::ComposedRealFuncWithDerivative funcWDeriv( surface, surfDeriv );
 
-         Math::NewtonSolver1D solveLeftWidth( this, funcWDeriv, m_peakWidthSurfFrac );
-         Math::NewtonSolver1D solveRightWidth( this, funcWDeriv, 1 - m_peakWidthSurfFrac );
+         // Math::NewtonSolver1D solveLeftWidth( this, funcWDeriv, m_peakWidthSurfFrac );
+         // Math::NewtonSolver1D solveRightWidth( this, funcWDeriv, 1 - m_peakWidthSurfFrac );
+         Math::BisectionSolver1D solver;
 
-         if ( msg.getLoggerId() == 16 )
-         {
-            solveLeftWidth.getLogger().setThreshold( Msg::Verbose );
-            const RealVector& xEval = Utils::createRangeReal( peak.getLeftBound(), peak.getRightBound(), 500 );
-            const RealVector& yEvalInt = funcWDeriv.evalMany( xEval );
-            const RealVector& yEvalDens = funcWDeriv.evalDerivMany( xEval );
-            gPlotFactory().createPlot( "Prob" );
-            gPlotFactory().createGraph( xEval, yEvalInt );
-            gPlotFactory().createGraph( xEval, yEvalDens );
-         }
-         Math::NewtonSolver1D::Result resultLeft = solveLeftWidth.solve( startValueSolver, 100 );
-         Math::NewtonSolver1D::Result resultRight = solveRightWidth.solve( startValueSolver, 100 );
+         Interval solutionInterval( peak.getLeftBound(), peak.getRightBound() );
+
+         Math::BisectionSolver1D::Result resultLeft = solver.solve( surface, m_peakWidthSurfFrac, solutionInterval );
+         Math::BisectionSolver1D::Result resultRight = solver.solve( surface, 1 - m_peakWidthSurfFrac, solutionInterval );
 
          if ( !resultLeft.isConverged() )
          {
@@ -367,8 +356,8 @@ void AccumArrayPeakAlgorithm::dressPeaks( const Math::RegularAccumArray& data, c
          gPlotFactory().createScatter( allEntries.getX(), allEntries.getY() );
          gPlotFactory().createGraph( xVec, evalPdfVec );
          gPlotFactory().createScatter( peakCentreX, peakCentreY, Qt::red );
-         // gPlotFactory().createGraph( leftWidthMarkerX, leftWidthMarkerY, Qt::blue );
-         // gPlotFactory().createGraph( rightWidthMarkerX, rightWidthMarkerY, Qt::blue );
+         gPlotFactory().createGraph( leftWidthMarkerX, leftWidthMarkerY, Qt::blue );
+         gPlotFactory().createGraph( rightWidthMarkerX, rightWidthMarkerY, Qt::blue );
       }
    }
 
