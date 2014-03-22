@@ -322,8 +322,8 @@ void TestMath::testNewtonSolver1D()
    gPlotFactory().createGraph( xEval, yIntegral );
    gPlotFactory().createGraph( xEval, yDensity );
 
-   Math::NewtonSolver1D solver( 0, pdfAsFunc, 0.3 );
-   Math::NewtonSolver1D::Result result = solver.solve( 2, 100 );
+   Math::NewtonSolver1D solver;
+   Math::NewtonSolver1D::Result result = solver.solve( pdfAsFunc, 0.3, 2 );
    msg << Msg::Info << "NewtonSolver1D foound result: " << result.getSolution() << Msg::EndReq;
 }
 

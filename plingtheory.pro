@@ -119,7 +119,10 @@ SOURCES += main.cpp \
     IRealFuncWithDerivative.cpp \
     ComposedRealFuncWithDerivative.cpp \
     NewtonSolver1D.cpp \
-    LoggerClient.cpp
+    LoggerClient.cpp \
+    BisectionSolver1D.cpp \
+    Interval.cpp \
+    RootFinder1DBase.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -234,7 +237,10 @@ HEADERS += \
     IRealFuncWithDerivative.h \
     ComposedRealFuncWithDerivative.h \
     NewtonSolver1D.h \
-    LoggerClient.h
+    LoggerClient.h \
+    BisectionSolver1D.h \
+    Interval.h \
+    RootFinder1DBase.h
 
 OTHER_FILES += \
     Todos.txt
