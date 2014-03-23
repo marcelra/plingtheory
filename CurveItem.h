@@ -23,6 +23,9 @@ class CurveItem : public IYVsXItem, public LineDrawAttr
        */
       virtual ~CurveItem();
 
+   protected:
+      CurveItem();
+
    private:
       /**
        * @see PaintItem.

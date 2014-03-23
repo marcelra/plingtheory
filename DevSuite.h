@@ -6,6 +6,12 @@ class DevSuite
    public:
       static void execute();
 
+   /**
+    * Plotting
+    */
+   public:
+      static void devHistogram();
+
    public:
       static void devPeakFinder2();
       static void devRebinSRSpec();

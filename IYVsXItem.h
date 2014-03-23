@@ -7,11 +7,14 @@
 namespace Plotting
 {
 
+/**
+ * @class IYVsXItem
+ * @brief An paint item that is described by paint commands that have an YVsXData data source.
+ */
 class IYVsXItem : public IPaintItem
 {
    public:
       IYVsXItem( const std::vector< double >& xData, const std::vector< double >& yData );
-      virtual ~IYVsXItem();
 
       double getMinX() const;
       double getMaxX() const;
@@ -19,8 +22,13 @@ class IYVsXItem : public IPaintItem
       double getMaxY() const;
 
    protected:
+      IYVsXItem();
+
+   protected:
       YVsXData       m_data;
 };
+
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Inline methods IYVsXItem

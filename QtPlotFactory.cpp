@@ -3,6 +3,8 @@
 #include "AvailablePlotsList.h"
 #include "CurveItem.h"
 #include "Exceptions.h"
+#include "HistogramItem.h"
+#include "IAccumArray.h"
 #include "Plot2D.h"
 #include "RawPcmData.h"
 #include "RegLargeDataCurve.h"
@@ -98,6 +100,18 @@ void QtPlotFactory::createStftGraph( const WaveAnalysis::StftData& stftData )
    }
 
    Plotting::StftPaintItem* item = new Plotting::StftPaintItem( stftData );
+   m_currentPlot->addItem( item );
+   m_plotItems.push_back( item );
+}
+
+void QtPlotFactory::createHistogram( const Math::IAccumArray& hist )
+{
+   if ( !m_currentPlot )
+   {
+      ExceptionNoPlotAvailable();
+   }
+
+   Plotting::HistogramItem* item = new Plotting::HistogramItem( hist );
    m_currentPlot->addItem( item );
    m_plotItems.push_back( item );
 }
