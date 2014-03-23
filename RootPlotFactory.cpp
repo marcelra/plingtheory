@@ -3,6 +3,7 @@
 #include "Exceptions.h"
 #include "IAccumArray.h"
 #include "Logger.h"
+#include "RegularAccumArray.h"
 #include "RootUtilities.h"
 #include "StftGraph.h"
 
@@ -125,9 +126,37 @@ void RootPlotFactory::createStftGraph( const WaveAnalysis::StftData& stftData )
    m_currentCanvas = stftGraph.create();
 }
 
-void RootPlotFactory::createHistogram( const Math::IAccumArray& hist )
+void RootPlotFactory::createHistogram( const Math::IAccumArray& hist, const QColor& colour )
 {
-   assert( false );
+   if ( !m_currentCanvas )
+   {
+      throw ExceptionNoPlotAvailable();
+   }
+
+   const Math::RegularAccumArray* regularAccumArray = dynamic_cast< const Math::RegularAccumArray* >( &hist );
+   assert( regularAccumArray );
+
+   RootUtilities& ru = RootUtilities::getInstance();
+   TString uniqueName = ru.generateUniqueName( "hist" );
+
+   TH1F* rootHist = new TH1F( uniqueName, uniqueName, hist.getNumBins(), hist.getMinX(), hist.getMaxX() );
+   for ( size_t i = 0; i < hist.getNumBins(); ++i )
+   {
+      rootHist->SetBinContent( i + 1, hist.getBinContent( i ) );
+   }
+
+   rootHist->SetBinContent( 0, hist.getUnderflow() );
+   rootHist->SetBinContent( hist.getNumBins(), hist.getOverflow() );
+   rootHist->SetLineColor( rootColorFromQColor( colour ) );
+
+   if ( checkIsNewCanvas() )
+   {
+      rootHist->Draw();
+   }
+   else
+   {
+      rootHist->Draw( "SAME" );
+   }
 }
 
 } /// namespace PlotInterface

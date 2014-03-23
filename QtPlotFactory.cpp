@@ -104,7 +104,7 @@ void QtPlotFactory::createStftGraph( const WaveAnalysis::StftData& stftData )
    m_plotItems.push_back( item );
 }
 
-void QtPlotFactory::createHistogram( const Math::IAccumArray& hist )
+void QtPlotFactory::createHistogram( const Math::IAccumArray& hist, const QColor& colour )
 {
    if ( !m_currentPlot )
    {
@@ -112,6 +112,8 @@ void QtPlotFactory::createHistogram( const Math::IAccumArray& hist )
    }
 
    Plotting::HistogramItem* item = new Plotting::HistogramItem( hist );
+   item->setLineColor( colour );
+   item->setAntialiasing( true );
    m_currentPlot->addItem( item );
    m_plotItems.push_back( item );
 }

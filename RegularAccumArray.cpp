@@ -217,22 +217,5 @@ void RegularAccumArray::setBinContents( const RealVector& contents )
    }
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// createHistogram
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TH1F* RegularAccumArray::createHistogram() const
-{
-   const TString& name = RootUtilities::getInstance().generateUniqueName( "regularAccumArray" );
-
-   TH1F* hist = new TH1F( name, name, getNumBins(), getMinX(), getMaxX() );
-   for ( size_t iBin = 0; iBin < getNumBins(); ++iBin )
-   {
-      double val = getBinContent( iBin );
-      hist->SetBinContent( iBin + 1, val );
-   }
-
-   return hist;
-}
-
 } /// namespace Math
 

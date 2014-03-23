@@ -28,7 +28,7 @@ class RootPlotFactory : public IPlotFactory
 
       void createScatter( const std::vector< double >& xData, const std::vector< double >& yData, const QColor& colour );
       void createStftGraph( const WaveAnalysis::StftData& stftData );
-      virtual void createHistogram( const Math::IAccumArray& hist );
+      virtual void createHistogram( const Math::IAccumArray& hist, const QColor& colour );
 
    private:
       bool checkIsNewCanvas();
