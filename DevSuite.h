@@ -16,7 +16,6 @@ class DevSuite
       static void devPeakFinder2();
       static void devRebinSRSpec();
 
-      static void devFourierTemplates();
       static void devSamples();
 
    /**

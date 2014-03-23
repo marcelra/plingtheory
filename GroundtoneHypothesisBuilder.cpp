@@ -31,10 +31,6 @@ RealVector GroundtoneHypothesisBuilder::execute( size_t numIterations )
       }
    }
 
-   new TCanvas();
-   TH1F* rootHist = hist.createHistogram();
-   rootHist->Draw();
-
    return result;
 }
 

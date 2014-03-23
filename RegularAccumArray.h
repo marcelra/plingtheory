@@ -3,8 +3,6 @@
 
 #include "IAccumArray.h"
 
-class TH1F;
-
 namespace Math
 {
 
@@ -40,12 +38,6 @@ class RegularAccumArray : public IAccumArray
        * Initialise all bin contents with @param vec. Asserts that the size of @param vec is equal to the number of bins.
        */
       void setBinContents( const RealVector& vec );
-
-   /**
-    * Create a ROOT histogram from the accumulation array.
-    */
-   public:
-      TH1F* createHistogram() const;
 
    /**
     * IAccumArray interface implementation (@see IAccumArray).

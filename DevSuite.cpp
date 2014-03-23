@@ -162,10 +162,9 @@ void DevSuite::devRebinSRSpec()
 
    SortCache sortX( spec.getFrequencies() );
 
-   TH1F* hAccArr = accArr.createHistogram();
+   gPlotFactory().createPlot( "devRebinSRSpec/Rebinned" );
+   gPlotFactory().createHistogram( accArr );
 
-   new TCanvas();
-   hAccArr->Draw();
    // TGraph* grUnbinned = RootUtilities::createGraph( sortX.applyTo( spec.getFrequencies() ), sortX.applyTo( spec.getMagnitude() ) );
    // grUnbinned->SetLineColor( kRed + 2 );
    // grUnbinned->SetMarkerColor( kRed + 2 );
@@ -251,140 +250,6 @@ void DevSuite::devPeakFinder2()
    // stftGraph.create();
 
    return;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// devFourierTemplates
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void DevSuite::devFourierTemplates()
-{
-   Logger msg( "devFourierTemplates" );
-   msg << Msg::Info << "In devFourierTempaltes..." << Msg::EndReq;
-
-   Music::NoteList noteList = Music::createHugeDiatonicScale();
-   size_t numHarmonics = 10;
-   double amp = 1;
-   SamplingInfo samplingInfo( 44100 );
-   size_t fourierSize = 1024;
-   size_t zeroPadding = 0; //fourierSize;
-   size_t numSamplesGenerate = 4096;
-   double hopRate = 1;
-
-   WaveAnalysis::SpectralReassignmentTransform transform( samplingInfo, fourierSize, zeroPadding, hopRate );
-
-   std::set< double > frequencies;
-
-   // for ( size_t iNote = 0; iNote < noteList.size(); ++iNote )
-   // {
-   //    for ( size_t iHarmonic = 0; iHarmonic < numHarmonics; ++iHarmonic )
-   //    {
-   //       frequencies.insert( noteList[ iNote ].getFrequency() * ( iHarmonic + 1 ) );
-   //    }
-   // }
-   frequencies.insert( 1000 );
-
-   double freqMinDraw = 0;
-   double freqMaxDraw = samplingInfo.getNyquistFrequency();
-
-   size_t counter = 0;
-   size_t numGraphs = 0;
-   size_t graphSkip = 20;
-   size_t numGraphsDrawn = 0;
-   bool interactiveGraphs = true;
-   if ( !interactiveGraphs )
-   {
-      graphSkip = 1;
-   }
-   for ( std::set< double >::iterator it = frequencies.begin(); it != frequencies.end(); ++it, ++counter )
-   {
-
-      double frequency = *it;
-      if ( frequency > samplingInfo.getNyquistFrequency() )
-      {
-         break;
-      }
-      msg << Msg::Info << "Creating fourier templates for frequency " << frequency << "." << Msg::EndReq;
-
-      msg << Msg::Debug << "Generating waveform." << Msg::EndReq;
-
-      RawPcmData pcmData( samplingInfo, numSamplesGenerate );
-
-      double phase = 0;
-      double phaseStep = samplingInfo.getPhaseStepPerSample( frequency );
-      for ( size_t iSample = 0; iSample < numSamplesGenerate; ++iSample )
-      {
-         pcmData[ iSample ] = amp * sin( phase );
-         phase += phaseStep;
-      }
-
-      msg << Msg::Debug << "Fourier transforming waveform." << Msg::EndReq;
-      WaveAnalysis::StftData::Ptr stftData = transform.execute( pcmData );
-      const WaveAnalysis::SrSpectrum& srSpectrum = dynamic_cast< const WaveAnalysis::SrSpectrum& >( stftData->getSpectrum( 0 ) );
-      const Math::RegularAccumArray& accArr = srSpectrum.rebinToFourierLattice();
-      TH1F* hist = accArr.createHistogram();
-
-      msg << Msg::Debug << "Generating delayed waveform." << Msg::EndReq;
-      RawPcmData delayedData( samplingInfo, numSamplesGenerate, 0 );
-      phase = 0;
-      for ( size_t iSample = 0; iSample < fourierSize; ++iSample )
-      {
-         delayedData[ iSample ] = ( amp / fourierSize ) * iSample * sin( phase );
-         phase += phaseStep;
-      }
-      WaveAnalysis::StftData::Ptr stftDataDelayed = transform.execute( delayedData );
-      const WaveAnalysis::SrSpectrum& srSpectrumDelayed = dynamic_cast< const WaveAnalysis::SrSpectrum& >( stftDataDelayed->getSpectrum( 0 ) );
-      const Math::RegularAccumArray& accArrDelayed = srSpectrumDelayed.rebinToFourierLattice();
-      TH1F* histDelayed = accArrDelayed.createHistogram();
-
-      if ( frequency > freqMinDraw && frequency < freqMaxDraw )
-      {
-         if ( numGraphs % graphSkip == 0 )
-         {
-            ++numGraphsDrawn;
-            std::stringstream name;
-            name << "templateCanvas" << counter;
-            std::stringstream title;
-            title << "Frequency = " << *it;
-            TCanvas* c = new TCanvas( name.str().c_str(), title.str().c_str() );
-            // c->SetLogy( true );
-
-            // if ( frequency < 1500 )
-            // {
-            //    c->SetLogx( true );
-            // }
-
-            msg << Msg::Info << counter << " histograms drawn." << Msg::EndReq;
-
-            hist->Draw();
-            hist->SetLineColor( kBlack );
-            // TGraph* grHatT = RootUtilities::createGraph( srSpectrum.getFrequencies(), srSpectrum.getTimeCorrections() );
-            // grHatT->Draw( "PSAME" );
-            // grHatT->SetMarkerColor( kBlack );
-
-
-            histDelayed->Draw( "SAME" );
-            histDelayed->SetLineColor( kBlue );
-
-            TGraph* grHatTDelayed = RootUtilities::createGraph( srSpectrumDelayed.getFrequencies(), srSpectrumDelayed.getTimeCorrections() );
-            grHatTDelayed->SetMarkerColor( kBlue );
-            grHatTDelayed->Draw( "PSAME" );
-//
-            // TGraph* grHatOmegaDelayed = RootUtilities::createGraph( srSpectrumDelayed.getFrequencies(), 10 * srSpectrumDelayed.getFrequencyCorrections() );
-            // grHatOmegaDelayed->SetMarkerColor( kRed );
-            // grHatOmegaDelayed->Draw( "PSAME" );
-
-            if ( !interactiveGraphs )
-            {
-               name << ".gif";
-               c->SaveAs( name.str().c_str() );
-               delete c;
-            }
-
-            // grHatTDelayed->Draw( "AL" );
-         }
-         ++numGraphs;
-      }
-   }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
