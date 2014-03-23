@@ -19,6 +19,10 @@ class YVsXData : public ITwoDimPlotData
        * Constructor that initialises the data set.
        */
       YVsXData( const std::vector< double >& xData, const std::vector< double >& yData );
+      /**
+       * Constructor without initialisation.
+       */
+      YVsXData();
 
    /**
     * Implementation of ITwoDimPlotData interface (@see ITwoDimPlotData).

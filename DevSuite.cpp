@@ -9,11 +9,13 @@ void DevSuite::execute()
 {
    Logger msg( "DevSuite" );
    msg << Msg::Info << "Running development code..." << Msg::EndReq;
+
+   devHistogram();
    // devRebinSRSpec();
    // devFourierTemplates();
    // devSamples();
 
-   devPeakFinder2();
+   // devPeakFinder2();
    // devNewtonSolver1D();
 
    /// Can move to test functions
@@ -444,3 +446,30 @@ void DevSuite::devSamples()
    WaveFile::write( "sinefrag2.wav", mc );
 }
 
+void DevSuite::devHistogram()
+{
+   TRandom3 rand( 0 );
+
+   size_t nBins = 100;
+   double xMin = -5;
+   double xMax = 5;
+
+   Math::RegularAccumArray hist( nBins, xMin, xMax );
+   size_t nDraws = 500;
+   double w = ( xMax - xMin ) / nDraws;
+
+   for ( size_t i = 0; i < nDraws; ++i )
+   {
+      double x = rand.Gaus( 0, 1 );
+      hist.add( x, w );
+   }
+
+   Math::GaussPdf pdf( 0, 1 );
+   const RealVector& xEval = Utils::createRangeReal( xMin, xMax, 100 );
+   Math::RealMemFunction<Math::GaussPdf> pdfFunc( &Math::GaussPdf::getDensity, &pdf );
+   const RealVector& yEval = pdfFunc.evalMany( xEval );
+
+   gPlotFactory().createPlot( "testHistogram/Gauss sampling" );
+   gPlotFactory().createHistogram( hist );
+   gPlotFactory().createGraph( xEval, yEval, Qt::blue );
+}

@@ -85,7 +85,7 @@ void AxisPaintArea::updateTicks()
       return;
    }
 
-   assert( unroundedDist > 2 && unroundedDist < 20 );
+   assert( unroundedDist >= 2 && unroundedDist <= 20 );
 
    size_t numMinorTicks;
    double tickBase;

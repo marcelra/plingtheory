@@ -1,6 +1,7 @@
 #include "RootPlotFactory.h"
 
 #include "Exceptions.h"
+#include "IAccumArray.h"
 #include "Logger.h"
 #include "RootUtilities.h"
 #include "StftGraph.h"
@@ -122,6 +123,11 @@ void RootPlotFactory::createStftGraph( const WaveAnalysis::StftData& stftData )
 {
    Visualisation::StftGraph stftGraph( stftData );
    m_currentCanvas = stftGraph.create();
+}
+
+void RootPlotFactory::createHistogram( const Math::IAccumArray& hist )
+{
+   assert( false );
 }
 
 } /// namespace PlotInterface

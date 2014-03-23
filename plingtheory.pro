@@ -122,7 +122,8 @@ SOURCES += main.cpp \
     LoggerClient.cpp \
     BisectionSolver1D.cpp \
     Interval.cpp \
-    RootFinder1DBase.cpp
+    RootFinder1DBase.cpp \
+    HistogramItem.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -240,7 +241,8 @@ HEADERS += \
     LoggerClient.h \
     BisectionSolver1D.h \
     Interval.h \
-    RootFinder1DBase.h
+    RootFinder1DBase.h \
+    HistogramItem.h
 
 OTHER_FILES += \
     Todos.txt
@@ -263,7 +265,8 @@ DEPENDPATH += /usr/root/include
 macx: LIBS += -L/usr/local/lib/ -lfftw3
 linux: LIBS += -L/usr/local/lib/ -lfftw3
 
-QMAKE_CXXFLAGS += -g -O3 -ffast-math -mfpmath=387
+QMAKE_CXXFLAGS += -g -ffast-math -mfpmath=387
+# QMAKE_CXXFLAGS_RELEASE -= -O2
 
 # macx: PRE_TARGETDEPS += $$PWD/usr/root/lib/libAfterImage.a
 

@@ -10,6 +10,11 @@
 class Logger;
 class RawPcmData;
 
+namespace Math
+{
+class IAccumArray;
+}
+
 namespace WaveAnalysis
 {
 class StftData;
@@ -49,6 +54,7 @@ class IPlotFactory : SingletonBase
 
       virtual void createScatter( const std::vector< double >& xData, const std::vector< double >& yData, const QColor& colour = Qt::black ) = 0;
       virtual void createStftGraph( const WaveAnalysis::StftData& stftData ) = 0;
+      virtual void createHistogram( const Math::IAccumArray& hist ) = 0;
 
    protected:
       /**
