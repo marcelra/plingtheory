@@ -18,6 +18,8 @@ class DevSuite
 
       static void devSamples();
 
+      static void devMlp();
+
    /**
     * Math
     */

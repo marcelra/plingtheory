@@ -16,6 +16,9 @@ void DevSuite::execute()
    // devSamples();
 
    // devPeakFinder2();
+   devMlp();
+   return;
+   devPeakFinder2();
    // devNewtonSolver1D();
 
    /// Can move to test functions
@@ -36,6 +39,7 @@ void DevSuite::execute()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <set>
+#include "MlpTrainer.h"
 #include "NoteList.h"
 #include "AccumArrayPeakAlgorithm.h"
 #include "GroundtoneHypothesisBuilder.h"
@@ -62,11 +66,14 @@ void DevSuite::execute()
 #include "IThread.h"
 #include "UniformPdf.h"
 #include "RealMemFunction.h"
+#include "RealFunctionPtr.h"
 #include "IRealFunction.h"
 #include "ComposedRealFuncWithDerivative.h"
 #include "NewtonSolver1D.h"
+#include "MultilayerPerceptron.h"
 
 #include <functional>
+#include <cmath>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Parked code fragments
@@ -337,4 +344,63 @@ void DevSuite::devHistogram()
    gPlotFactory().createPlot( "testHistogram/Gauss sampling" );
    gPlotFactory().createHistogram( hist );
    gPlotFactory().createGraph( xEval, yEval, Qt::blue );
+}
+
+void DevSuite::devMlp()
+{
+   Logger msg( "devMlp" );
+   msg << Msg::Info << "In devMlp..." << Msg::EndReq;
+
+   TRandom3 rand( 0 );
+
+   std::vector< RealVector > inputData;
+   std::vector< RealVector > outputData;
+   RealVector xUp, yUp, xDown, yDown;
+
+   size_t nTrainSamples = 1000;
+   for ( size_t iTrainSample = 0; iTrainSample < nTrainSamples; ++iTrainSample )
+   {
+      double x = rand.Uniform( -1, 1 );
+      double y = rand.Uniform( -1, 1 );
+      double z = -1;
+      if ( x * y > 0 )
+      {
+         z = 1;
+         xUp.push_back( x );
+         yUp.push_back( y );
+      }
+      else
+      {
+         xDown.push_back( x );
+         yDown.push_back( y );
+      }
+      RealVector v;
+      v.push_back( x );
+      v.push_back( y );
+      inputData.push_back( v );
+      outputData.push_back( RealVector( 1, z ) );
+   }
+
+   gPlotFactory().createPlot( "devMlp/trainingSet" );
+   gPlotFactory().createScatter( xUp, yUp, Qt::red );
+   gPlotFactory().createScatter( xDown, yDown, Qt::blue );
+
+   Mva::Network network( 2, 1 );
+   network.addHiddenLayer( 5 );
+   Mva::MultilayerPerceptron mlp( network, 0 );
+
+   Mva::MlpTrainer mlpTrainer( network, inputData, outputData );
+   mlpTrainer.train();
+
+   RealVector test( 2, 1 );
+   msg << Msg::Info << "Dimension check: " << mlp.getNetwork().eval( test ) << Msg::EndReq;
+
+   Math::RealFunctionPtr func( &tanh );
+   const RealVector& xEval = Utils::createRangeReal( -10, 10, 100 );
+   const RealVector& yEval = func.evalMany( xEval );
+
+   gPlotFactory().createPlot( "devMlp/tanh" );
+   gPlotFactory().createGraph( xEval, yEval, Qt::blue );
+
+   return;
 }

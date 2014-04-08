@@ -204,8 +204,8 @@ std::vector< Feature::Peak > AccumArrayPeakAlgorithm::findPeaks( const RealVecto
 
       Feature::Peak peak( maxPos );
       peak.setProminence( maxVal );
-      size_t rightBoundIndex = iRightMin < baselineSubtractedData.size() - 1? rightBoundIndex + 1 : rightBoundIndex;
-      peak.setBoundIndices( iLeftMin, iRightMin + 1 );
+      size_t rightBoundIndex = iRightMin < baselineSubtractedData.size() - 1? iRightMin + 1 : iRightMin;
+      peak.setBoundIndices( iLeftMin, rightBoundIndex );
       peaks.push_back( peak );
    }
 
@@ -234,133 +234,142 @@ void AccumArrayPeakAlgorithm::dressPeaks( const Math::RegularAccumArray& data, c
    Logger msg( "AccumArrayPeakAlgorithm" );
    // msg.setThreshold( Msg::Always );
 
+   /// Peak entries
+   /// Total weight (corrected, uncorrected)
+
+   /// Peak neighbours
+   /// Peak data
    for ( size_t iPeak = 0; iPeak < peaks.size(); ++iPeak )
    {
       Feature::Peak& peak = peaks[ iPeak ];
-      /// Do position weighting in peak bin.
-      size_t binIndexPos = peak.getPositionIndex();
-      const Math::TwoTuple& entries = data.getBinEntries( binIndexPos );
-      double weightedPos = 0;
-      double totalWeight = 0;
-      for ( size_t iEntry = 0; iEntry < entries.getNumElements(); ++iEntry )
+
+      if ( iPeak != 0 )
       {
-         weightedPos += entries.getX()[ iEntry ] * entries.getY()[ iEntry ];
-         totalWeight += entries.getY()[ iEntry ];
+         peak.setLeftNeighbourPeak( &peaks[ iPeak ] );
       }
-      weightedPos /= totalWeight;
-      peak.setPosition( weightedPos );
+      else
+      {
+         peak.setLeftNeighbourPeak( 0 );
+      }
 
-      /// Set peak data.
-      IndexVector indexVec = Utils::createRange( peak.getLeftBoundIndex(), peak.getRightBoundIndex() );
-      msg << Msg::Verbose << indexVec << Msg::EndReq;
-      const RealVector& peakData = Utils::createSelection( baselineSubtractedData, indexVec );
-      msg << Msg::Verbose << "peakData = " << peakData << Msg::EndReq;
+      if ( iPeak != peaks.size() - 1 )
+      {
+         peak.setRightNeighbourPeak( &peaks[ iPeak ] );
+      }
+      else
+      {
+         peak.setRightNeighbourPeak( 0 );
+      }
+
+      RealVector peakData;
+      size_t iBinLeft = peak.getLeftBoundIndex();
+      size_t iBinRight = peak.getRightBoundIndex();
+      for ( size_t iBin = iBinLeft; iBin < iBinRight; ++iBin )
+      {
+         peakData.push_back( baselineSubtractedData[ iBin ] );
+      }
+
       peak.setData( peakData );
-      peak.setBounds( data.getBin( peak.getLeftBoundIndex() ).getMinX(), data.getBin( peak.getRightBoundIndex() ).getMaxX() );
+
+      double xLeft = data.getBin( iBinLeft ).getMinX();
+      double xRight = data.getBin( iBinRight ).getMaxX();
+
+      peak.setBounds( xLeft, xRight );
+
    }
 
-   for ( size_t iPeak = 1; iPeak < peaks.size() - 1; ++iPeak )
+   /// Centre of mass
+   for ( size_t iPeak = 0; iPeak < peaks.size(); ++iPeak )
    {
-      peaks[ iPeak ].setLeftNeighbourPeak( &peaks[ iPeak - 1 ] );
-      peaks[ iPeak ].setRightNeighbourPeak( &peaks[ iPeak + 1 ] );
+      Feature::Peak& peak = peaks[ iPeak ];
+
+      double peakCm = 0;
+      double peakWeight = 0;
+
+      size_t iBinLeft = peak.getLeftBoundIndex();
+      size_t iBinRight = peak.getRightBoundIndex();
+
+      for ( size_t iBin = iBinLeft; iBin <= iBinRight; ++iBin )
+      {
+         const Math::TwoTuple& entries = data.getBinEntries( iBin );
+         for ( size_t iEntry = 0; iEntry < entries.getNumElements(); ++iEntry )
+         {
+            peakCm += entries.getX( iEntry ) * entries.getY( iEntry );
+            peakWeight += entries.getY( iEntry );
+         }
+      }
+
+      peakCm /= peakWeight;
+      peak.setPosition( peakCm );
    }
 
+   /// Width
+   for ( size_t iPeak = 0; iPeak < peaks.size(); ++iPeak )
+   {
+      Feature::Peak& peak = peaks[ iPeak ];
+
+      Math::TwoTuple allPeakEntries;
+
+      for ( size_t iBin = peak.getLeftBoundIndex(); iBin < peak.getRightBoundIndex(); ++iBin )
+      {
+          const Math::TwoTuple& binEntries = data.getBinEntries( iBin );
+          allPeakEntries.append( binEntries );
+      }
+      peak.setPeakEntries( allPeakEntries );
+
+      Math::KernelPdf kernPdf( Math::IPdf::CPtr( new Math::GaussPdf( 0, 1 ) ), allPeakEntries.getX(), allPeakEntries.getY() );
+      Math::RealMemFunction< Math::KernelPdf > memFunc( &Math::KernelPdf::getIntegral, &kernPdf );
+      Math::IRealFunction& func = memFunc;
+
+      Interval solutionInterval( peak.getLeftBound(), peak.getRightBound() );
+
+      Math::BisectionSolver1D solver;
+      Math::BisectionSolver1D::Result resultLeft = solver.solve( func, m_peakWidthSurfFrac, solutionInterval );
+      Math::BisectionSolver1D::Result resultRight = solver.solve( func, 1 - m_peakWidthSurfFrac, solutionInterval );
+      if ( resultLeft.isConverged() && resultRight.isConverged() )
+      {
+         peak.setWidth( ( resultRight.getSolution() - resultLeft.getSolution() ) / 2. );
+      }
+      else
+      {
+         getLogger() << Msg::Debug << "Width determination failed!" << Msg::EndReq;
+      }
+   }
+
+
+   /// Monitoring code
    if ( m_doMonitor )
    {
-      for ( size_t showPeak = 0; showPeak < peaks.size()-1; ++showPeak )
+      for ( size_t iPeak = 0; iPeak < peaks.size(); ++iPeak )
       {
-         const Feature::Peak& peak = peaks[ showPeak ];
+         Feature::Peak& peak = peaks[ iPeak ];
 
-         Logger msg( "PeakDressing" );
-         msg << Msg::Info << "Dressing peak " << showPeak << Msg::EndReq;
-         msg << Msg::Debug << "Peak centre is located at " << peak.getPosition() << Msg::EndReq;
-         msg << Msg::Debug << peak.getData() << Msg::EndReq;
+         const RealVector& peakEntries = Utils::createRangeReal( peak.getLeftBoundIndex(), peak.getRightBoundIndex() );
+         const RealVector& peakData = peak.getData();
 
-         IndexVector range = Utils::createRange( peak.getLeftBoundIndex(), peak.getRightBoundIndex() );
-         Math::TwoTuple allEntries;
-         for ( size_t i = 0; i < range.size(); ++i )
-         {
-            Math::TwoTuple binTuple = data.getBinEntries( range[ i ] );
-            allEntries.append( binTuple );
-         }
+         assert( peakData.size() == peakEntries.size() );
 
-         RealVector peakCentreX( 1, peak.getPosition() );
-         RealVector peakCentreY( 1, peak.getProminence() );
+         gPlotFactory().createScatter( peak.getPeakEntries()->getX(), peak.getPeakEntries()->getY(), Qt::black );
 
-         std::map< double, size_t > distMap;
-         double totalWeight = 0;
-         for ( size_t iEntry = 0; iEntry < allEntries.getNumElements(); ++iEntry )
-         {
-            double dist = fabs( allEntries.getX( iEntry ) - peak.getPosition() );
-            distMap[ dist ] = iEntry;
-            totalWeight += allEntries.getY( iEntry );
-         }
+         std::ostringstream peakName;
+         peakName << "Peak_" << iPeak;
+         gPlotFactory().createPlot( peakName.str() );
+         gPlotFactory().createGraph( peakEntries * data.getBinWidth(), peakData, Qt::black );
 
-         Math::KernelPdf dataKernel( Math::IPdf::CPtr( new Math::GaussPdf( 0, 1 ) ), allEntries.getX(), allEntries.getY() );
+         RealVector xCentre( 2, peak.getPosition() );
+         RealVector yCentre( 1, peak.getProminence() );
+         yCentre.push_back( 0 );
 
-         size_t nEvalPdf = 100;
-         RealVector evalPdfVec( nEvalPdf );
-         RealVector xVec( nEvalPdf );
-         double x = peak.getLeftBound();
-         double step = ( peak.getRightBound() - peak.getLeftBound() ) / nEvalPdf;
-         for ( size_t i = 0; i < nEvalPdf; ++i )
-         {
-            evalPdfVec[ i ] = dataKernel.getDensity( x );
-            xVec[ i ] = x;
-            x+= step;
-         }
+         gPlotFactory().createGraph( xCentre, yCentre, Qt::blue );
 
-         double peakMaxWidth = peak.getRightBound() - peak.getLeftBound();
-         double probLeft = dataKernel.getIntegral( peak.getLeftBound() );
-         double probRight = 1 - dataKernel.getIntegral( peak.getRightBound() );
+         RealVector xWidth;
+         xWidth.push_back( peak.getPosition() - 0.5 * peak.getWidth() );
+         xWidth.push_back( peak.getPosition() + 0.5 * peak.getWidth() );
+         RealVector yWidth( 2, 0.5 * peak.getProminence() );
 
-         double startValueSolver = peak.getLeftBound() + peakMaxWidth / 2;
-
-         Math::RealMemFunction< Math::KernelPdf > surface( &Math::KernelPdf::getIntegral, &dataKernel );
-         Math::RealMemFunction< Math::KernelPdf > surfDeriv( &Math::KernelPdf::getDensity, &dataKernel );
-         Math::ComposedRealFuncWithDerivative funcWDeriv( surface, surfDeriv );
-
-         // Math::NewtonSolver1D solveLeftWidth( this, funcWDeriv, m_peakWidthSurfFrac );
-         // Math::NewtonSolver1D solveRightWidth( this, funcWDeriv, 1 - m_peakWidthSurfFrac );
-         Math::BisectionSolver1D solver;
-
-         Interval solutionInterval( peak.getLeftBound(), peak.getRightBound() );
-
-         Math::BisectionSolver1D::Result resultLeft = solver.solve( surface, m_peakWidthSurfFrac, solutionInterval );
-         Math::BisectionSolver1D::Result resultRight = solver.solve( surface, 1 - m_peakWidthSurfFrac, solutionInterval );
-
-         if ( !resultLeft.isConverged() )
-         {
-            msg << Msg::Warning << "Width solver did not converge!" << Msg::EndReq;
-         }
-
-         double minWidthX = resultLeft.getSolution();
-         double maxWidthX = resultRight.getSolution();
-
-         double width = maxWidthX - minWidthX;
-
-         RealVector leftWidthMarkerX( 2, minWidthX );
-         RealVector rightWidthMarkerX( 2, maxWidthX );
-         RealVector leftWidthMarkerY( 2, 10 );
-         leftWidthMarkerY[0] = 0;
-         RealVector rightWidthMarkerY( 2, 10 );
-         rightWidthMarkerY[0] = 0;
-
-         msg << Msg::Verbose << "probLeft = " << probLeft << ", probRight = " << probRight << Msg::EndReq;
-         msg << Msg::Verbose << "minWidthX = " << minWidthX << ", maxWidthX = " << maxWidthX << Msg::EndReq;
-
-         std::ostringstream plotName;
-         plotName << "AAPA/DressPeak" << showPeak;
-         gPlotFactory().createPlot( plotName.str() );
-         gPlotFactory().createGraph( Utils::createRangeReal( peak.getLeftBoundIndex(), peak.getRightBoundIndex() ) * data.getBinWidth(), peak.getData() );
-         gPlotFactory().createScatter( allEntries.getX(), allEntries.getY() );
-         gPlotFactory().createGraph( xVec, evalPdfVec );
-         gPlotFactory().createScatter( peakCentreX, peakCentreY, Qt::red );
-         gPlotFactory().createGraph( leftWidthMarkerX, leftWidthMarkerY, Qt::blue );
-         gPlotFactory().createGraph( rightWidthMarkerX, rightWidthMarkerY, Qt::blue );
+         gPlotFactory().createGraph( xWidth, yWidth, Qt::red );
       }
    }
-
 }
 
 
