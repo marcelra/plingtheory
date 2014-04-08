@@ -25,12 +25,12 @@ void MlpTrainer::train()
       for ( size_t iNet = 0; iNet < numNets; ++iNet )
       {
          double err = 0;
-         for ( size_t iData = 0; iData < inputData.size(); ++iData )
+         for ( size_t iData = 0; iData < m_inputData.size(); ++iData )
          {
-            const RealVector& outputVec = m_network.eval( inputData );
+            const RealVector& outputVec = m_network.eval( m_inputData[ iData ] );
             for ( size_t iOutput = 0; iOutput < outputVec.size(); ++iOutput )
             {
-               double diff = outputVec[ iOutput ] - m_outputData[ iOutput ];
+               double diff = outputVec[ iOutput ] - m_outputData[ iData ][ iOutput ];
                err += diff * diff;
             }
          }
