@@ -7,6 +7,11 @@
 #include <cassert>
 #include <cmath>
 
+namespace Math
+{
+class TwoTuple;
+}
+
 namespace Feature
 {
 
@@ -68,7 +73,8 @@ class Peak
       void setPedestal( double pedestal );
 
       /**
-       * Set left and right bound indices.
+       * Set left and right bound indices. The bound indices are the boundary points in the data set, and lookups in
+       * the data set with these indices should always be a valid operation (@see getLeftBoundIndex and @see getRightBoundIndex).
        */
       void setBoundIndices( size_t leftIndex, size_t rightIndex );
       /**
@@ -92,6 +98,9 @@ class Peak
       size_t getRightBoundIndex() const;
       double getLeftBound() const;
       double getRightBound() const;
+
+      void setPeakEntries( const Math::TwoTuple& entries );
+      const Math::TwoTuple* getPeakEntries() const;
 
       /**
        * Set links to neighbouring peak.
@@ -120,6 +129,7 @@ class Peak
       Peak*                 m_leftNeighbour;   //! Pointer to peak left of this peak
       Peak*                 m_rightNeighbour;  //! Pointer to peak right of this peak
       RealVector            m_data;            //! Data points between peak minima
+      Math::TwoTuple*       m_entries;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
