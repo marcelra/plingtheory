@@ -18,6 +18,7 @@ void DevSuite::execute()
    // devPeakFinder2();
    devMlp();
    // devMcmc();
+   // devMcmc();
    return;
    devPeakFinder2();
    // devNewtonSolver1D();
@@ -646,28 +647,41 @@ void DevSuite::devMcmc()
 
    size_t numSamples = 500;
 
-   MultivariateGaussObjective objFunc( RealVector( 1, 0 ), RealVector( 1, 1 ) );
+   MultivariateGaussObjective objFunc( realVector( 1, 0 ) , realVector( 20, 10 ) );
+
    Math::McmcOptimiser mcmc( objFunc );
-   mcmc.setStartValues( Math::RealVectorEnsemble( numSamples, RealVector( 1, 10 ) ) );
+   mcmc.setStartValues( Math::RealVectorEnsemble( numSamples, realVector( 10, 10 ) ) );
    mcmc.setStepSize( 1 );
+   mcmc.setNumIterations( 200 );
+   mcmc.setBurninSkip( 150 );
    const Math::RealVectorEnsemble& solution = mcmc.solve();
 
-   Math::RegularAccumArray accArr( 50, -5, 5 );
+   double yEval = 0;
+   double yWidth = 0.1;
+
+   RealVector xData( solution.size() );
+   RealVector yData( solution.size() );
+
    for ( size_t i = 0; i < solution.size(); ++i )
    {
-      accArr.add( solution[ i ][ 0 ], 1. / solution.size() / accArr.getBinWidth() );
+      xData[ i ] = solution[ i ][ 0 ];
+      yData[ i ] = solution[ i ][ 1 ];
    }
+
+   gPlotFactory().createPlot( "devMcmc/twoDimScatter" );
+   gPlotFactory().createScatter( xData, yData, Qt::black );
+
 
    const RealVector& xArr = Utils::createRangeReal( -5, 5, 50 );
    RealVector objFuncEval( xArr.size() );
 
    for ( size_t i = 0; i < xArr.size(); ++i )
    {
-      objFuncEval[ i ] = objFunc.evaluate( RealVector( 1, xArr[ i ] ) );
+      objFuncEval[ i ] = objFunc.evaluate( realVector( xArr[ i ], yEval ) );
    }
 
    gPlotFactory().createPlot( "devMcmc/distribution" );
-   gPlotFactory().createGraph( xArr, accArr.getAllBinContents() );
+   // gPlotFactory().createGraph( xArr, accArr.getAllBinContents() );
    gPlotFactory().createGraph( xArr, objFuncEval, Qt::blue );
 
 }
