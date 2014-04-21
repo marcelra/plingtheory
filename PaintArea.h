@@ -42,9 +42,19 @@ class PaintArea : public PaintAreaBase
 
       void autoScale();
 
-    private:
+   private:
+      enum ZoomMode
+      {
+         ZoomBoth = 0,
+         ZoomHorizontal,
+         ZoomVertical
+      };
+
+   private:
       void generatePaintCommands();
       void clearPaintCommands();
+      QRectF getZoomViewportHorizontal( double zoomFactor, const QRectF& oldViewport, double xCentre ) const;
+      QRectF getZoomViewportVertical( double zoomFactor, const QRectF& oldViewport, double yCentre ) const;
 
    private:
       std::vector< const IPaintItem* >  m_paintItems;
@@ -57,7 +67,7 @@ class PaintArea : public PaintAreaBase
 
       std::vector< const IPaintCommand* >  m_paintCommands;
 
-      bool        m_horizontalMouseWheel;
+      ZoomMode                 m_zoomMode;
 
       std::auto_ptr< QPoint >  m_zoomAreaStart;
       std::auto_ptr< QPoint >  m_zoomAreaEnd;
