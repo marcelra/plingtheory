@@ -14,10 +14,9 @@ namespace Plotting
 ScrollPaintArea::ScrollPaintArea( QWidget* parent ) :
    PaintAreaBase( parent ),
    m_dataMin( 0 ),
-   m_dataMax( 0 )
-{
-   connect( this, SIGNAL( viewportChanged( QRectF ) ), this, SLOT( viewportChangedSlot( QRectF ) ) );
-}
+   m_dataMax( 0 ),
+   m_isScrolling( false )
+{}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// destructor
@@ -80,6 +79,9 @@ void ScrollPaintArea::mouseMoveEvent( QMouseEvent* event )
       return;
    }
 
+   /// Notify that user is scrolling (this should freezes the viewport).
+   setIsScrolling( true );
+
    /// Calculate shift in world coordinates.
    const QPointF& shiftOfViewport = transformToWorldCoordinates( event->pos() ) - transformToWorldCoordinates( *m_oldMousePos );
 
@@ -92,9 +94,47 @@ void ScrollPaintArea::mouseMoveEvent( QMouseEvent* event )
    /// Update mouse position.
    m_oldMousePos.reset( new QPoint( event->pos() ) );
 
+   /// Notify that user has finished scrolling.
+   setIsScrolling( false );
+
    /// Set event handled.
    event->accept();
 
+   update();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// blockUpdateViewport
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void ScrollPaintArea::setIsScrolling( bool isScrolling )
+{
+   m_isScrolling = isScrolling;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// viewportUpdateIsBlocked
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+bool ScrollPaintArea::isScrolling() const
+{
+   return m_isScrolling;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// setViewport
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void ScrollPaintArea::setViewport( const QRectF& viewport )
+{
+   /// Only update the viewport of the graph when the user is scrolling.
+   if ( isScrolling() )
+   {
+      m_viewportGraph = viewport;
+   }
+   else
+   {
+      m_viewport = viewport;
+      m_viewportGraph = viewport;
+      viewportGraphChanged( viewport );
+   }
    update();
 }
 
