@@ -17,6 +17,7 @@ void DevSuite::execute()
 
    // devPeakFinder2();
    devMlp();
+   // devMcmc();
    return;
    devPeakFinder2();
    // devNewtonSolver1D();
@@ -39,7 +40,10 @@ void DevSuite::execute()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <set>
-#include "MlpTrainer.h"
+#include <cassert>
+#include "GaussPdf.h"
+#include "IObjectiveFunction.h"
+#include "McmcOptimiser.h"
 #include "NoteList.h"
 #include "AccumArrayPeakAlgorithm.h"
 #include "GroundtoneHypothesisBuilder.h"
@@ -60,7 +64,6 @@ void DevSuite::execute()
 #include "RootUtilities.h"
 #include "Utils.h"
 #include "SpectralReassignmentTransform.h"
-#include "GaussPdf.h"
 #include "KernelPdf.h"
 #include "IPlotFactory.h"
 #include "IThread.h"
@@ -71,6 +74,7 @@ void DevSuite::execute()
 #include "ComposedRealFuncWithDerivative.h"
 #include "NewtonSolver1D.h"
 #include "MultilayerPerceptron.h"
+#include "RandomNumberGenerator.h"
 
 #include <functional>
 #include <cmath>
@@ -260,6 +264,141 @@ void DevSuite::devPeakFinder2()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+<<<<<<< HEAD
+=======
+/// devFourierTemplates
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void DevSuite::devFourierTemplates()
+{
+   Logger msg( "devFourierTemplates" );
+   msg << Msg::Info << "In devFourierTempaltes..." << Msg::EndReq;
+
+   Music::NoteList noteList = Music::createHugeDiatonicScale();
+   double amp = 1;
+   SamplingInfo samplingInfo( 44100 );
+   size_t fourierSize = 1024;
+   size_t zeroPadding = 0; //fourierSize;
+   size_t numSamplesGenerate = 4096;
+   double hopRate = 1;
+
+   WaveAnalysis::SpectralReassignmentTransform transform( samplingInfo, fourierSize, zeroPadding, hopRate );
+
+   std::set< double > frequencies;
+
+   // for ( size_t iNote = 0; iNote < noteList.size(); ++iNote )
+   // {
+   //    for ( size_t iHarmonic = 0; iHarmonic < numHarmonics; ++iHarmonic )
+   //    {
+   //       frequencies.insert( noteList[ iNote ].getFrequency() * ( iHarmonic + 1 ) );
+   //    }
+   // }
+   frequencies.insert( 1000 );
+
+   double freqMinDraw = 0;
+   double freqMaxDraw = samplingInfo.getNyquistFrequency();
+
+   size_t counter = 0;
+   size_t numGraphs = 0;
+   size_t graphSkip = 20;
+   size_t numGraphsDrawn = 0;
+   bool interactiveGraphs = true;
+   if ( !interactiveGraphs )
+   {
+      graphSkip = 1;
+   }
+   for ( std::set< double >::iterator it = frequencies.begin(); it != frequencies.end(); ++it, ++counter )
+   {
+
+      double frequency = *it;
+      if ( frequency > samplingInfo.getNyquistFrequency() )
+      {
+         break;
+      }
+      msg << Msg::Info << "Creating fourier templates for frequency " << frequency << "." << Msg::EndReq;
+
+      msg << Msg::Debug << "Generating waveform." << Msg::EndReq;
+
+      RawPcmData pcmData( samplingInfo, numSamplesGenerate );
+
+      double phase = 0;
+      double phaseStep = samplingInfo.getPhaseStepPerSample( frequency );
+      for ( size_t iSample = 0; iSample < numSamplesGenerate; ++iSample )
+      {
+         pcmData[ iSample ] = amp * sin( phase );
+         phase += phaseStep;
+      }
+
+      msg << Msg::Debug << "Fourier transforming waveform." << Msg::EndReq;
+      WaveAnalysis::StftData::Ptr stftData = transform.execute( pcmData );
+      const WaveAnalysis::SrSpectrum& srSpectrum = dynamic_cast< const WaveAnalysis::SrSpectrum& >( stftData->getSpectrum( 0 ) );
+      const Math::RegularAccumArray& accArr = srSpectrum.rebinToFourierLattice();
+      TH1F* hist = accArr.createHistogram();
+
+      msg << Msg::Debug << "Generating delayed waveform." << Msg::EndReq;
+      RawPcmData delayedData( samplingInfo, numSamplesGenerate, 0 );
+      phase = 0;
+      for ( size_t iSample = 0; iSample < fourierSize; ++iSample )
+      {
+         delayedData[ iSample ] = ( amp / fourierSize ) * iSample * sin( phase );
+         phase += phaseStep;
+      }
+      WaveAnalysis::StftData::Ptr stftDataDelayed = transform.execute( delayedData );
+      const WaveAnalysis::SrSpectrum& srSpectrumDelayed = dynamic_cast< const WaveAnalysis::SrSpectrum& >( stftDataDelayed->getSpectrum( 0 ) );
+      const Math::RegularAccumArray& accArrDelayed = srSpectrumDelayed.rebinToFourierLattice();
+      TH1F* histDelayed = accArrDelayed.createHistogram();
+
+      if ( frequency > freqMinDraw && frequency < freqMaxDraw )
+      {
+         if ( numGraphs % graphSkip == 0 )
+         {
+            ++numGraphsDrawn;
+            std::stringstream name;
+            name << "templateCanvas" << counter;
+            std::stringstream title;
+            title << "Frequency = " << *it;
+            TCanvas* c = new TCanvas( name.str().c_str(), title.str().c_str() );
+            // c->SetLogy( true );
+
+            // if ( frequency < 1500 )
+            // {
+            //    c->SetLogx( true );
+            // }
+
+            msg << Msg::Info << counter << " histograms drawn." << Msg::EndReq;
+
+            hist->Draw();
+            hist->SetLineColor( kBlack );
+            // TGraph* grHatT = RootUtilities::createGraph( srSpectrum.getFrequencies(), srSpectrum.getTimeCorrections() );
+            // grHatT->Draw( "PSAME" );
+            // grHatT->SetMarkerColor( kBlack );
+
+
+            histDelayed->Draw( "SAME" );
+            histDelayed->SetLineColor( kBlue );
+
+            TGraph* grHatTDelayed = RootUtilities::createGraph( srSpectrumDelayed.getFrequencies(), srSpectrumDelayed.getTimeCorrections() );
+            grHatTDelayed->SetMarkerColor( kBlue );
+            grHatTDelayed->Draw( "PSAME" );
+//
+            // TGraph* grHatOmegaDelayed = RootUtilities::createGraph( srSpectrumDelayed.getFrequencies(), 10 * srSpectrumDelayed.getFrequencyCorrections() );
+            // grHatOmegaDelayed->SetMarkerColor( kRed );
+            // grHatOmegaDelayed->Draw( "PSAME" );
+
+            if ( !interactiveGraphs )
+            {
+               name << ".gif";
+               c->SaveAs( name.str().c_str() );
+               delete c;
+            }
+
+            // grHatTDelayed->Draw( "AL" );
+         }
+         ++numGraphs;
+      }
+   }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// devSamples
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void DevSuite::devSamples()
@@ -318,6 +457,7 @@ void DevSuite::devSamples()
    WaveFile::write( "sinefrag2.wav", mc );
 }
 
+<<<<<<< HEAD
 void DevSuite::devHistogram()
 {
    TRandom3 rand( 0 );
@@ -344,6 +484,40 @@ void DevSuite::devHistogram()
    gPlotFactory().createPlot( "testHistogram/Gauss sampling" );
    gPlotFactory().createHistogram( hist );
    gPlotFactory().createGraph( xEval, yEval, Qt::blue );
+=======
+void DevSuite::devMlp2()
+{
+   Logger msg( "devMlp2" );
+   msg << Msg::Info << "In devMlp2..." << Msg::EndReq;
+
+   std::vector< RealVector > inputData, outputData;
+   inputData.push_back( realVector( 1, 1 ) );
+   outputData.push_back( realVector( 1 ) );
+   inputData.push_back( realVector( 1, 0 ) );
+   outputData.push_back( realVector( 0 ) );
+   inputData.push_back( realVector( 0, 1 ) );
+   outputData.push_back( realVector( 0 ) );
+   inputData.push_back( realVector( 0, 0 ) );
+   outputData.push_back( realVector( 0 ) );
+
+   Mva::MultilayerPerceptron net( 2, 1 );
+   net.addHiddenLayer( 4 );
+   net.addHiddenLayer( 3 );
+   net.addHiddenLayer( 2 );
+   net.addHiddenLayer( 2 );
+   net.build();
+
+   for ( size_t i = 0; i < inputData.size(); ++i )
+   {
+      msg << Msg::Info << "Input = " << inputData[ i ] << ", eval = " << net.evaluate( inputData[ i ] ) << ", expected = " << outputData[ i ] << Msg::EndReq;
+   }
+
+   net.train( inputData, outputData );
+
+   for ( size_t i = 0; i < inputData.size(); ++i )
+   {
+      msg << Msg::Info << "Input = " << inputData[ i ] << ", eval = " << net.evaluate( inputData[ i ] ) << ", expected = " << outputData[ i ] << Msg::EndReq;
+   }
 }
 
 void DevSuite::devMlp()
@@ -385,15 +559,18 @@ void DevSuite::devMlp()
    gPlotFactory().createScatter( xUp, yUp, Qt::red );
    gPlotFactory().createScatter( xDown, yDown, Qt::blue );
 
-   Mva::Network network( 2, 1 );
-   network.addHiddenLayer( 5 );
-   Mva::MultilayerPerceptron mlp( network, 0 );
+   Mva::MultilayerPerceptron network( 2, 1 );
+   network.addHiddenLayer( 8 );
+   network.addHiddenLayer( 4 );
+   network.addHiddenLayer( 3 );
+   network.addHiddenLayer( 2 );
+   network.addHiddenLayer( 1 );
+   network.build();
 
-   Mva::MlpTrainer mlpTrainer( network, inputData, outputData );
-   mlpTrainer.train();
+   network.train( inputData, outputData );
 
    RealVector test( 2, 1 );
-   msg << Msg::Info << "Dimension check: " << mlp.getNetwork().eval( test ) << Msg::EndReq;
+   msg << Msg::Info << "Dimension check: " << network.evaluate( test ) << Msg::EndReq;
 
    Math::RealFunctionPtr func( &tanh );
    const RealVector& xEval = Utils::createRangeReal( -10, 10, 100 );
@@ -402,5 +579,96 @@ void DevSuite::devMlp()
    gPlotFactory().createPlot( "devMlp/tanh" );
    gPlotFactory().createGraph( xEval, yEval, Qt::blue );
 
+   RealVector xUpPredicted, yUpPredicted, xDownPredicted, yDownPredicted;
+   for ( size_t i = 0; i < inputData.size(); ++i )
+   {
+      RealVector output = network.evaluate( inputData[ i ] );
+      if ( output [ 0 ] > 0 )
+      {
+         xUpPredicted.push_back( inputData[ i ][ 0 ] );
+         yUpPredicted.push_back( inputData[ i ][ 1 ] );
+      }
+      else
+      {
+         xDownPredicted.push_back( inputData[ i ][ 0 ] );
+         yDownPredicted.push_back( inputData[ i ][ 1 ] );
+      }
+   }
+
+   gPlotFactory().createPlot( "devMlp/testSet" );
+   gPlotFactory().createScatter( xUpPredicted, yUpPredicted, Qt::red );
+   gPlotFactory().createScatter( xDownPredicted, yDownPredicted, Qt::blue );
+
    return;
 }
+
+class MultivariateGaussObjective : public Math::IObjectiveFunction
+{
+   public:
+      MultivariateGaussObjective( const RealVector& muVec, const RealVector& sigmaVec ) :
+         m_muVec( muVec ),
+         m_sigmaVec( sigmaVec )
+      {
+         assert( m_muVec.size() == m_sigmaVec.size() );
+         for ( size_t i = 0; i < m_muVec.size(); ++i )
+         {
+            m_pdfs.push_back( Math::GaussPdf( m_muVec[ i ], m_sigmaVec[ i ] ) );
+         }
+      }
+
+      size_t getNumParameters() const
+      {
+         return m_muVec.size();
+      }
+
+      double evaluate( const RealVector& x ) const
+      {
+         assert( x.size() == getNumParameters() );
+         double p = 1;
+         for ( size_t i = 0; i < x.size(); ++i )
+         {
+            p *= m_pdfs[ i ].getDensity( x[ i ] );
+         }
+         return p;
+      }
+
+   private:
+      RealVector                    m_muVec;
+      RealVector                    m_sigmaVec;
+      std::vector< Math::GaussPdf > m_pdfs;
+
+};
+
+void DevSuite::devMcmc()
+{
+   Logger msg( "devMcmc" );
+   msg << Msg::Info << "Running devMcmc..." << Msg::EndReq;
+
+   size_t numSamples = 500;
+
+   MultivariateGaussObjective objFunc( RealVector( 1, 0 ), RealVector( 1, 1 ) );
+   Math::McmcOptimiser mcmc( objFunc );
+   mcmc.setStartValues( Math::RealVectorEnsemble( numSamples, RealVector( 1, 10 ) ) );
+   mcmc.setStepSize( 1 );
+   const Math::RealVectorEnsemble& solution = mcmc.solve();
+
+   Math::RegularAccumArray accArr( 50, -5, 5 );
+   for ( size_t i = 0; i < solution.size(); ++i )
+   {
+      accArr.add( solution[ i ][ 0 ], 1. / solution.size() / accArr.getBinWidth() );
+   }
+
+   const RealVector& xArr = Utils::createRangeReal( -5, 5, 50 );
+   RealVector objFuncEval( xArr.size() );
+
+   for ( size_t i = 0; i < xArr.size(); ++i )
+   {
+      objFuncEval[ i ] = objFunc.evaluate( RealVector( 1, xArr[ i ] ) );
+   }
+
+   gPlotFactory().createPlot( "devMcmc/distribution" );
+   gPlotFactory().createGraph( xArr, accArr.getAllBinContents() );
+   gPlotFactory().createGraph( xArr, objFuncEval, Qt::blue );
+
+}
+

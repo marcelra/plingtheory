@@ -13,7 +13,7 @@ typedef std::vector< double > RealVector;
 typedef std::auto_ptr< RealVector > RealVectorPtr;
 
 /**
- * Operator overloading for RealVector
+ * Operator overloading for RealVector.
  */
 RealVector operator+( const RealVector& x, const RealVector& y );
 RealVector operator-( const RealVector& x, const RealVector& y );
@@ -25,11 +25,26 @@ double operator*( const RealVector& x, const RealVector& y );
 RealVector operator*=( const RealVector& x, double lambda );
 
 /**
- * Modify vector
+ * Modify vector.
  */
 void scale( RealVector& x, double lambda );
 void normalise( RealVector& x );
 
+/**
+ * Create.
+ */
+RealVector realVector( double x0 );
+RealVector realVector( double x0, double x1 );
+RealVector realVector( double x0, double x1, double x2 );
+RealVector realVector( double x0, double x1, double x2, double x3 );
+RealVector realVector( double x0, double x1, double x2, double x3, double x4 );
+RealVector realVector( double x0, double x1, double x2, double x3, double x4, double x5 );
+RealVector realVector( double x0, double x1, double x2, double x3, double x4, double x5, double x6 );
+RealVector realVector( double x0, double x1, double x2, double x3, double x4, double x5, double x6, double x7 );
+
+/**
+ * Miscellaneous.
+ */
 RealVector calcDerivative( const RealVector& x );
 bool isEqual( const RealVector& x, const RealVector& y );
 

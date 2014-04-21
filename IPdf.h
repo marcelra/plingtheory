@@ -4,6 +4,8 @@
 #include <cstddef>
 #include <memory>
 
+#include "IRealFunction.h"
+
 namespace Math
 {
 
@@ -44,6 +46,11 @@ class IPdf
        * Get maximum bound.
        */
       virtual double getMaxX() const;
+
+      /**
+       * Get as function object.
+       */
+      IRealFunction::Ptr getDensityAsFunc() const;
 };
 
 } /// namespace Math

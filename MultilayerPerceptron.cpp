@@ -1,182 +1,284 @@
 #include "MultilayerPerceptron.h"
 
-#include <cmath>
+#include "IObjectiveFunction.h"
+#include "Logger.h"
+#include "McmcOptimiser.h"
+#include "SortCache.h"
+
+#include <iostream>
+
+namespace
+{
+
+class ErrorObjective : public Math::IObjectiveFunction
+{
+   public:
+      ErrorObjective( Mva::MultilayerPerceptron& network, const std::vector< RealVector >& inputData, const std::vector< RealVector >& outputData );
+
+      double evaluate( const RealVector& x ) const;
+      size_t getNumParameters() const;
+
+      double calcSumSquaredError( const RealVector& xMeasured, const RealVector& xTruth ) const;
+
+   private:
+      Mva::MultilayerPerceptron& m_network;
+      std::vector< double* >     m_weights;
+      const std::vector< RealVector >& m_inputData;
+      const std::vector< RealVector >& m_outputData;
+};
+
+ErrorObjective::ErrorObjective( Mva::MultilayerPerceptron& network, const std::vector< RealVector >& inputData, const std::vector< RealVector >& outputData  ) :
+   m_network( network ),
+   m_weights( m_network.getWeights() ),
+   m_inputData( inputData ),
+   m_outputData( outputData )
+{}
+
+double ErrorObjective::evaluate( const RealVector& x ) const
+{
+   /// This implicitly modifies the network weights.
+   for ( size_t i = 0; i < getNumParameters(); ++i )
+   {
+      *m_weights[ i ] = x[ i ];
+   }
+
+   double error = 0;
+   for ( size_t iInputData = 0; iInputData < m_inputData.size(); ++iInputData )
+   {
+      const RealVector& output = m_network.evaluate( m_inputData[ iInputData ] );
+      error += calcSumSquaredError( output, m_outputData[ iInputData ] );
+   }
+   return -sqrt( error ) / m_inputData.size();
+}
+
+double ErrorObjective::calcSumSquaredError( const RealVector& xMeasured, const RealVector& xTruth ) const
+{
+   double diffSquared = 0;
+   for ( size_t i = 0; i < xMeasured.size(); ++i )
+   {
+      double delta = xMeasured[ i ] - xTruth[ i ];
+      diffSquared += delta * delta;
+   }
+   return diffSquared;
+}
+
+size_t ErrorObjective::getNumParameters() const
+{
+   return m_weights.size();
+}
+
+} /// anonymous namespace
 
 namespace Mva
 {
 
-Synapse::Synapse( Neuron* to, double weight ) :
-   m_to( to ),
-   m_weight( weight )
-{}
-
-void Synapse::fire( double value )
+MultilayerPerceptron::MultilayerPerceptron( size_t numInputNodes, size_t numOutputNodes ) :
+   m_inputLayer( numInputNodes, 0 ),
+   m_outputLayer( numOutputNodes, 0 ),
+   m_neurons()
 {
-   m_to->excite( value * m_weight );
-}
-
-void Neuron::addConncetion( const Synapse& synapse )
-{
-   m_connections.push_back( synapse );
-}
-
-Network::Network( size_t numInputNeurons, size_t numOutputNeurons ) :
-   m_inputNeurons( numInputNeurons ),
-   m_outputNeurons( numOutputNeurons )
-{}
-
-Network::~Network()
-{}
-
-void Network::addHiddenLayer( size_t numNeurons )
-{
-   m_hiddenLayers.push_back( std::vector< Neuron >( numNeurons ) );
-}
-
-void Network::connectNeurons( Neuron* from, Neuron* to, double weight )
-{
-   from->addConncetion( Synapse( to, weight ) );
-}
-
-void Network::connectLayers( NeuronLayer& layer0, NeuronLayer& layer1 )
-{
-   for ( size_t iNeuron0 = 0; iNeuron0 < layer0.size(); ++iNeuron0 )
+   for ( size_t iInputNode = 0; iInputNode < numInputNodes; ++iInputNode )
    {
-      Neuron* neuronFrom = &layer0[ iNeuron0 ];
-      for ( size_t iNeuron1 = 0; iNeuron1 < layer1.size(); ++iNeuron1 )
+      m_inputLayer[ iInputNode ] = new InputNode();
+   }
+   for ( size_t iOutputNode = 0; iOutputNode < numOutputNodes; ++iOutputNode )
+   {
+      m_outputLayer[ iOutputNode ] = new OutputNode();
+   }
+}
+
+MultilayerPerceptron::~MultilayerPerceptron()
+{
+   for ( size_t i = 0; i < m_inputLayer.size(); ++i )
+   {
+      delete m_inputLayer[ i ];
+   }
+   for ( size_t i = 0; i < m_outputLayer.size(); ++i )
+   {
+      delete m_outputLayer[ i ];
+   }
+   for ( size_t iLayer = 0; iLayer < m_neurons.size(); ++iLayer )
+   {
+      for ( size_t iNeuron = 0; iNeuron < m_neurons[ iLayer ].size(); ++iNeuron )
       {
-         Neuron* neuronTo = &layer1[ iNeuron1 ];
-         connectNeurons( neuronFrom, neuronTo, 1 );
+         delete m_neurons[ iLayer ][ iNeuron ];
       }
    }
 }
 
-size_t Network::getNumLayers() const
+void MultilayerPerceptron::addHiddenLayer( size_t numNeurons )
 {
-   return m_hiddenLayers.size() + 2;
-}
-
-Network::NeuronLayer& Network::getNeuronLayer( size_t index )
-{
-   if ( index == 0 )
+   NeuronLayer newNeuronLayer;
+   for ( size_t iNeuron = 0; iNeuron < numNeurons; ++iNeuron )
    {
-      return m_inputNeurons;
+      newNeuronLayer.push_back( new Neuron() );
    }
-   else if ( index < getNumLayers() - 1 )
+   m_neurons.push_back( newNeuronLayer );
+}
+
+void MultilayerPerceptron::build()
+{
+   for ( size_t iLayer = 0; iLayer < getNumNeuronLayers() - 1; ++iLayer )
    {
-      return m_hiddenLayers[ index - 1 ];
-   }
-   else
-   {
-      assert( index == getNumLayers() - 1 );
-      return m_outputNeurons;
-   }
-}
-
-void Network::build()
-{
-   for ( size_t iLayer = 0; iLayer < getNumLayers() - 1; ++iLayer )
-   {
-      connectLayers( getNeuronLayer( iLayer ), getNeuronLayer( iLayer + 1 ) );
-   }
-}
-
-MultilayerPerceptron::MultilayerPerceptron( const Network& network, const AlgorithmBase* parent ) :
-   AlgorithmBase( "MultilayerPerceptron", parent ),
-   m_network( network )
-{
-   m_network.build();
-}
-
-Network& MultilayerPerceptron::getNetwork()
-{
-   return m_network;
-}
-
-void Neuron::excite( double weight )
-{
-   m_in += weight;
-}
-
-void Neuron::relax()
-{
-   m_in = 0;
-   m_out = 0;
-}
-
-double Neuron::activationFunc( double x ) const
-{
-   return tanh( x );
-}
-
-void Neuron::fire()
-{
-   m_out = activationFunc( m_in );
-
-   for ( size_t iConn = 0; iConn < m_connections.size(); ++iConn )
-   {
-      m_connections[ iConn ].fire( m_in );
-   }
-}
-
-RealVector Network::eval( const RealVector& input )
-{
-   relax();
-   for ( size_t iInput = 0; iInput < input.size(); ++iInput )
-   {
-      m_inputNeurons[ iInput ].excite( input[ iInput ] );
-   }
-   for ( size_t iLayer = 0; iLayer < getNumLayers(); ++iLayer )
-   {
-      NeuronLayer& layer = getNeuronLayer( iLayer );
-      for ( size_t iNeuron = 0; iNeuron < layer.size(); ++iNeuron )
+      NeuronLayer& layer0 = getNeuronLayer( iLayer );
+      NeuronLayer& layer1 = getNeuronLayer( iLayer + 1 );
+      for ( size_t iNeuron0 = 0; iNeuron0 < layer0.size(); ++iNeuron0 )
       {
-         layer[ iNeuron ].fire();
-      }
-   }
-
-   RealVector result( m_outputNeurons.size() );
-   for ( size_t iOutput = 0; iOutput < result.size(); ++iOutput )
-   {
-      result[ iOutput ] = m_outputNeurons[ iOutput ].getValueOut();
-   }
-   return result;
-}
-
-void Network::relax()
-{
-   for ( size_t iNeuronLayer = 0; iNeuronLayer < getNumLayers(); ++iNeuronLayer )
-   {
-      NeuronLayer& layer = getNeuronLayer( iNeuronLayer );
-      for ( size_t iNeuron = 0; iNeuron < layer.size(); ++iNeuron )
-      {
-         layer[ iNeuron ].relax();
-      }
-   }
-}
-
-double Neuron::getValueOut() const
-{
-   return m_out;
-}
-
-std::vector< double* > Network::getWeights()
-{
-   std::vector< double* > weightVector;
-   for ( size_t iNeuronLayer = 0; iNeuronLayer < getNumLayers(); ++iNeuronLayer )
-   {
-      NeuronLayer& layer = getNeuronLayer( iNeuronLayer );
-      for ( size_t iNeuron = 0; iNeuron < layer.size(); ++iNeuron )
-      {
-         Neuron& neuron = layer[ iNeuron ];
-         std::vector< Synapse >& synapses = neuron.getConnections();
-         for ( size_t iSynapse = 0; iSynapse < synapses.size(); ++iSynapse )
+         for ( size_t iNeuron1 = 0; iNeuron1 < layer1.size(); ++iNeuron1 )
          {
-            weightVector.push_back( &synapses[ iSynapse ].getWeightRef() );
+            layer0[ iNeuron0 ]->addSynapse( Synapse( layer1[ iNeuron1 ], 1 ) );
          }
       }
    }
-   return weightVector;
+}
+
+RealVector MultilayerPerceptron::evaluate( const RealVector& x )
+{
+   assert( x.size() == getNumInputNodes() );
+
+   for ( size_t i = 0; i < x.size(); ++i )
+   {
+      m_inputLayer[ i ]->activate( x[ i ] );
+   }
+
+   for ( size_t iNeuronLayer = 0; iNeuronLayer < getNumNeuronLayers() - 1; ++iNeuronLayer )
+   {
+      NeuronLayer& layer = getNeuronLayer( iNeuronLayer );
+      for ( size_t iNeuron = 0; iNeuron < layer.size(); ++iNeuron )
+      {
+         static_cast< Neuron* >( layer[ iNeuron ] )->fire();
+      }
+   }
+
+   RealVector result( getNumOutputNodes() );
+   for ( size_t iOutputNeuron = 0; iOutputNeuron < m_outputLayer.size(); ++iOutputNeuron )
+   {
+      OutputNode* outputNeuron = static_cast< OutputNode* >( m_outputLayer[ iOutputNeuron ] );
+      result[ iOutputNeuron ] = outputNeuron->getActivation();
+      outputNeuron->resetActivation();
+   }
+
+   return result;
+}
+
+size_t MultilayerPerceptron::getNumInputNodes() const
+{
+   return m_inputLayer.size();
+}
+
+size_t MultilayerPerceptron::getNumOutputNodes() const
+{
+   return m_outputLayer.size();
+}
+
+MultilayerPerceptron::NeuronLayer& MultilayerPerceptron::getNeuronLayer( size_t index )
+{
+   if ( index == 0 )
+   {
+      return m_inputLayer;
+   }
+   else if ( index <= m_neurons.size() )
+   {
+      return m_neurons[ index - 1 ];
+   }
+   else
+   {
+      assert( index == m_neurons.size() + 1 );
+      return m_outputLayer;
+   }
+}
+
+size_t MultilayerPerceptron::getNumNeuronLayers() const
+{
+   return m_neurons.size() + 2;
+}
+
+void MultilayerPerceptron::train( const std::vector< RealVector >& inputData, const std::vector< RealVector >& outputData )
+{
+   Logger msg( "MultilayerpPerceptron" );
+   msg << Msg::Verbose << "Training neural network." << Msg::EndReq;
+
+   std::vector< double* > weightRefVec = getWeights();
+   for ( size_t i = 0; i < weightRefVec.size(); ++i )
+   {
+      msg << Msg::Verbose << "weights[ " << i << " ] = " << *weightRefVec[ i ] << Msg::EndReq;
+   }
+
+   RealVector startValVec( weightRefVec.size() );
+   for ( size_t i = 0; i < weightRefVec.size(); ++i )
+   {
+      startValVec[ i ] = *weightRefVec[ i ];
+   }
+
+   ::ErrorObjective errorFunc( *this, inputData, outputData );
+   Math::McmcOptimiser mcmcOpt( errorFunc );
+
+   size_t numNets = 1;
+   std::vector< RealVector > startValues( numNets );
+   for ( size_t iNet = 0; iNet < numNets; ++iNet )
+   {
+      startValues[ iNet ] = startValVec;
+   }
+
+   mcmcOpt.setStartValues( startValues );
+   mcmcOpt.setNumIterations( 1000 );
+   mcmcOpt.setBurninSkip( 900);
+
+   Math::RealVectorEnsemble solutions = mcmcOpt.solve();
+
+   RealVector solutionError( solutions.size() );
+   for ( size_t iSolution = 0; iSolution < solutions.size(); ++iSolution )
+   {
+      solutionError[ iSolution ] = errorFunc.evaluate( solutions[ iSolution ] );
+      msg << Msg::Info << "Solution = " << solutionError[ iSolution ] << Msg::EndReq;
+   }
+
+   SortCache sortCache( solutionError );
+
+   for ( size_t iSolution = 0; iSolution < solutions.size(); ++iSolution )
+   {
+      // size_t index = sortCache.getSortedIndex( iSolution );
+      // msg << Msg::Info << "Solution " << index << ": error = " << errorFunc.evaluate( solutions[ index ] ) << ", vec = " << solutions[ index ] << Msg::EndReq;
+   }
+
+   size_t bestIndex = sortCache.getReverseSortedIndex( 0 );
+   RealVector bestSolution = solutions[ bestIndex ];
+
+   /// Set the neural network weights
+   for ( size_t iWeight = 0; iWeight < weightRefVec.size(); ++iWeight )
+   {
+      *weightRefVec[ iWeight ] = bestSolution[ iWeight ];
+   }
+
+   for ( size_t i = 0; i < weightRefVec.size(); ++i )
+   {
+      msg << Msg::Info << "weights[ " << i << " ] = " << *weightRefVec[ i ] << Msg::EndReq;
+   }
+
+}
+
+std::vector< double* > MultilayerPerceptron::getWeights()
+{
+   std::vector< double* > weights;
+
+   /// Input weights.
+   for ( size_t iInput = 0; iInput < m_inputLayer.size(); ++iInput )
+   {
+      const std::vector< double* >& synapseWeights = m_inputLayer[ iInput ]->getWeights();
+      weights.insert( weights.end(), synapseWeights.begin(), synapseWeights.end() );
+   }
+
+   /// Hidden layers.
+   for ( size_t iLayer = 0; iLayer < m_neurons.size(); ++iLayer )
+   {
+      for ( size_t iNeuron = 0; iNeuron < m_neurons[ iLayer ].size(); ++iNeuron )
+      {
+         const std::vector< double* >& neuronWeights = m_neurons[ iLayer ][ iNeuron ]->getWeights();
+         weights.insert( weights.end(), neuronWeights.begin(), neuronWeights.end() );
+      }
+   }
+
+   return weights;
 }
 
 } /// namespace Mva

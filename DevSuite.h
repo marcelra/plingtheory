@@ -19,6 +19,8 @@ class DevSuite
       static void devSamples();
 
       static void devMlp();
+      static void devMlp2();
+      static void devMcmc();
 
    /**
     * Math
