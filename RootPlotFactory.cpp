@@ -95,7 +95,10 @@ bool RootPlotFactory::checkIsNewCanvas()
    return false;
 }
 
-void RootPlotFactory::createScatter( const std::vector< double >& xData, const std::vector< double >& yData, const QColor& colour )
+void RootPlotFactory::createScatter( const std::vector< double >& xData,
+                                     const std::vector< double >& yData,
+                                     const QColor& colour,
+                                     Plotting::MarkerType markerType )
 {
    if ( !m_currentCanvas )
    {
@@ -104,6 +107,24 @@ void RootPlotFactory::createScatter( const std::vector< double >& xData, const s
 
    TGraph* graph = RootUtilities::createGraph( xData, yData );
    graph->SetLineColor( rootColorFromQColor( colour ) );
+
+   switch ( markerType )
+   {
+      case Plotting::MarkerRectangle:
+         graph->SetMarkerStyle( 21 );
+         break;
+      case Plotting::MarkerCircle:
+         graph->SetMarkerStyle( 20 );
+         break;
+      case Plotting::MarkerCross:
+         graph->SetMarkerStyle( 5 );
+         break;
+      case Plotting::MarkerPlus:
+         graph->SetMarkerStyle( 2 );
+         break;
+      default:
+         assert( false );
+   }
 
    if ( checkIsNewCanvas() )
    {

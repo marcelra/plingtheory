@@ -128,7 +128,8 @@ SOURCES += main.cpp \
     RandomNumberGenerator.cpp \
     MultilayerPerceptron.cpp \
     Neuron.cpp \
-    Synapse.cpp
+    Synapse.cpp \
+    MarkerDrawAttr.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -252,7 +253,8 @@ HEADERS += \
     RandomNumberGenerator.h \
     MultilayerPerceptron.h \
     Neuron.h \
-    Synapse.h
+    Synapse.h \
+    MarkerDrawAttr.h
 
 OTHER_FILES += \
     Todos.txt
