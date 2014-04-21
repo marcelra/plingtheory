@@ -26,7 +26,11 @@ class RootPlotFactory : public IPlotFactory
       void createGraph( const std::vector< double >& xData, const std::vector< double >& yData, const QColor& colour );
       void drawPcmData( const RawPcmData& pcmData, const QColor& colour );
 
-      void createScatter( const std::vector< double >& xData, const std::vector< double >& yData, const QColor& colour );
+      void createScatter( const std::vector< double >& xData,
+                          const std::vector< double >& yData,
+                          const QColor& colour,
+                          Plotting::MarkerType markerType );
+
       void createStftGraph( const WaveAnalysis::StftData& stftData );
       virtual void createHistogram( const Math::IAccumArray& hist, const QColor& colour );
 

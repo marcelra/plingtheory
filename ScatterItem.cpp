@@ -24,9 +24,11 @@ void ScatterItem::generatePlotCommands( PaintArea* paintArea ) const
    const std::vector< double >& xData = m_data.getX();
    const std::vector< double >& yData = m_data.getY();
 
+   const MarkerType markerType = getMarkerType();
+
    for ( size_t i = 0; i < xData.size(); ++i )
    {
-      PcMarkerPaint* cmd = new PcMarkerPaint( QPointF( xData[ i ], yData[ i ] ), 4 );
+      PcMarkerPaint* cmd = new PcMarkerPaint( QPointF( xData[ i ], yData[ i ] ), 4, markerType );
       paintArea->addPaintCommand( cmd );
    }
 }
