@@ -27,6 +27,7 @@ class TestSuite
        * Utilities
        */
       static void testFindMinima();
+      static void testRandomNumberGenerator();
 
       /**
        * Data framework

@@ -1,102 +1,40 @@
 #ifndef MULTILAYERPERCEPTRON_H
 #define MULTILAYERPERCEPTRON_H
 
-#include <cstddef>
-#include <vector>
-
-#include "AlgorithmBase.h"
+#include "Neuron.h"
 #include "RealVector.h"
 
 namespace Mva
 {
 
-class Neuron;
-
-class Synapse
+class MultilayerPerceptron
 {
    public:
-      Synapse( Neuron* to, double weight );
-
-      void fire( double value );
-
-      double& getWeightRef()
-      {
-         return m_weight;
-      }
-
-   private:
-      Neuron*        m_to;
-      double         m_weight;
-};
-
-class Neuron
-{
-   public:
-      virtual ~Neuron() {}
-
-      void addConncetion( const Synapse& synapse );
-
-      void excite( double weight );
-      void relax();
-      void fire();
-
-      double getValueOut() const;
-
-      virtual double activationFunc( double x ) const;
-
-      std::vector< Synapse >& getConnections()
-      {
-         return m_connections;
-      }
-
-   private:
-      std::vector< Synapse > m_connections;
-
-   private:
-      double                 m_in;
-      double                 m_out;
-};
-
-class Network
-{
-   public:
-      Network( size_t numInputNeurons, size_t numOutputNeurons );
-      virtual ~Network();
+      MultilayerPerceptron( size_t numInputNodes, size_t numOutputNodes );
+      ~MultilayerPerceptron();
 
       void addHiddenLayer( size_t numNeurons );
       void build();
 
-      RealVector eval( const RealVector& input );
-      void relax();
+      RealVector evaluate( const RealVector& x );
 
+      size_t getNumInputNodes() const;
+      size_t getNumOutputNodes() const;
+
+      void train( const std::vector< RealVector >& inputData, const std::vector< RealVector >& outputData );
       std::vector< double* > getWeights();
 
    private:
-      typedef std::vector< Neuron > NeuronLayer;
-
-      void connectNeurons( Neuron* from, Neuron* to, double weight );
-      void connectLayers( NeuronLayer& layer1, NeuronLayer& layer2 );
+      typedef std::vector< MlpNode* > NeuronLayer;
 
    private:
-      size_t getNumLayers() const;
       NeuronLayer& getNeuronLayer( size_t index );
-
-
-   private:
-      NeuronLayer      m_inputNeurons;
-      NeuronLayer      m_outputNeurons;
-      std::vector< NeuronLayer > m_hiddenLayers;
-};
-
-class MultilayerPerceptron : public AlgorithmBase
-{
-   public:
-      MultilayerPerceptron( const Network& network, const AlgorithmBase* parent );
-
-      Network& getNetwork();
+      size_t getNumNeuronLayers() const;
 
    private:
-      Network     m_network;
+      NeuronLayer                   m_inputLayer;
+      NeuronLayer                   m_outputLayer;
+      std::vector< NeuronLayer >    m_neurons;
 };
 
 } /// namespace Mva

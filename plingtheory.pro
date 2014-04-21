@@ -124,8 +124,11 @@ SOURCES += main.cpp \
     Interval.cpp \
     RootFinder1DBase.cpp \
     HistogramItem.cpp \
+    McmcOptimiser.cpp \
+    RandomNumberGenerator.cpp \
     MultilayerPerceptron.cpp \
-    MlpTrainer.cpp
+    Neuron.cpp \
+    Synapse.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -245,8 +248,11 @@ HEADERS += \
     Interval.h \
     RootFinder1DBase.h \
     HistogramItem.h \
+    McmcOptimiser.h \
+    RandomNumberGenerator.h \
     MultilayerPerceptron.h \
-    MlpTrainer.h
+    Neuron.h \
+    Synapse.h
 
 OTHER_FILES += \
     Todos.txt
@@ -269,7 +275,7 @@ DEPENDPATH += /usr/root/include
 macx: LIBS += -L/usr/local/lib/ -lfftw3
 linux: LIBS += -L/usr/local/lib/ -lfftw3
 
-QMAKE_CXXFLAGS += -g -ffast-math -mfpmath=387
+QMAKE_CXXFLAGS += -g -ffast-math -mfpmath=387 -O3
 QMAKE_CXXFLAGS_RELEASE -= -O2
 
 # macx: PRE_TARGETDEPS += $$PWD/usr/root/lib/libAfterImage.a

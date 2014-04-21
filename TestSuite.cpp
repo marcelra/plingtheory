@@ -18,6 +18,7 @@ void TestSuite::execute()
 
    /// Utilities
    testFindMinima();
+   testRandomNumberGenerator();
 
    /// Base classes
    testSoundData();
@@ -87,6 +88,7 @@ void TestSuite::singleTest()
 #include "AdsrEnvelope.h"
 #include "NoiseGenerator.h"
 #include "TriangleGenerator.h"
+#include "RandomNumberGenerator.h"
 #include "SawtoothGenerator.h"
 #include "StftData.h"
 #include "SpectralReassignmentTransform.h"
@@ -997,3 +999,39 @@ void TestSuite::testFindMinima()
    }
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// testRandomRumberGenerator
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// Create two random data sets with same seed. Check if both data sets are identical.
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void TestSuite::testRandomNumberGenerator()
+{
+   Logger msg( "testRandomNumberGenerator" );
+   msg << Msg::Info << "In testRandomNumberGenerator..." << Msg::EndReq;
+
+   size_t numSamples = 100;
+
+   RealVector set1( numSamples );
+   RandomNumberGenerator rng1( 1 );
+   for ( size_t i = 0; i < numSamples; ++i )
+   {
+      set1[ i ] = rng1.uniform();
+   }
+
+   RealVector set2( numSamples );
+   RandomNumberGenerator rng2( 1 );
+   for ( size_t i = 0; i < numSamples; ++i )
+   {
+      set2[ i ] = rng2.uniform();
+   }
+
+   for ( size_t i = 0; i < set1.size(); ++i )
+   {
+      msg << Msg::Info << "set1[ " << i << " ] = " << set1[ i ] << ", set2[ " << i << " ] = " << set2[ i ] << Msg::EndReq;
+      /// Double comparison possible.
+      if ( set1[ i ] - set2[ i ] != 0 )
+      {
+         throw ExceptionTestFailed( "testRandomNumberGenerator", "Irreproducible random numbers." );
+      }
+   }
+}
