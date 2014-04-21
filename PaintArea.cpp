@@ -23,7 +23,7 @@ namespace Plotting
 PaintArea::PaintArea( QWidget* parent ) :
    PaintAreaBase( parent ),
    m_gridItem( 0 ),
-   m_horizontalMouseWheel( true ),
+   m_zoomMode( ZoomBoth ),
    m_zoomAreaStart( 0 )
 {
    m_dataRange = QRectF( QPointF( -1, 1 ), QPointF( 1, -1 ) );
@@ -203,43 +203,67 @@ void PaintArea::addPaintCommand( const IPaintCommand* paintCommand )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void PaintArea::wheelEvent( QWheelEvent* event )
 {
-   const QPointF& viewportCenter = transformToWorldCoordinates( event->pos() );
+   const QPointF& viewportCentre = transformToWorldCoordinates( event->pos() );
    const QRectF& viewport = getViewport();
 
-   if ( m_horizontalMouseWheel )
+   QRectF newViewport;
+   double zoomFactor = event->delta() > 0 ? 0.75 : 1.25;
+
+   if ( m_zoomMode == ZoomHorizontal )
    {
-      double newWidth = viewport.width();
-      newWidth *= event->delta() > 0 ? 0.75 : 1.25;
-
-      QRectF newViewPort( viewport );
-
-      double x = viewportCenter.x() - viewport.left();
-      double viewportShift = x - x / viewport.width() * newWidth;
-
-      newViewPort.setLeft( viewport.left() + viewportShift );
-      newViewPort.setWidth( newWidth );
-
-      setViewport( newViewPort );
-      update();
+      newViewport = getZoomViewportHorizontal( zoomFactor, viewport, viewportCentre.x() );
+   }
+   else if ( m_zoomMode == ZoomVertical )
+   {
+      newViewport = getZoomViewportVertical( zoomFactor, viewport, viewportCentre.y() );
    }
    else
    {
-      double newHeight = viewport.height();
-      newHeight *= event->delta() > 0 ? 0.75 : 1.25;
-
-      QRectF newViewPort( viewport );
-
-      double y = viewportCenter.y();
-      double newTop = newHeight/viewport.height() * newViewPort.top() + y * ( 1.0 - newHeight/viewport.height() );
-
-      newViewPort.setTop( newTop );
-      newViewPort.setBottom( newTop + newHeight );
-
-      setViewport( newViewPort );
-      update();
+      newViewport = getZoomViewportHorizontal( zoomFactor, viewport, viewportCentre.x() );
+      newViewport = getZoomViewportVertical( zoomFactor, newViewport, viewportCentre.y() );
    }
 
+   setViewport( newViewport );
+   update();
    event->accept();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// getZoomViewportHorizontal
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+QRectF PaintArea::getZoomViewportHorizontal( double zoomFactor, const QRectF& oldViewport, double xCentre ) const
+{
+   double newWidth = oldViewport.width();
+   newWidth *= zoomFactor;
+
+   QRectF newViewport( oldViewport );
+
+   double x = xCentre - oldViewport.left();
+   double viewportShift = x - x / oldViewport.width() * newWidth;
+
+   newViewport.setLeft( oldViewport.left() + viewportShift );
+   newViewport.setWidth( newWidth );
+   return newViewport;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// getZoomViewportVertical
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+QRectF PaintArea::getZoomViewportVertical( double zoomFactor, const QRectF& oldViewport, double yCentre ) const
+{
+   double newHeight = oldViewport.height();
+   newHeight *= zoomFactor;
+
+   QRectF newViewport( oldViewport );
+
+   double y = yCentre;
+   double newTop = newHeight/oldViewport.height() * newViewport.top() + y * ( 1.0 - newHeight/oldViewport.height() );
+
+   newViewport.setTop( newTop );
+   newViewport.setBottom( newTop + newHeight );
+
+   return newViewport;
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -247,7 +271,18 @@ void PaintArea::wheelEvent( QWheelEvent* event )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void PaintArea::mouseDoubleClickEvent( QMouseEvent* event )
 {
-   m_horizontalMouseWheel = !m_horizontalMouseWheel;
+   if ( m_zoomMode == ZoomBoth )
+   {
+      m_zoomMode = ZoomHorizontal;
+   }
+   else if ( m_zoomMode == ZoomHorizontal )
+   {
+      m_zoomMode = ZoomVertical;
+   }
+   else if ( m_zoomMode == ZoomVertical )
+   {
+      m_zoomMode = ZoomBoth;
+   }
    event->accept();
 }
 
