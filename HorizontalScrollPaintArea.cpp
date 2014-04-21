@@ -55,7 +55,7 @@ QRectF HorizontalScrollPaintArea::getViewRangeRect() const
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// viewportChangedSlot
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void HorizontalScrollPaintArea::viewportChangedSlot( const QRectF& newViewportOfGraph )
+void HorizontalScrollPaintArea::viewportGraphChanged( const QRectF& newViewportOfGraph )
 {
    m_viewportGraph = newViewportOfGraph;
    if ( m_viewportGraph.left() > m_dataMin )

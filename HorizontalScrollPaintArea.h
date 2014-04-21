@@ -32,7 +32,7 @@ class HorizontalScrollPaintArea : public ScrollPaintArea
     * @see ScrollPaintArea interface for docuemtation.
     */
    private slots:
-      virtual void viewportChangedSlot( const QRectF& newViewportOfGraph );
+      virtual void viewportGraphChanged( const QRectF& newViewportOfGraph );
 };
 
 } /// namespace Plotting

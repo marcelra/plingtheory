@@ -332,19 +332,23 @@ void PaintArea::setGridItem( const GridItem* gridItem )
 {
    if ( event->button() == Qt::RightButton && m_zoomAreaStart.get() )
    {
-      const QPointF& p0 = transformToWorldCoordinates( *m_zoomAreaStart );
-      const QPointF& p1 = transformToWorldCoordinates( *m_zoomAreaEnd );
+      /// It can happen that m_zoomAreaEnd is still undefined.
+      if ( m_zoomAreaEnd.get() )
+      {
+         const QPointF& p0 = transformToWorldCoordinates( *m_zoomAreaStart );
+         const QPointF& p1 = transformToWorldCoordinates( *m_zoomAreaEnd );
 
-      QRectF newViewport;
-      newViewport.setLeft( std::min( p0.x(), p1.x() ) );
-      newViewport.setRight( std::max( p0.x(), p1.x() ) );
-      newViewport.setBottom( std::min( p0.y(), p1.y() ) );
-      newViewport.setTop( std::max( p0.y(), p1.y() ) );
+         QRectF newViewport;
+         newViewport.setLeft( std::min( p0.x(), p1.x() ) );
+         newViewport.setRight( std::max( p0.x(), p1.x() ) );
+         newViewport.setBottom( std::min( p0.y(), p1.y() ) );
+         newViewport.setTop( std::max( p0.y(), p1.y() ) );
 
-      setViewport( newViewport );
+         setViewport( newViewport );
 
+         m_zoomAreaEnd.reset( 0 );
+      }
       m_zoomAreaStart.reset( 0 );
-      m_zoomAreaEnd.reset( 0 );
 
       event->accept();
       update();

@@ -46,7 +46,7 @@ class PaintAreaBase : public QWidget
       /**
        * Sets viewport @param viewport (see @note about viewport's height).
        */
-      void setViewport( const QRectF& viewport );
+      virtual void setViewport( const QRectF& viewport );
       /**
        * Gets the viewport (see @note about viewport's height).
        */
@@ -67,7 +67,7 @@ class PaintAreaBase : public QWidget
        * Signal that is emitted when the viewport is changed. The Plot2D class uses this to synchronise the different
        * viewports of the different paint areas.
        */
-      void viewportChanged( const QRectF& newViewPort );
+      void viewportChanged( const QRectF& newViewport );
 
    protected:
       /**

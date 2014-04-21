@@ -34,6 +34,12 @@ class ScrollPaintArea : public PaintAreaBase
        */
       void setDataRange( double min, double max );
 
+   protected:
+      /**
+       * True if updates from viewport are blocked.
+       */
+      bool isScrolling() const;
+
    private:
       /**
        * @see PaintAreaBase::paintEventImpl.
@@ -57,6 +63,10 @@ class ScrollPaintArea : public PaintAreaBase
        * Given a shift of the viewport from e.g. a mouse move event, update the graph view port.
        */
       virtual void updateViewportGraphFromShift( const QPointF& shift ) = 0;
+      /**
+       * Block updating the viewport.
+       */
+      void setIsScrolling( bool isScrolling );
 
    signals:
       /**
@@ -64,16 +74,23 @@ class ScrollPaintArea : public PaintAreaBase
        */
       void viewportFromScroll( const QRectF& viewport );
 
+   public:
+      /**
+       * Sets viewport. Can be graph viewport only if user is scrolling.
+       */
+      void setViewport( const QRectF& viewport );
+
    private slots:
       /**
        * Handle a view port change of the graph.
        */
-      virtual void viewportChangedSlot( const QRectF& newViewportOfGraph ) = 0;
+      virtual void viewportGraphChanged( const QRectF& newViewportOfGraph ) = 0;
 
    protected:
-      double   m_dataMin;           //! Min of the data.
-      double   m_dataMax;           //! Max of the data.
-      QRectF   m_viewportGraph;     //! Viewport of the graph.
+      double   m_dataMin;                 //! Min of the data.
+      double   m_dataMax;                 //! Max of the data.
+      QRectF   m_viewportGraph;           //! Viewport of the graph.
+      bool     m_isScrolling;             //! True iff user is scrolling.
 
 };
 
