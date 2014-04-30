@@ -16,8 +16,8 @@ void DevSuite::execute()
    // devSamples();
 
    // devPeakFinder2();
-   // devMlp();
-   devMcmc();
+   devMlp();
+   // devMcmc();
    return;
    devPeakFinder2();
    // devNewtonSolver1D();
@@ -509,19 +509,19 @@ void DevSuite::devMcmc()
    Logger msg( "devMcmc" );
    msg << Msg::Info << "Running devMcmc..." << Msg::EndReq;
 
-   size_t numSamples = 1;
+   size_t numSamples = 100;
 
-   MultivariateGaussObjective objFunc( realVector( 1, 0 ) , realVector( 20, 10 ) );
+   MultivariateGaussObjective objFunc( realVector( 50, 0 ) , realVector( 20, 10 ) );
 
    Math::McmcOptimiser mcmc( objFunc );
    mcmc.setStartValues( Math::RealVectorEnsemble( numSamples, realVector( 10, 10 ) ) );
-   mcmc.setStepSize( 0.1 );
-   mcmc.setNumIterations( 10000 );
-   mcmc.setBurninSkip( 0 );
+   mcmc.setStepSize( 1 );
+   mcmc.setNumIterations( 300 );
+   mcmc.setBurninSkip( 100 );
    const Math::RealVectorEnsemble& solution = mcmc.solve();
 
    double yEval = 0;
-   double yWidth = 0.1;
+   // double yWidth = 0.1;
 
    RealVector xData( solution.size() );
    RealVector yData( solution.size() );
