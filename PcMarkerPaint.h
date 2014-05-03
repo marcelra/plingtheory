@@ -13,6 +13,7 @@ namespace Plotting
 class PcMarkerPaint : public IPaintCommand
 {
    public:
+      /// TODO: use MarkerDrawAttr here?
       PcMarkerPaint( const QPointF& location, double markerSize, MarkerType markerType );
       virtual ~PcMarkerPaint();
 

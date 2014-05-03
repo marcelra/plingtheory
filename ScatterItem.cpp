@@ -43,7 +43,7 @@ void ScatterItem::generatePlotCommands( PaintArea* paintArea ) const
       const QPointF point( xData[ i ], yData[ i ] );
       if ( viewport.contains( point ) )
       {
-         PcMarkerPaint* cmd = new PcMarkerPaint( QPointF( xData[ i ], yData[ i ] ), 4, markerType );
+         PcMarkerPaint* cmd = new PcMarkerPaint( QPointF( xData[ i ], yData[ i ] ), getMarkerSize(), markerType );
          paintArea->addPaintCommand( cmd );
       }
    }
