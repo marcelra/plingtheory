@@ -422,8 +422,8 @@ void DevSuite::devMlp()
    }
 
    gPlotFactory().createPlot( "devMlp/trainingSet" );
-   gPlotFactory().createScatter( xUp, yUp, Qt::red );
-   gPlotFactory().createScatter( xDown, yDown, Qt::blue );
+   gPlotFactory().createScatter( xUp, yUp, Plotting::MarkerDrawAttr( Qt::red ) );
+   gPlotFactory().createScatter( xDown, yDown, Plotting::MarkerDrawAttr( Qt::blue ) );
 
    Mva::MultilayerPerceptron network( 2, 1 );
    network.addHiddenLayer( 4 );
@@ -461,8 +461,8 @@ void DevSuite::devMlp()
    }
 
    gPlotFactory().createPlot( "devMlp/testSet" );
-   gPlotFactory().createScatter( xUpPredicted, yUpPredicted, Qt::red );
-   gPlotFactory().createScatter( xDownPredicted, yDownPredicted, Qt::blue );
+   gPlotFactory().createScatter( xUpPredicted, yUpPredicted, Plotting::MarkerDrawAttr( Qt::red ) );
+   gPlotFactory().createScatter( xDownPredicted, yDownPredicted, Plotting::MarkerDrawAttr( Qt::blue ) );
 
    return;
 }
@@ -533,7 +533,7 @@ void DevSuite::devMcmc()
    }
 
    gPlotFactory().createPlot( "devMcmc/twoDimScatter" );
-   gPlotFactory().createScatter( xData, yData, Qt::black, Plotting::MarkerPlus );
+   gPlotFactory().createScatter( xData, yData, Plotting::MarkerDrawAttr( Qt::black, Plotting::MarkerPlus ) );
 
 
    const RealVector& xArr = Utils::createRangeReal( -5, 5, 50 );

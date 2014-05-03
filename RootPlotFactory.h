@@ -7,6 +7,11 @@
 
 class TCanvas;
 
+namespace Plotting
+{
+class MarkerDrawAttr;
+}
+
 namespace PlotInterface
 {
 
@@ -28,8 +33,7 @@ class RootPlotFactory : public IPlotFactory
 
       void createScatter( const std::vector< double >& xData,
                           const std::vector< double >& yData,
-                          const QColor& colour,
-                          Plotting::MarkerType markerType );
+                          const Plotting::MarkerDrawAttr& markerDrawAttr );
 
       void createStftGraph( const WaveAnalysis::StftData& stftData );
       virtual void createHistogram( const Math::IAccumArray& hist, const QColor& colour );

@@ -7,11 +7,14 @@
 namespace Plotting
 {
 
-/// TODO: doc
+/**
+ * @class ScatterItem
+ * @brief A X vs Y scatter plot.
+ */
 class ScatterItem : public IYVsXItem, public MarkerDrawAttr
 {
    public:
-      ScatterItem( const std::vector< double >& xData, const std::vector< double >& yData );
+      ScatterItem( const std::vector< double >& xData, const std::vector< double >& yData, const MarkerDrawAttr& markerDrawAttr = MarkerDrawAttr() );
       virtual ~ScatterItem();
 
    private:

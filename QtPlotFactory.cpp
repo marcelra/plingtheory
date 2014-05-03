@@ -80,18 +80,14 @@ void QtPlotFactory::drawPcmData( const RawPcmData& pcmData, const QColor& colour
 
 void QtPlotFactory::createScatter( const std::vector< double >& xData,
                                    const std::vector< double >& yData,
-                                   const QColor& colour,
-                                   Plotting::MarkerType markerType )
+                                   const Plotting::MarkerDrawAttr& markerDrawAttr )
 {
    if ( !m_currentPlot )
    {
       ExceptionNoPlotAvailable();
    }
 
-   Plotting::ScatterItem * item = new Plotting::ScatterItem( xData, yData );
-   item->setLineColor( colour );
-   item->setAntialiasing( true );
-   item->setMarkerType( markerType );
+   Plotting::ScatterItem * item = new Plotting::ScatterItem( xData, yData, markerDrawAttr );
    m_currentPlot->addItem( item );
    m_plotItems.push_back( item );
 }

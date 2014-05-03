@@ -97,8 +97,7 @@ bool RootPlotFactory::checkIsNewCanvas()
 
 void RootPlotFactory::createScatter( const std::vector< double >& xData,
                                      const std::vector< double >& yData,
-                                     const QColor& colour,
-                                     Plotting::MarkerType markerType )
+                                     const Plotting::MarkerDrawAttr& markerDrawAttr )
 {
    if ( !m_currentCanvas )
    {
@@ -106,9 +105,9 @@ void RootPlotFactory::createScatter( const std::vector< double >& xData,
    }
 
    TGraph* graph = RootUtilities::createGraph( xData, yData );
-   graph->SetLineColor( rootColorFromQColor( colour ) );
+   graph->SetLineColor( rootColorFromQColor( markerDrawAttr.getLineColor() ) );
 
-   switch ( markerType )
+   switch ( markerDrawAttr.getMarkerType() )
    {
       case Plotting::MarkerRectangle:
          graph->SetMarkerStyle( 21 );
