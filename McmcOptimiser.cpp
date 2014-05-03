@@ -2,6 +2,9 @@
 
 #include "Logger.h"
 
+/// TODO: used for heuristics in MLP learning
+#include <cmath>
+
 namespace Math
 {
 
@@ -76,10 +79,10 @@ RealVectorEnsemble McmcOptimiser::solve()
          {
             solutions.push_back( m_mcmcChains[ iChain ] );
          }
-         if ( ( iIter % m_numIterStepUpdate ) == 0 )
-         {
-            updateStepSize();
-         }
+      }
+      if ( ( iIter % m_numIterStepUpdate ) == 0 )
+      {
+         updateStepSize();
       }
    }
    return solutions;
@@ -117,7 +120,17 @@ bool McmcOptimiser::accept( double probNew, double probOld )
    }
    else
    {
-      bool doAccept = m_random.uniform( 0, probOld ) < probNew;
+      bool doAccept;
+      if ( probOld < 0 )
+      {
+         /// TODO: heuristics for MLP learning
+         // doAccept = m_random.uniform( probOld, 0 ) > probOld;
+         doAccept = false;
+      }
+      else
+      {
+         doAccept = m_random.uniform( 0, probOld ) < probNew;
+      }
       return doAccept;
    }
 }
@@ -127,17 +140,22 @@ bool McmcOptimiser::accept( double probNew, double probOld )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void McmcOptimiser::updateStepSize()
 {
+   Logger msg( "McmcOptimiser" );
    for ( size_t i = 0; i < m_stepSizeVec.size(); ++i )
    {
       double eff = static_cast< double >( m_numAccepted[ i ] ) / m_numIterStepUpdate;
+      msg << Msg::Info << "eff = " << m_numAccepted[ i ] << Msg::EndReq;
       if ( eff < m_effLow )
       {
-         m_stepSizeVec[ i ] *= 0.99;
+         m_stepSizeVec[ i ] *= 0.9;
+         // msg << Msg::Info << "---" << i << ": " << m_stepSizeVec[ i ] << Msg::EndReq;
       }
-      else
+      else if ( eff > m_effHigh )
       {
-         m_stepSizeVec[ i ] *= 1.01;
+         m_stepSizeVec[ i ] *= 1.1;
+         // msg << Msg::Info << "+++" << i << ": " << m_stepSizeVec[ i ] << Msg::EndReq;
       }
+      m_numAccepted[ i ] = 0;
    }
 }
 

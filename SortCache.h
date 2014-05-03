@@ -28,6 +28,10 @@ class SortCache
        * Get the index in the original vector of the @index-th item reverse sorted by value (i.e. large items first).
        */
       size_t getReverseSortedIndex( size_t index ) const;
+      /**
+       * Get the number of values after sort (this can be different due to duplicates).
+       */
+      size_t getSize() const;
 
       /**
        * Sort vector.

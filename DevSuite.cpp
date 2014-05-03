@@ -10,14 +10,14 @@ void DevSuite::execute()
    Logger msg( "DevSuite" );
    msg << Msg::Info << "Running development code..." << Msg::EndReq;
 
-   devHistogram();
+   // devHistogram();
    // devRebinSRSpec();
    // devFourierTemplates();
    // devSamples();
 
    // devPeakFinder2();
-   devMlp();
-   // devMcmc();
+   // devMlp();
+   devMcmc();
    return;
    devPeakFinder2();
    // devNewtonSolver1D();
@@ -391,7 +391,7 @@ void DevSuite::devMlp()
    Logger msg( "devMlp" );
    msg << Msg::Info << "In devMlp..." << Msg::EndReq;
 
-   TRandom3 rand( 0 );
+   TRandom3 rand( 1 );
 
    std::vector< RealVector > inputData;
    std::vector< RealVector > outputData;
@@ -425,14 +425,11 @@ void DevSuite::devMlp()
    gPlotFactory().createScatter( xUp, yUp, Qt::red );
    gPlotFactory().createScatter( xDown, yDown, Qt::blue );
 
-   // Mva::MultilayerPerceptron network( 2, 1 );
-   // network.addHiddenLayer( 8 );
-   // network.addHiddenLayer( 4 );
-   // network.addHiddenLayer( 3 );
-   // network.addHiddenLayer( 2 );
-   // network.addHiddenLayer( 1 );
-   // network.build();
-   Mva::RootMlp network( "i0,i1:4:2:o0" );
+   Mva::MultilayerPerceptron network( 2, 1 );
+   network.addHiddenLayer( 4 );
+   network.addHiddenLayer( 2 );
+   network.build();
+   // Mva::RootMlp network( "i0,i1:4:2:o0" );
 
    network.train( inputData, outputData );
 
@@ -450,6 +447,7 @@ void DevSuite::devMlp()
    for ( size_t i = 0; i < inputData.size(); ++i )
    {
       RealVector output = network.evaluate( inputData[ i ] );
+      // msg << Msg::Info << "output = " << output << ", desired = " << outputData[ i ] << Msg::EndReq;
       if ( output [ 0 ] > 0 )
       {
          xUpPredicted.push_back( inputData[ i ][ 0 ] );
@@ -511,15 +509,15 @@ void DevSuite::devMcmc()
    Logger msg( "devMcmc" );
    msg << Msg::Info << "Running devMcmc..." << Msg::EndReq;
 
-   size_t numSamples = 100;
+   size_t numSamples = 1;
 
    MultivariateGaussObjective objFunc( realVector( 50, 0 ) , realVector( 20, 10 ) );
 
    Math::McmcOptimiser mcmc( objFunc );
    mcmc.setStartValues( Math::RealVectorEnsemble( numSamples, realVector( 10, 10 ) ) );
    mcmc.setStepSize( 1 );
-   mcmc.setNumIterations( 300 );
-   mcmc.setBurninSkip( 100 );
+   mcmc.setNumIterations( 500000 );
+   mcmc.setBurninSkip( 0 );
    const Math::RealVectorEnsemble& solution = mcmc.solve();
 
    double yEval = 0;

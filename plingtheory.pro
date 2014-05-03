@@ -270,10 +270,10 @@ linux: LIBS += -L/usr/local/lib/ -lboost_filesystem -lboost_system -lboost_threa
 
 ### ROOT
 macx: LIBS += -L/usr/local/lib/root -lCore -lCint -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lz -pthread -Wl -lm -ldl -lMLP
-linux: LIBS += -L/usr/root/lib/ -m64 -lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -pthread -lm -ldl -rdynamic -lMLP
+linux: LIBS += -L/usr/local/lib/root -m64 -lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -pthread -lm -ldl -rdynamic -lMLP -lCint -lTreePlayer
 macx: INCLUDEPATH += /usr/local/include/root
-linux: INCLUDEPATH += /usr/root/include
-DEPENDPATH += /usr/root/include
+linux: INCLUDEPATH += /usr/local/include/root
+DEPENDPATH += /usr/local/include/root
 
 ### FFTW3
 macx: LIBS += -L/usr/local/lib/ -lfftw3

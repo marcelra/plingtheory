@@ -6,14 +6,15 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Constructor
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-SortCache::SortCache( const RealVector& values ) :
-   m_translation( values.size() )
+SortCache::SortCache( const RealVector& values )
 {
    std::map< double, int > sortedValueVsIndex;
    for ( size_t i = 0; i < values.size(); ++i )
    {
       sortedValueVsIndex.insert( std::pair< double, int >( values[i], i ) );
    }
+
+   m_translation.resize( sortedValueVsIndex.size() );
 
    size_t sortedIndex = 0;
    for ( std::map< double, int >::const_iterator it = sortedValueVsIndex.begin(); it != sortedValueVsIndex.end(); ++it, ++sortedIndex )
@@ -56,4 +57,11 @@ RealVector SortCache::applyReverseTo( const RealVector& vector ) const
    return result;
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// getSize
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+size_t SortCache::getSize() const
+{
+   return m_translation.size();
+}
 
