@@ -129,7 +129,8 @@ SOURCES += main.cpp \
     MultilayerPerceptron.cpp \
     Neuron.cpp \
     Synapse.cpp \
-    MarkerDrawAttr.cpp
+    MarkerDrawAttr.cpp \
+    RootMlp.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -254,7 +255,8 @@ HEADERS += \
     MultilayerPerceptron.h \
     Neuron.h \
     Synapse.h \
-    MarkerDrawAttr.h
+    MarkerDrawAttr.h \
+    RootMlp.h
 
 OTHER_FILES += \
     Todos.txt
@@ -267,8 +269,8 @@ linux: LIBS += -L/usr/local/lib/ -lboost_filesystem -lboost_system -lboost_threa
 #DEPENDPATH += /Users/marcelra/devTools/boost_1_50_0/stage
 
 ### ROOT
-macx: LIBS += -L/usr/local/lib/root -lCore -lCint -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lz -pthread -Wl -lm -ldl
-linux: LIBS += -L/usr/root/lib/ -m64 -lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -pthread -lm -ldl -rdynamic
+macx: LIBS += -L/usr/local/lib/root -lCore -lCint -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lz -pthread -Wl -lm -ldl -lMLP
+linux: LIBS += -L/usr/root/lib/ -m64 -lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -pthread -lm -ldl -rdynamic -lMLP
 macx: INCLUDEPATH += /usr/local/include/root
 linux: INCLUDEPATH += /usr/root/include
 DEPENDPATH += /usr/root/include

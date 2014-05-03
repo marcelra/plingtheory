@@ -75,6 +75,7 @@ void DevSuite::execute()
 #include "NewtonSolver1D.h"
 #include "MultilayerPerceptron.h"
 #include "RandomNumberGenerator.h"
+#include "RootMlp.h"
 
 #include <functional>
 #include <cmath>
@@ -424,13 +425,14 @@ void DevSuite::devMlp()
    gPlotFactory().createScatter( xUp, yUp, Qt::red );
    gPlotFactory().createScatter( xDown, yDown, Qt::blue );
 
-   Mva::MultilayerPerceptron network( 2, 1 );
-   network.addHiddenLayer( 8 );
-   network.addHiddenLayer( 4 );
-   network.addHiddenLayer( 3 );
-   network.addHiddenLayer( 2 );
-   network.addHiddenLayer( 1 );
-   network.build();
+   // Mva::MultilayerPerceptron network( 2, 1 );
+   // network.addHiddenLayer( 8 );
+   // network.addHiddenLayer( 4 );
+   // network.addHiddenLayer( 3 );
+   // network.addHiddenLayer( 2 );
+   // network.addHiddenLayer( 1 );
+   // network.build();
+   Mva::RootMlp network( "i0,i1:4:2:o0" );
 
    network.train( inputData, outputData );
 
