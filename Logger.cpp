@@ -4,8 +4,9 @@
 #include "GlobalLogParameters.h"
 
 #include <iostream>
+#include <sstream>
 
-#include <boost/thread.hpp>
+// #include <boost/thread.hpp>
 
 namespace
 {
