@@ -3,7 +3,7 @@
 namespace Plotting
 {
 
-MarkerDrawAttr::MarkerDrawAttr( MarkerType markerType, QColor color, double width, bool antialiasing ) :
+MarkerDrawAttr::MarkerDrawAttr( QColor color, MarkerType markerType, double width, bool antialiasing ) :
    LineDrawAttr( color, width, antialiasing ),
    m_markerType( markerType )
 {}

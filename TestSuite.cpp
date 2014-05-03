@@ -953,7 +953,7 @@ void TestSuite::testSpectralReassignment()
 
    gPlotFactory().createPlot( "testSpectralReassignment/Comaprison with Fourier" );
    gPlotFactory().createGraph( spec.getFrequencies(), spec.getMagnitude(), Qt::red );
-   gPlotFactory().createScatter( specReass.getFrequencies(), specReass.getMagnitude(), Qt::black );
+   gPlotFactory().createScatter( specReass.getFrequencies(), specReass.getMagnitude(), Plotting::MarkerDrawAttr() );
 
    // Visualisation::StftGraph graph( *trans );
    // graph.create();

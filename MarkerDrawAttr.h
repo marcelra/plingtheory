@@ -17,7 +17,7 @@ enum MarkerType
 class MarkerDrawAttr : public LineDrawAttr
 {
    public:
-      MarkerDrawAttr( MarkerType markerType = MarkerRectangle, QColor color = Qt::black, double width = 2, bool antialiasing = false );
+      MarkerDrawAttr( QColor color = Qt::black, MarkerType markerType = MarkerRectangle, double width = 2, bool antialiasing = false );
 
       void setMarkerType( Plotting::MarkerType markerType );
       MarkerType getMarkerType() const;

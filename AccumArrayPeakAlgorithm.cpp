@@ -219,7 +219,7 @@ std::vector< Feature::Peak > AccumArrayPeakAlgorithm::findPeaks( const RealVecto
          peakPositions[ iPeak] = thisPeakPos;
          peakHeights[ iPeak ] = peaks[ iPeak ].getProminence();
       }
-      gPlotFactory().createScatter( peakPositions, peakHeights, Qt::red );
+      gPlotFactory().createScatter( peakPositions, peakHeights, Plotting::MarkerDrawAttr( Qt::red ) );
    }
 
    dressPeaks( data, baselineSubtractedData, peaks );
@@ -349,7 +349,7 @@ void AccumArrayPeakAlgorithm::dressPeaks( const Math::RegularAccumArray& data, c
 
          assert( peakData.size() == peakEntries.size() );
 
-         gPlotFactory().createScatter( peak.getPeakEntries()->getX(), peak.getPeakEntries()->getY(), Qt::black );
+         gPlotFactory().createScatter( peak.getPeakEntries()->getX(), peak.getPeakEntries()->getY() );
 
          std::ostringstream peakName;
          peakName << "Peak_" << iPeak;
