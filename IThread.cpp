@@ -4,6 +4,7 @@
 
 /// boost includes
 #include <boost/chrono.hpp>
+#include <stdint.h>
 #include <boost/thread.hpp>
 
 /// STL includes
