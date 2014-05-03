@@ -15,7 +15,8 @@ void RootMlp::train( const std::vector< RealVector >& inputData, const std::vect
 {
    TTree* trainSetTree = getTreeFromTrainData( inputData, outputData );
    m_mlp.reset( new TMultiLayerPerceptron( m_networkLayout.c_str(), trainSetTree ) );
-   m_mlp->Train( 10, "text" );
+   // m_mlp->Train( 10, "text" );
+   m_mlp.release();
 }
 
 TTree* RootMlp::getTreeFromTrainData( const std::vector< RealVector >& inputData, const std::vector< RealVector >& outputData )

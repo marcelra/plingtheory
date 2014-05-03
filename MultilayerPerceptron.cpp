@@ -48,7 +48,7 @@ double ErrorObjective::evaluate( const RealVector& x ) const
       const RealVector& output = m_network.evaluate( m_inputData[ iInputData ] );
       error += calcSumSquaredError( output, m_outputData[ iInputData ] );
    }
-   return -sqrt( error ) / m_inputData.size();
+   return -sqrt( error );
 }
 
 double ErrorObjective::calcSumSquaredError( const RealVector& xMeasured, const RealVector& xTruth ) const
@@ -195,50 +195,51 @@ size_t MultilayerPerceptron::getNumNeuronLayers() const
 
 void MultilayerPerceptron::train( const std::vector< RealVector >& inputData, const std::vector< RealVector >& outputData )
 {
-   Logger msg( "MultilayerpPerceptron" );
+   Logger msg( "MultilayerPerceptron" );
    msg << Msg::Verbose << "Training neural network." << Msg::EndReq;
 
    std::vector< double* > weightRefVec = getWeights();
-   for ( size_t i = 0; i < weightRefVec.size(); ++i )
-   {
-      msg << Msg::Verbose << "weights[ " << i << " ] = " << *weightRefVec[ i ] << Msg::EndReq;
-   }
 
    RealVector startValVec( weightRefVec.size() );
    for ( size_t i = 0; i < weightRefVec.size(); ++i )
    {
-      startValVec[ i ] = *weightRefVec[ i ];
+      startValVec[ i ] = 0; // *weightRefVec[ i ];
    }
 
    ::ErrorObjective errorFunc( *this, inputData, outputData );
    Math::McmcOptimiser mcmcOpt( errorFunc );
 
-   size_t numNets = 1;
+   size_t numNets = startValVec.size();
    std::vector< RealVector > startValues( numNets );
    for ( size_t iNet = 0; iNet < numNets; ++iNet )
    {
+      startValVec[ iNet ] = 0;
       startValues[ iNet ] = startValVec;
+      startValVec[ iNet ] = 1;
    }
 
+   size_t numIter = 2000;
+
    mcmcOpt.setStartValues( startValues );
-   mcmcOpt.setNumIterations( 1000 );
-   mcmcOpt.setBurninSkip( 900);
+   mcmcOpt.setStepSize( 1 );
+   mcmcOpt.setNumIterations( numIter );
+   mcmcOpt.setBurninSkip( numIter - 10 );
 
    Math::RealVectorEnsemble solutions = mcmcOpt.solve();
 
    RealVector solutionError( solutions.size() );
+
    for ( size_t iSolution = 0; iSolution < solutions.size(); ++iSolution )
    {
       solutionError[ iSolution ] = errorFunc.evaluate( solutions[ iSolution ] );
-      msg << Msg::Info << "Solution = " << solutionError[ iSolution ] << Msg::EndReq;
    }
 
    SortCache sortCache( solutionError );
 
-   for ( size_t iSolution = 0; iSolution < solutions.size(); ++iSolution )
+   for ( size_t iSolution = 0; iSolution < sortCache.getSize(); ++iSolution )
    {
-      // size_t index = sortCache.getSortedIndex( iSolution );
-      // msg << Msg::Info << "Solution " << index << ": error = " << errorFunc.evaluate( solutions[ index ] ) << ", vec = " << solutions[ index ] << Msg::EndReq;
+      size_t index = sortCache.getSortedIndex( iSolution );
+      msg << Msg::Info << "Solution " << index << ": error = " << errorFunc.evaluate( solutions[ index ] ) << Msg::EndReq; // << ", vec = " << solutions[ index ] << Msg::EndReq;
    }
 
    size_t bestIndex = sortCache.getReverseSortedIndex( 0 );
