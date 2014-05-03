@@ -533,7 +533,7 @@ void DevSuite::devMcmc()
    }
 
    gPlotFactory().createPlot( "devMcmc/twoDimScatter" );
-   gPlotFactory().createScatter( xData, yData, Plotting::MarkerDrawAttr( Qt::black, Plotting::MarkerPlus ) );
+   gPlotFactory().createScatter( xData, yData, Plotting::MarkerDrawAttr( Qt::black, Plotting::MarkerCross ) );
 
 
    const RealVector& xArr = Utils::createRangeReal( -5, 5, 50 );
