@@ -8,11 +8,13 @@
 #include "ComposedRealFuncWithDerivative.h"
 #include "GaussPdf.h"
 #include "GradDescOptimiser.h"
+#include "KernelPdf.h"
+#include "McmcOptimiser.h"
 #include "NewtonSolver1D.h"
 #include "RealMemFunction.h"
 #include "SampledMovingAverage.h"
 #include "TwoDimExampleObjective.h"
-#include "McmcOptimiser.h"
+#include "UniformPdf.h"
 
 #include "TGraph.h"
 
@@ -33,6 +35,7 @@ void TestMath::execute()
    testTwoTuple();
    testRegularAccumArray();
    testMcmc();
+   testPdf();
    msg << Msg::Info << "Math tests done." << Msg::EndReq;
 }
 
@@ -433,6 +436,55 @@ void TestMath::testMcmc()
    gPlotFactory().createPlot( "testMcmc/distribution" );
    gPlotFactory().createGraph( xArr, objFuncEval, Qt::blue );
    gPlotFactory().createHistogram( regAccArr );
+}
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// testPdf
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void TestMath::testPdf()
+{
+   Logger msg( "testPdf" );
+   msg << Msg::Info << "Running testPdf..." << Msg::EndReq;
+
+   size_t nPoints = 5000;
+
+   const RealVector xEval = Utils::createRangeReal( -10, 10, nPoints );
+
+   Math::GaussPdf gauss( 0, 1 );
+
+   Math::IRealFunction::Ptr func( new Math::RealMemFunction< Math::GaussPdf >( &Math::GaussPdf::getDensity, &gauss ) );
+   const RealVector& gaussEval = func->evalMany( xEval );
+
+   gPlotFactory().createPlot( "testPdf/GaussPdf" );
+   gPlotFactory().createGraph( xEval, gaussEval );
+
+   double integralApprox = 0;
+   double deltaX = 20.0 / nPoints;
+   for ( size_t i = 0; i < gaussEval.size(); ++i )
+   {
+      integralApprox += gaussEval[ i ] * deltaX;
+   }
+   msg << Msg::Info << "Integral = " << integralApprox << Msg::EndReq;
+
+   size_t nGauss = 2000;
+   RealVector sampling( nGauss );
+   for ( size_t i = 0; i < nGauss; ++i )
+   {
+      sampling[ i ] = gRandom->Uniform( -100, 100 );
+   }
+
+   const RealVector& xEvalKern = Utils::createRangeReal( -200, 200, nPoints );
+
+   Math::UniformPdf uniform( -100, 100 );
+   func.reset( new Math::RealMemFunction< Math::UniformPdf >( &Math::UniformPdf::getDensity, &uniform ) );
+   const RealVector& uniformEval = func->evalMany( xEvalKern );
+
+   Math::KernelPdf kern( Math::IPdf::CPtr( new Math::GaussPdf( 0, 25 ) ), sampling );
+   func.reset( new Math::RealMemFunction< Math::KernelPdf >( &Math::KernelPdf::getDensity, &kern ) );
+   const RealVector& kernEval = func->evalMany( xEvalKern );
+
+   gPlotFactory().createPlot( "testPdf/KernelPdf" );
+   gPlotFactory().createGraph( xEvalKern, kernEval );
+   gPlotFactory().createGraph( xEvalKern, uniformEval, Qt::red );
 }
 

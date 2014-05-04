@@ -17,7 +17,6 @@ void DevSuite::execute()
 
    // devPeakFinder2();
    // devMlp();
-   devHist2D();
    return;
    devPeakFinder2();
    // devNewtonSolver1D();
@@ -101,56 +100,6 @@ void DevSuite::devNewtonSolver1D()
    msg << Msg::Info << "Solution = " << result.getSolution() << Msg::EndReq;
 
    return;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// testPdf
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void DevSuite::testPdf()
-{
-   Logger msg( "testPdf" );
-   msg << Msg::Info << "Running testPdf..." << Msg::EndReq;
-
-   size_t nPoints = 5000;
-
-   const RealVector xEval = Utils::createRangeReal( -10, 10, nPoints );
-
-   Math::GaussPdf gauss( 0, 1 );
-
-   Math::IRealFunction::Ptr func( new Math::RealMemFunction< Math::GaussPdf >( &Math::GaussPdf::getDensity, &gauss ) );
-   const RealVector& gaussEval = func->evalMany( xEval );
-
-   gPlotFactory().createPlot( "testPdf/GaussPdf" );
-   gPlotFactory().createGraph( xEval, gaussEval );
-
-   double integralApprox = 0;
-   double deltaX = 20.0 / nPoints;
-   for ( size_t i = 0; i < gaussEval.size(); ++i )
-   {
-      integralApprox += gaussEval[ i ] * deltaX;
-   }
-   msg << Msg::Info << "Integral = " << integralApprox << Msg::EndReq;
-
-   size_t nGauss = 2000;
-   RealVector sampling( nGauss );
-   for ( size_t i = 0; i < nGauss; ++i )
-   {
-      sampling[ i ] = gRandom->Uniform( -100, 100 );
-   }
-
-   const RealVector& xEvalKern = Utils::createRangeReal( -200, 200, nPoints );
-
-   Math::UniformPdf uniform( -100, 100 );
-   func.reset( new Math::RealMemFunction< Math::UniformPdf >( &Math::UniformPdf::getDensity, &uniform ) );
-   const RealVector& uniformEval = func->evalMany( xEvalKern );
-
-   Math::KernelPdf kern( Math::IPdf::CPtr( new Math::GaussPdf( 0, 25 ) ), sampling );
-   func.reset( new Math::RealMemFunction< Math::KernelPdf >( &Math::KernelPdf::getDensity, &kern ) );
-   const RealVector& kernEval = func->evalMany( xEvalKern );
-
-   gPlotFactory().createPlot( "testPdf/KernelPdf" );
-   gPlotFactory().createGraph( xEvalKern, kernEval );
-   gPlotFactory().createGraph( xEvalKern, uniformEval, Qt::red );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -263,93 +212,6 @@ void DevSuite::devPeakFinder2()
    // stftGraph.create();
 
    return;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// devSamples
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void DevSuite::devSamples()
-{
-   size_t numSamples = 10 * 44100;
-
-   SamplingInfo samplingInfo( 44100 );
-   RawPcmData pcmData( samplingInfo, numSamples, 0 );
-
-   double frequency = 110;
-   double phase = 0;
-   double amp = 0.5;
-   double phaseStep = samplingInfo.getPhaseStepPerSample( frequency );
-
-   size_t i = 0;
-   while ( i < numSamples )
-   {
-      size_t tStart = samplingInfo.convertSecsToSamples( 0.1 ) + i;
-      size_t tEnd = samplingInfo.convertSecsToSamples( 0.50 ) + i;
-      size_t tRestart = samplingInfo.convertSecsToSamples( 1.0 ) + i;
-      double phaseAdd = M_PI / ( tEnd - tStart );
-
-      for ( ; i < tStart && i < numSamples ; ++i )
-      {
-         pcmData[ i ] = amp * sin( phase );
-         phase += phaseStep;
-      }
-
-      phaseStep += phaseAdd;
-      for ( ; i < tEnd && i < numSamples; ++i )
-      {
-         pcmData[ i ] = amp * sin( phase );
-         phase += phaseStep;
-      }
-
-      phaseStep -= phaseAdd;
-      for ( ; i < tRestart && i < numSamples; ++i )
-      {
-         pcmData[ i ] = amp * sin( phase );
-         phase += phaseStep;
-      }
-
-      ++i;
-   }
-
-   TGraph* grData = RootUtilities::createGraph( pcmData );
-   grData->Draw( "AL" );
-
-   WaveAnalysis::SpectralReassignmentTransform transform( samplingInfo, 1024, 3*1024, 4 );
-   WaveAnalysis::StftData::Ptr stft = transform.execute( pcmData );
-
-   Visualisation::RebinnedSRGraph graph( *stft );
-   graph.create();
-
-   MultiChannelRawPcmData mc( new RawPcmData( pcmData ) );
-   WaveFile::write( "sinefrag2.wav", mc );
-}
-
-void DevSuite::devHistogram()
-{
-   TRandom3 rand( 0 );
-
-   size_t nBins = 100;
-   double xMin = -5;
-   double xMax = 5;
-
-   Math::RegularAccumArray hist( nBins, xMin, xMax );
-   size_t nDraws = 500;
-   double w = ( xMax - xMin ) / nDraws;
-
-   for ( size_t i = 0; i < nDraws; ++i )
-   {
-      double x = rand.Gaus( 0, 1 );
-      hist.add( x, w );
-   }
-
-   Math::GaussPdf pdf( 0, 1 );
-   const RealVector& xEval = Utils::createRangeReal( xMin, xMax, 100 );
-   Math::RealMemFunction<Math::GaussPdf> pdfFunc( &Math::GaussPdf::getDensity, &pdf );
-   const RealVector& yEval = pdfFunc.evalMany( xEval );
-
-   gPlotFactory().createPlot( "testHistogram/Gauss sampling" );
-   gPlotFactory().createHistogram( hist );
-   gPlotFactory().createGraph( xEval, yEval, Qt::blue );
 }
 
 void DevSuite::devMlp2()
@@ -467,33 +329,4 @@ void DevSuite::devMlp()
 
    return;
 }
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// devHist2D
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void DevSuite::devHist2D()
-{
-   Logger msg( "devHist2D" );
-   msg << Msg::Info << "In devHist2D..." << Msg::EndReq;
-
-   Math::Regular2DHistogram hist2D( 250, -5, 5, 250, -5, 5 );
-
-   RandomNumberGenerator rng( 1 );
-   size_t nSamples = 10000000;
-
-   for ( size_t i = 0; i < nSamples; ++i )
-   {
-      double x = rng.gauss( 0, 1 );
-      double y = rng.gauss( 2, 1 );
-      hist2D.add( x, y, 1 );
-   }
-
-   msg << Msg::Debug << "Maximum value = " << hist2D.getMaximum() << Msg::EndReq;
-   msg << Msg::Debug << "Minimum value = " << hist2D.getMinimum() << Msg::EndReq;
-
-   gPlotFactory().createPlot( "devHist2D/gaussianSampling" );
-   gPlotFactory().create2DHist( hist2D );
-
-}
-
 
