@@ -3,6 +3,7 @@
 #include "AvailablePlotsList.h"
 #include "CurveItem.h"
 #include "Exceptions.h"
+#include "Hist2DItem.h"
 #include "HistogramItem.h"
 #include "IAccumArray.h"
 #include "Plot2D.h"
@@ -115,6 +116,19 @@ void QtPlotFactory::createHistogram( const Math::IAccumArray& hist, const QColor
    item->setLineColor( colour );
    item->setAntialiasing( true );
    m_currentPlot->addItem( item );
+   m_plotItems.push_back( item );
+}
+
+void QtPlotFactory::create2DHist( const Math::Regular2DHistogram& hist )
+{
+   if ( !m_currentPlot )
+   {
+      ExceptionNoPlotAvailable();
+   }
+
+   Plotting::Hist2DItem* item = new Plotting::Hist2DItem( hist );
+   m_currentPlot->addItem( item );
+   m_currentPlot->setEnableGrid( false );
    m_plotItems.push_back( item );
 }
 
