@@ -156,7 +156,7 @@ double Regular2DHistogram::getMaximum() const
    double max = -std::numeric_limits< double >::max();
    for ( size_t iX = 0; iX < m_contents.size(); ++iX )
    {
-      for ( size_t iY = 0; iY < m_contents.size(); ++iY )
+      for ( size_t iY = 0; iY < m_contents[ 0 ].size(); ++iY )
       {
          if ( m_contents[ iX ][ iY ] > max )
          {
@@ -175,7 +175,7 @@ double Regular2DHistogram::getMinimum() const
    double min = std::numeric_limits< double >::max();
    for ( size_t iX = 0; iX < m_contents.size(); ++iX )
    {
-      for ( size_t iY = 0; iY < m_contents.size(); ++iY )
+      for ( size_t iY = 0; iY < m_contents[ 0 ].size(); ++iY )
       {
          if ( m_contents[ iX ][ iY ] < min )
          {

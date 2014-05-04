@@ -95,6 +95,7 @@ void TestSuite::singleTest()
 #include "TriangleGenerator.h"
 #include "RandomNumberGenerator.h"
 #include "RealMemFunction.h"
+#include "RebinnedSRGraph.h"
 #include "SawtoothGenerator.h"
 #include "StftData.h"
 #include "SpectralReassignmentTransform.h"
@@ -961,8 +962,8 @@ void TestSuite::testSpectralReassignment()
    gPlotFactory().createGraph( spec.getFrequencies(), spec.getMagnitude(), Qt::red );
    gPlotFactory().createScatter( specReass.getFrequencies(), specReass.getMagnitude(), Plotting::MarkerDrawAttr() );
 
-   // Visualisation::StftGraph graph( *trans );
-   // graph.create();
+   Visualisation::RebinnedSRGraph graph( *trans );
+   graph.create( "testSpectralReassignment/Stft" );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

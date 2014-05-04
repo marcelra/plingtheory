@@ -7,6 +7,7 @@
 
 #include <QColor>
 #include <QPainter>
+#include <QDebug>
 
 namespace Plotting
 {
@@ -33,8 +34,6 @@ Hist2DItem::Hist2DItem( const Math::Regular2DHistogram& hist2D, const Palette& p
       for ( size_t iY = 0; iY < hist2D.getNumBinsY(); ++iY )
       {
          double z = ( hist2D.getBinContent( iX, iY ) - min ) / zTot;
-         /// Due to rounding errors, z can be smaller than zero.
-         z = z < 0 ? 0 : z;
          p.setPen( palette.getColour( z ) );
          p.drawPoint( QPoint( iX, hist2D.getNumBinsY() - iY - 1 ) );
       }
