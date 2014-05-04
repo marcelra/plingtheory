@@ -12,6 +12,11 @@ class Regular2DHistogram;
 
 namespace Plotting
 {
+class Palette;
+}
+
+namespace Plotting
+{
 
 /**
  * @class Hist2DItem
@@ -23,7 +28,7 @@ class Hist2DItem : public IPaintItem
       /**
        * Create a Hist2DItem from a Regular2DHistogram @param hist2D.
        */
-      Hist2DItem( const Math::Regular2DHistogram& hist2D );
+      Hist2DItem( const Math::Regular2DHistogram& hist2D, const Palette& palette );
 
       double getMinX() const;
       double getMaxX() const;

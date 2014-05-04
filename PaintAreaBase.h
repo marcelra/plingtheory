@@ -66,6 +66,15 @@ class PaintAreaBase : public QWidget
        */
       void setName( const QString& name );
 
+      /**
+       * Clips viewport to data (i.e. cannot pan or zoom outside data range).
+       */
+      void setViewportConstraints( const QRectF& viewportConstraints );
+      /**
+       * Disable the viewport constraints if available.
+       */
+      void disableViewportConstraints();
+
    signals:
       /**
        * Signal that is emitted when the viewport is changed. The Plot2D class uses this to synchronise the different
@@ -90,12 +99,16 @@ class PaintAreaBase : public QWidget
        */
       virtual void paintEventImpl( QPaintEvent* event ) = 0;
 
+   private:
+      void updateViewportWithConstraint( const QRectF& viewport );
+
    protected:
       QString                    m_name;
       QRectF                     m_viewport;
       QRect                      m_canvas;
       QPainter*                  m_painter;
       std::auto_ptr< QPoint >    m_oldMousePos;
+      std::auto_ptr< QRectF >    m_viewportConstraints;
 };
 
 

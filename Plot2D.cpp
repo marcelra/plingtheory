@@ -64,16 +64,16 @@ Plot2D::Plot2D( QWidget* parent ) :
 
    /// Make connections.
    bool isConnected;
-   isConnected = connect( m_graph, SIGNAL( viewportChanged( QRectF ) ), this, SLOT( synchroniseViewPorts( QRectF ) ) );
+   isConnected = connect( m_graph, SIGNAL( viewportChanged( QRectF ) ), this, SLOT( synchroniseViewports( QRectF ) ) );
    assert( isConnected );
-   isConnected = connect( m_xScroll, SIGNAL( viewportFromScroll( QRectF ) ), this, SLOT( setViewPort( QRectF ) ) );
+   isConnected = connect( m_xScroll, SIGNAL( viewportFromScroll( QRectF ) ), this, SLOT( setViewport( QRectF ) ) );
    assert( isConnected );
-   isConnected = connect( m_yScroll, SIGNAL( viewportFromScroll( QRectF ) ), this, SLOT( setViewPort( QRectF ) ) );
+   isConnected = connect( m_yScroll, SIGNAL( viewportFromScroll( QRectF ) ), this, SLOT( setViewport( QRectF ) ) );
    assert( isConnected );
 
    /// Enable grid by default.
    setEnableGrid( true );
-   synchroniseViewPorts( m_graph->getViewport() );
+   synchroniseViewports( m_graph->getViewport() );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -109,6 +109,14 @@ void Plot2D::setEnableGrid( bool enableGrid )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// setEnableScrollOutsideDataRange
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void Plot2D::setViewportConstraintsToData()
+{
+   m_graph->setViewportConstraints( m_graph->getDataRange() );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// addItem
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void Plot2D::addItem( const IPaintItem* item )
@@ -124,17 +132,17 @@ void Plot2D::addItem( const IPaintItem* item )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// setViewPort
+/// setViewport
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void Plot2D::setViewPort( const QRectF& viewport )
+void Plot2D::setViewport( const QRectF& viewport )
 {
   m_graph->setViewport( viewport );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// synchroniseViewPorts
+/// synchroniseViewports
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void Plot2D::synchroniseViewPorts( const QRectF& viewport )
+void Plot2D::synchroniseViewports( const QRectF& viewport )
 {
    m_xScroll->setViewport( viewport );
    m_yScroll->setViewport( viewport );
