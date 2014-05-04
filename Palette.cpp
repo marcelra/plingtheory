@@ -12,16 +12,17 @@ Palette::Palette( const std::vector< QColor >& stops, const std::vector< double 
    assert( stopPoints[0] == 0 );
    assert( stopPoints[ stopPoints.size() - 1 ] == 1 );
    assert( stopPoints.size() == m_stops.size() );
+   assert( stopPoints.size() >= 2 );
 }
 
 QColor Palette::getColour( double z ) const
 {
    assert( z >= 0 && z <= 1 );
 
-   size_t stopIndexLeft;
+   size_t stopIndexLeft = 0;
    for ( size_t i = 0; i < m_stopPoints.size() - 1; ++i )
    {
-      if ( z > m_stopPoints[ i ] && z < m_stopPoints[ i + 1] )
+      if ( z > m_stopPoints[ i ] && z < m_stopPoints[ i + 1 ] )
       {
          stopIndexLeft = i;
          break;
@@ -87,6 +88,49 @@ Palette Palette::heatPalette()
    stopPoints.push_back( 3./6. ); stops.push_back( QColor( Qt::green ) );
    stopPoints.push_back( 4./6. ); stops.push_back( QColor( Qt::yellow ) );
    stopPoints.push_back( 5./6. ); stops.push_back( QColor( Qt::red ) );
+   stopPoints.push_back( 1 ); stops.push_back( QColor( Qt::darkRed ) );
+
+   return Palette( stops, stopPoints );
+}
+
+Palette Palette::firePalette()
+{
+   std::vector< double > stopPoints;
+   std::vector< QColor > stops;
+
+   stopPoints.push_back( 0 ); stops.push_back( QColor( Qt::darkRed ) );
+   stopPoints.push_back( 1./3. ); stops.push_back( QColor( Qt::red ) );
+   stopPoints.push_back( 2./3. ); stops.push_back( QColor( Qt::yellow ) );
+   stopPoints.push_back( 1 ); stops.push_back( QColor( Qt::white ) );
+
+   return Palette( stops, stopPoints );
+}
+
+Palette Palette::rainbowPalette()
+{
+   std::vector< double > stopPoints;
+   std::vector< QColor > stops;
+
+   stopPoints.push_back( 0 ); stops.push_back( QColor( Qt::red ) );
+   stopPoints.push_back( 1./5. ); stops.push_back( QColor( Qt::yellow ) );
+   stopPoints.push_back( 2./5. ); stops.push_back( QColor( Qt::green ) );
+   stopPoints.push_back( 3./5. ); stops.push_back( QColor( Qt::cyan ) );
+   stopPoints.push_back( 4./5. ); stops.push_back( QColor( Qt::blue ) );
+   stopPoints.push_back( 1 ); stops.push_back( QColor( "violet" ) );
+
+   return Palette( stops, stopPoints );
+}
+
+Palette Palette::inverseRainbowPalette()
+{
+   std::vector< double > stopPoints;
+   std::vector< QColor > stops;
+
+   stopPoints.push_back( 0 ); stops.push_back( QColor( Qt::white ) );
+   stopPoints.push_back( 1./5. ); stops.push_back( QColor( Qt::darkBlue ) );
+   stopPoints.push_back( 2./5. ); stops.push_back( QColor( Qt::cyan ) );
+   stopPoints.push_back( 3./5. ); stops.push_back( QColor( Qt::green ) );
+   stopPoints.push_back( 4./5. ); stops.push_back( QColor( Qt::yellow ) );
    stopPoints.push_back( 1 ); stops.push_back( QColor( Qt::darkRed ) );
 
    return Palette( stops, stopPoints );

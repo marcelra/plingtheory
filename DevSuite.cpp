@@ -476,10 +476,10 @@ void DevSuite::devHist2D()
    Logger msg( "devHist2D" );
    msg << Msg::Info << "In devHist2D..." << Msg::EndReq;
 
-   Math::Regular2DHistogram hist2D( 500, -5, 5, 500, -5, 5 );
+   Math::Regular2DHistogram hist2D( 250, -5, 5, 250, -5, 5 );
 
    RandomNumberGenerator rng( 1 );
-   size_t nSamples = 10000000;
+   size_t nSamples = 100000000;
 
    for ( size_t i = 0; i < nSamples; ++i )
    {
@@ -503,4 +503,5 @@ void DevSuite::devHist2D()
    gPlotFactory().create2DHist( hist2D );
 
 }
+
 
