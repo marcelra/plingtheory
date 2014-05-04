@@ -20,7 +20,6 @@ class DevSuite
 
       static void devMlp();
       static void devMlp2();
-      static void devMcmc();
 
    /**
     * Math

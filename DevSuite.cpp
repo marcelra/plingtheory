@@ -17,7 +17,6 @@ void DevSuite::execute()
 
    // devPeakFinder2();
    // devMlp();
-   devMcmc();
    return;
    devPeakFinder2();
    // devNewtonSolver1D();
@@ -465,88 +464,5 @@ void DevSuite::devMlp()
    gPlotFactory().createScatter( xDownPredicted, yDownPredicted, Plotting::MarkerDrawAttr( Qt::blue ) );
 
    return;
-}
-
-class MultivariateGaussObjective : public Math::IObjectiveFunction
-{
-   public:
-      MultivariateGaussObjective( const RealVector& muVec, const RealVector& sigmaVec ) :
-         m_muVec( muVec ),
-         m_sigmaVec( sigmaVec )
-      {
-         assert( m_muVec.size() == m_sigmaVec.size() );
-         for ( size_t i = 0; i < m_muVec.size(); ++i )
-         {
-            m_pdfs.push_back( Math::GaussPdf( m_muVec[ i ], m_sigmaVec[ i ] ) );
-         }
-      }
-
-      size_t getNumParameters() const
-      {
-         return m_muVec.size();
-      }
-
-      double evaluate( const RealVector& x ) const
-      {
-         assert( x.size() == getNumParameters() );
-         double p = 1;
-         for ( size_t i = 0; i < x.size(); ++i )
-         {
-            p *= m_pdfs[ i ].getDensity( x[ i ] );
-         }
-         return p;
-      }
-
-   private:
-      RealVector                    m_muVec;
-      RealVector                    m_sigmaVec;
-      std::vector< Math::GaussPdf > m_pdfs;
-
-};
-
-void DevSuite::devMcmc()
-{
-   Logger msg( "devMcmc" );
-   msg << Msg::Info << "Running devMcmc..." << Msg::EndReq;
-
-   size_t numSamples = 1;
-
-   MultivariateGaussObjective objFunc( realVector( 50, 0 ) , realVector( 20, 10 ) );
-
-   Math::McmcOptimiser mcmc( objFunc );
-   mcmc.setStartValues( Math::RealVectorEnsemble( numSamples, realVector( 10, 10 ) ) );
-   mcmc.setStepSize( 1 );
-   mcmc.setNumIterations( 500000 );
-   mcmc.setBurninSkip( 0 );
-   const Math::RealVectorEnsemble& solution = mcmc.solve();
-
-   double yEval = 0;
-   // double yWidth = 0.1;
-
-   RealVector xData( solution.size() );
-   RealVector yData( solution.size() );
-
-   for ( size_t i = 0; i < solution.size(); ++i )
-   {
-      xData[ i ] = solution[ i ][ 0 ];
-      yData[ i ] = solution[ i ][ 1 ];
-   }
-
-   gPlotFactory().createPlot( "devMcmc/twoDimScatter" );
-   gPlotFactory().createScatter( xData, yData, Plotting::MarkerDrawAttr( Qt::black, Plotting::MarkerCross, 3 ) );
-
-
-   const RealVector& xArr = Utils::createRangeReal( -5, 5, 50 );
-   RealVector objFuncEval( xArr.size() );
-
-   for ( size_t i = 0; i < xArr.size(); ++i )
-   {
-      objFuncEval[ i ] = objFunc.evaluate( realVector( xArr[ i ], yEval ) );
-   }
-
-   gPlotFactory().createPlot( "devMcmc/distribution" );
-   // gPlotFactory().createGraph( xArr, accArr.getAllBinContents() );
-   gPlotFactory().createGraph( xArr, objFuncEval, Qt::blue );
-
 }
 
