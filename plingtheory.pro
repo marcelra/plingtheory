@@ -130,7 +130,9 @@ SOURCES += main.cpp \
     Neuron.cpp \
     Synapse.cpp \
     MarkerDrawAttr.cpp \
-    RootMlp.cpp
+    RootMlp.cpp \
+    Hist2DItem.cpp \
+    Regular2DHistogram.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -256,7 +258,9 @@ HEADERS += \
     Neuron.h \
     Synapse.h \
     MarkerDrawAttr.h \
-    RootMlp.h
+    RootMlp.h \
+    Hist2DItem.h \
+    Regular2DHistogram.h
 
 OTHER_FILES += \
     Todos.txt
