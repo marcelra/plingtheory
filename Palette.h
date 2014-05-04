@@ -16,6 +16,9 @@ class Palette
       static Palette whiteBlackPalette();
       static Palette blueRedPalette();
       static Palette heatPalette();
+      static Palette firePalette();
+      static Palette rainbowPalette();
+      static Palette inverseRainbowPalette();
 
    private:
       QColor interpolate( const QColor& c1, const QColor& c2, double x ) const;
