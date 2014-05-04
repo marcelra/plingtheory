@@ -479,7 +479,7 @@ void DevSuite::devHist2D()
    Math::Regular2DHistogram hist2D( 250, -5, 5, 250, -5, 5 );
 
    RandomNumberGenerator rng( 1 );
-   size_t nSamples = 100000000;
+   size_t nSamples = 10000000;
 
    for ( size_t i = 0; i < nSamples; ++i )
    {
@@ -487,14 +487,6 @@ void DevSuite::devHist2D()
       double y = rng.gauss( 2, 1 );
       hist2D.add( x, y, 1 );
    }
-
-   // for ( size_t iBinX = 0; iBinX < hist2D.getNumBinsX(); ++iBinX )
-   // {
-   //    for ( size_t iBinY = 0; iBinY < hist2D.getNumBinsY(); ++iBinY )
-   //    {
-   //       msg << Msg::Verbose << "iBinX = " << iBinX << ", iBinY = " << iBinY << ", contents = " << hist2D.getBinContent( iBinX, iBinY ) << Msg::EndReq;
-   //    }
-   // }
 
    msg << Msg::Debug << "Maximum value = " << hist2D.getMaximum() << Msg::EndReq;
    msg << Msg::Debug << "Minimum value = " << hist2D.getMinimum() << Msg::EndReq;

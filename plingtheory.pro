@@ -287,7 +287,7 @@ DEPENDPATH += /usr/local/include/root
 macx: LIBS += -L/usr/local/lib/ -lfftw3
 linux: LIBS += -L/usr/local/lib/ -lfftw3
 
-QMAKE_CXXFLAGS += -g -ffast-math -mfpmath=387 -O3
+QMAKE_CXXFLAGS += -g -ffast-math -mfpmath=387
 QMAKE_CXXFLAGS_RELEASE -= -O2
 
 # macx: PRE_TARGETDEPS += $$PWD/usr/root/lib/libAfterImage.a

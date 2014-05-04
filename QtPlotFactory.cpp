@@ -127,7 +127,7 @@ void QtPlotFactory::create2DHist( const Math::Regular2DHistogram& hist )
       ExceptionNoPlotAvailable();
    }
 
-   Plotting::Hist2DItem* item = new Plotting::Hist2DItem( hist, Plotting::Palette::inverseRainbowPalette() );
+   Plotting::Hist2DItem* item = new Plotting::Hist2DItem( hist, Plotting::Palette::heatPalette() );
    m_currentPlot->addItem( item );
    m_currentPlot->setEnableGrid( false );
    m_currentPlot->setViewportConstraintsToData();
