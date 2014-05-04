@@ -13,13 +13,13 @@ namespace Math
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 McmcOptimiser::McmcOptimiser( const IObjectiveFunction& objFunc ) :
    m_objFunc( objFunc ),
+   m_numIterStepUpdate( 100 ),
    m_numIterations( 1000 ),
    m_burnInSkip( 200 ),
    m_stepMultiply( 1.0000001 ),
-   m_random( 10 ),
-   m_numIterStepUpdate( 100 ),
    m_effLow( 0.23 ),
-   m_effHigh( 0.45 )
+   m_effHigh( 0.45 ),
+   m_random( 10 )
 {
 }
 
@@ -64,7 +64,6 @@ RealVectorEnsemble McmcOptimiser::solve()
    {
       for ( size_t iChain = 0; iChain < m_mcmcChains.size(); ++iChain )
       {
-         bool accepted = false;
          const RealVector& x = proposeNew( m_mcmcChains[ iChain ], m_stepSizeVec[ iChain ] );
 
          double probNew = calcProb( x );
@@ -72,7 +71,6 @@ RealVectorEnsemble McmcOptimiser::solve()
          {
             m_mcmcChains[ iChain ] = x;
             m_probOld[ iChain ] = probNew;
-            accepted = true;
             m_numAccepted[ iChain ] += 1;
          }
          if ( iIter > m_burnInSkip )

@@ -21,6 +21,8 @@ class DevSuite
       static void devMlp();
       static void devMlp2();
 
+      static void devHist2D();
+
    /**
     * Math
     */

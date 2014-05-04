@@ -17,6 +17,7 @@ void DevSuite::execute()
 
    // devPeakFinder2();
    // devMlp();
+   devHist2D();
    return;
    devPeakFinder2();
    // devNewtonSolver1D();
@@ -40,6 +41,7 @@ void DevSuite::execute()
 
 #include <set>
 #include <cassert>
+#include "Regular2DHistogram.h"
 #include "GaussPdf.h"
 #include "IObjectiveFunction.h"
 #include "McmcOptimiser.h"
@@ -464,5 +466,35 @@ void DevSuite::devMlp()
    gPlotFactory().createScatter( xDownPredicted, yDownPredicted, Plotting::MarkerDrawAttr( Qt::blue ) );
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// devHist2D
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void DevSuite::devHist2D()
+{
+   Logger msg( "devHist2D" );
+   msg << Msg::Info << "In devHist2D..." << Msg::EndReq;
+
+   Math::Regular2DHistogram hist2D( 50, -5, 5, 50, -5, 5 );
+
+   RandomNumberGenerator rng( 1 );
+   size_t nSamples = 10000;
+
+   for ( size_t i = 0; i < nSamples; ++i )
+   {
+      double x = rng.gauss( 0, 1 );
+      double y = rng.gauss( 0, 1 );
+      hist2D.add( x, y, 1 );
+   }
+
+   for ( size_t iBinX = 0; iBinX < hist2D.getNumBinsX(); ++iBinX )
+   {
+      for ( size_t iBinY = 0; iBinY < hist2D.getNumBinsY(); ++iBinY )
+      {
+         msg << Msg::Verbose << "iBinX = " << iBinX << ", iBinY = " << iBinY << ", contents = " << hist2D.getBinContent( iBinX, iBinY ) << Msg::EndReq;
+      }
+   }
+
 }
 
