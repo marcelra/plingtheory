@@ -3,16 +3,26 @@
 
 #include "IPaintItem.h"
 
-#include "Regular2DHistogram.h"
-
 #include <QPixmap>
+
+namespace Math
+{
+class Regular2DHistogram;
+}
 
 namespace Plotting
 {
 
+/**
+ * @class Hist2DItem
+ * @brief PaintItem for two dimensional histogram with regular sized bins. @see IPaintItem.
+ */
 class Hist2DItem : public IPaintItem
 {
    public:
+      /**
+       * Create a Hist2DItem from a Regular2DHistogram @param hist2D.
+       */
       Hist2DItem( const Math::Regular2DHistogram& hist2D );
 
       double getMinX() const;
@@ -23,8 +33,11 @@ class Hist2DItem : public IPaintItem
       void generatePlotCommands( PaintArea* paintArea ) const;
 
    private:
-      Math::Regular2DHistogram   m_hist;
-      QPixmap                    m_pixmap;
+      QPixmap     m_pixmap;
+      double      m_minX;
+      double      m_maxX;
+      double      m_minY;
+      double      m_maxY;
 };
 
 } /// namespace Plotting
