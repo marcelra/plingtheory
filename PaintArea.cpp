@@ -27,8 +27,8 @@ PaintArea::PaintArea( QWidget* parent ) :
    m_zoomAreaStart( 0 )
 {
    m_dataRange = QRectF( QPointF( -1, 1 ), QPointF( 1, -1 ) );
-   QRectF initialViewPort( QPointF( -1, 1 ), QPointF( 1, -1 ) );
-   setViewport( initialViewPort );
+   QRectF initialViewport( QPointF( -1, 1 ), QPointF( 1, -1 ) );
+   setViewport( initialViewport );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

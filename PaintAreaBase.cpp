@@ -1,5 +1,7 @@
 #include "PaintAreaBase.h"
 
+#include <cmath>
+
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPaintEvent>
@@ -15,7 +17,8 @@ namespace Plotting
 PaintAreaBase::PaintAreaBase( QWidget* parent ) :
    QWidget( parent ),
    m_name( "Undefined" ),
-   m_oldMousePos( 0 )
+   m_oldMousePos( 0 ),
+   m_viewportConstraints( 0 )
 {
    setBackgroundRole( QPalette::Base );
    setAutoFillBackground( true );
@@ -92,7 +95,7 @@ void PaintAreaBase::setName( const QString& name )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// getViewPort
+/// getViewport
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const QRectF& PaintAreaBase::getViewport() const
 {
@@ -100,11 +103,15 @@ const QRectF& PaintAreaBase::getViewport() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// setViewPort
+/// setViewport
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void PaintAreaBase::setViewport( const QRectF& viewport )
 {
    m_viewport = viewport;
+   if ( m_viewportConstraints.get() )
+   {
+      updateViewportWithConstraint( viewport );
+   }
    emit viewportChanged( m_viewport );
    update();
 }
@@ -127,6 +134,62 @@ void PaintAreaBase::mouseReleaseEvent( QMouseEvent* event )
 const QRect& PaintAreaBase::getCanvas() const
 {
    return m_canvas;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// setClipViewportToData
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void PaintAreaBase::setViewportConstraints( const QRectF& viewportConstraints )
+{
+   m_viewportConstraints.reset( new QRectF( viewportConstraints ) );
+   setViewport( viewportConstraints );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// disableViewportConstraints
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void PaintAreaBase::disableViewportConstraints()
+{
+   m_viewportConstraints.reset( 0 );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// getWithinConstraints
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void PaintAreaBase::updateViewportWithConstraint( const QRectF& viewport )
+{
+   double newWidth = viewport.width();
+   if ( newWidth > m_viewportConstraints->width() )
+   {
+      newWidth = m_viewportConstraints->width();
+   }
+
+   double newHeight = fabs( viewport.height() );
+   if ( newHeight > fabs( m_viewportConstraints->height() ) )
+   {
+      newHeight = fabs( m_viewportConstraints->height() );
+   }
+
+   if ( viewport.left() < m_viewportConstraints->left() )
+   {
+      m_viewport.setLeft( m_viewportConstraints->left() );
+      m_viewport.setRight( m_viewport.left() + newWidth );
+   }
+   if ( viewport.right() > m_viewportConstraints->right() )
+   {
+      m_viewport.setRight( m_viewportConstraints->right() );
+      m_viewport.setLeft( m_viewport.right() - newWidth );
+   }
+   if ( viewport.bottom() < m_viewportConstraints->bottom() )
+   {
+      m_viewport.setBottom( m_viewportConstraints->bottom() );
+      m_viewport.setTop( m_viewport.bottom() + newHeight );
+   }
+   if ( viewport.top() > m_viewportConstraints->top() )
+   {
+      m_viewport.setTop( m_viewportConstraints->top() );
+      m_viewport.setBottom( m_viewport.top() - newHeight );
+   }
 }
 
 } /// namespace Plotting

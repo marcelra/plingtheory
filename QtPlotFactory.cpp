@@ -6,6 +6,7 @@
 #include "Hist2DItem.h"
 #include "HistogramItem.h"
 #include "IAccumArray.h"
+#include "Palette.h"
 #include "Plot2D.h"
 #include "RawPcmData.h"
 #include "RegLargeDataCurve.h"
@@ -126,9 +127,10 @@ void QtPlotFactory::create2DHist( const Math::Regular2DHistogram& hist )
       ExceptionNoPlotAvailable();
    }
 
-   Plotting::Hist2DItem* item = new Plotting::Hist2DItem( hist );
+   Plotting::Hist2DItem* item = new Plotting::Hist2DItem( hist, Plotting::Palette::heatPalette() );
    m_currentPlot->addItem( item );
    m_currentPlot->setEnableGrid( false );
+   m_currentPlot->setViewportConstraintsToData();
    m_plotItems.push_back( item );
 }
 

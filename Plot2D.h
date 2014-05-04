@@ -29,12 +29,13 @@ class Plot2D : public QWidget
 
       void addItem( const IPaintItem* item );
       void setEnableGrid( bool enableGrid );
+      void setViewportConstraintsToData();
 
    public slots:
-      void setViewPort( const QRectF& viewport );
+      void setViewport( const QRectF& viewport );
 
    private slots:
-      void synchroniseViewPorts( const QRectF& viewport );
+      void synchroniseViewports( const QRectF& viewport );
 
    private:
       QGridLayout*       m_gridLayout;

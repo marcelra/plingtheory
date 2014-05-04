@@ -1,6 +1,7 @@
 #include "Hist2DItem.h"
 
 #include "PaintArea.h"
+#include "Palette.h"
 #include "PcPixmapPaint.h"
 #include "Regular2DHistogram.h"
 
@@ -13,7 +14,7 @@ namespace Plotting
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// constructor
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-Hist2DItem::Hist2DItem( const Math::Regular2DHistogram& hist2D ) :
+Hist2DItem::Hist2DItem( const Math::Regular2DHistogram& hist2D, const Palette& palette ) :
    m_pixmap( hist2D.getNumBinsX(), hist2D.getNumBinsY() ),
    m_minX( hist2D.getMinX() ),
    m_maxX( hist2D.getMaxX() ),
@@ -31,14 +32,10 @@ Hist2DItem::Hist2DItem( const Math::Regular2DHistogram& hist2D ) :
    {
       for ( size_t iY = 0; iY < hist2D.getNumBinsY(); ++iY )
       {
-         double z = 1 - ( hist2D.getBinContent( iX, iY ) - min ) / zTot;
+         double z = ( hist2D.getBinContent( iX, iY ) - min ) / zTot;
          /// Due to rounding errors, z can be smaller than zero.
          z = z < 0 ? 0 : z;
-         QColor colour;
-         colour.setRedF( z );
-         colour.setGreenF( z );
-         colour.setBlueF( z );
-         p.setPen( colour );
+         p.setPen( palette.getColour( z ) );
          p.drawPoint( QPoint( iX, hist2D.getNumBinsY() - iY - 1 ) );
       }
    }

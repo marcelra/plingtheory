@@ -133,7 +133,8 @@ SOURCES += main.cpp \
     RootMlp.cpp \
     Hist2DItem.cpp \
     Regular2DHistogram.cpp \
-    PcPixmapPaint.cpp
+    PcPixmapPaint.cpp \
+    Palette.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -262,7 +263,8 @@ HEADERS += \
     RootMlp.h \
     Hist2DItem.h \
     Regular2DHistogram.h \
-    PcPixmapPaint.h
+    PcPixmapPaint.h \
+    Palette.h
 
 OTHER_FILES += \
     Todos.txt
