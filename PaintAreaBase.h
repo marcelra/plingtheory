@@ -51,6 +51,10 @@ class PaintAreaBase : public QWidget
        * Gets the viewport (see @note about viewport's height).
        */
       const QRectF& getViewport() const;
+      /**
+       * Gets the canvas.
+       */
+      const QRect& getCanvas() const;
 
       /**
        * Obtain a reference to the painter.

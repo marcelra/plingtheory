@@ -132,7 +132,8 @@ SOURCES += main.cpp \
     MarkerDrawAttr.cpp \
     RootMlp.cpp \
     Hist2DItem.cpp \
-    Regular2DHistogram.cpp
+    Regular2DHistogram.cpp \
+    PcPixmapPaint.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -260,7 +261,8 @@ HEADERS += \
     MarkerDrawAttr.h \
     RootMlp.h \
     Hist2DItem.h \
-    Regular2DHistogram.h
+    Regular2DHistogram.h \
+    PcPixmapPaint.h
 
 OTHER_FILES += \
     Todos.txt

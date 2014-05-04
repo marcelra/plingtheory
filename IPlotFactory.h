@@ -4,6 +4,7 @@
 #include "MarkerDrawAttr.h"
 #include "SingletonBase.h"
 
+#include <cassert>
 #include <vector>
 
 #include <QColor>
@@ -14,6 +15,7 @@ class RawPcmData;
 namespace Math
 {
 class IAccumArray;
+class Regular2DHistogram;
 }
 
 namespace WaveAnalysis
@@ -59,6 +61,8 @@ class IPlotFactory : SingletonBase
 
       virtual void createStftGraph( const WaveAnalysis::StftData& stftData ) = 0;
       virtual void createHistogram( const Math::IAccumArray& hist, const QColor& colour = Qt::black ) = 0;
+
+      virtual void create2DHist( const Math::Regular2DHistogram& hist ) { assert( &hist ); assert( false ); }
 
    protected:
       /**

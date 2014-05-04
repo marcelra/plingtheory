@@ -476,25 +476,31 @@ void DevSuite::devHist2D()
    Logger msg( "devHist2D" );
    msg << Msg::Info << "In devHist2D..." << Msg::EndReq;
 
-   Math::Regular2DHistogram hist2D( 50, -5, 5, 50, -5, 5 );
+   Math::Regular2DHistogram hist2D( 500, -5, 5, 500, -5, 5 );
 
    RandomNumberGenerator rng( 1 );
-   size_t nSamples = 10000;
+   size_t nSamples = 10000000;
 
    for ( size_t i = 0; i < nSamples; ++i )
    {
       double x = rng.gauss( 0, 1 );
-      double y = rng.gauss( 0, 1 );
+      double y = rng.gauss( 2, 1 );
       hist2D.add( x, y, 1 );
    }
 
-   for ( size_t iBinX = 0; iBinX < hist2D.getNumBinsX(); ++iBinX )
-   {
-      for ( size_t iBinY = 0; iBinY < hist2D.getNumBinsY(); ++iBinY )
-      {
-         msg << Msg::Verbose << "iBinX = " << iBinX << ", iBinY = " << iBinY << ", contents = " << hist2D.getBinContent( iBinX, iBinY ) << Msg::EndReq;
-      }
-   }
+   // for ( size_t iBinX = 0; iBinX < hist2D.getNumBinsX(); ++iBinX )
+   // {
+   //    for ( size_t iBinY = 0; iBinY < hist2D.getNumBinsY(); ++iBinY )
+   //    {
+   //       msg << Msg::Verbose << "iBinX = " << iBinX << ", iBinY = " << iBinY << ", contents = " << hist2D.getBinContent( iBinX, iBinY ) << Msg::EndReq;
+   //    }
+   // }
+
+   msg << Msg::Debug << "Maximum value = " << hist2D.getMaximum() << Msg::EndReq;
+   msg << Msg::Debug << "Minimum value = " << hist2D.getMinimum() << Msg::EndReq;
+
+   gPlotFactory().createPlot( "devHist2D/gaussianSampling" );
+   gPlotFactory().create2DHist( hist2D );
 
 }
 

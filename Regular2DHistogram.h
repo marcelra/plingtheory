@@ -10,6 +10,8 @@ namespace Math
 /**
  * @class Regular2DHistogram
  * @brief 2D histogram with equal sized bins.
+ *
+ * @note Copy constructor and assignment operators are used but not implemented.
  */
 class Regular2DHistogram
 {
@@ -36,6 +38,20 @@ class Regular2DHistogram
        * Get the bin width in the y direction.
        */
       double getBinWidthY() const;
+
+      /**
+       * Get bounds.
+       */
+      double getMinX() const;
+      double getMaxX() const;
+      double getMinY() const;
+      double getMaxY() const;
+
+      /**
+       * Get maximum value
+       */
+      double getMaximum() const;
+      double getMinimum() const;
 
       /**
        * Set the bin content for bin @param iBinX and @param iBinY to value.
