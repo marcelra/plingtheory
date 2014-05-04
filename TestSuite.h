@@ -75,6 +75,12 @@ class TestSuite
        */
       static void testIntegration();
 
+      /**
+       * Plotting
+       */
+      static void testHist2D();
+      static void testHistogram();
+
    /**
     * Helper methods
     */

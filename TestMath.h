@@ -19,6 +19,7 @@ class TestMath
    private:
       static void testNewtonSolver1D();
       static void testMcmc();
+      static void testPdf();
 
 };
 

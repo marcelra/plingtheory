@@ -41,13 +41,16 @@ void TestSuite::execute()
    testAdvancedFourier();
    testStftAlgorithm();
    testSpectralReassignment();
-   return;
 
    /// Feature algorithms
    testPeakDetection();
 
    /// Everything together
    testIntegration();
+
+   /// Plotting
+   testHist2D();
+   testHistogram();
 
    return;
    /// Expensive tests
@@ -73,6 +76,7 @@ void TestSuite::singleTest()
 #include "Note.h"
 #include "NoteList.h"
 #include "FftwAlgorithm.h"
+#include "GaussPdf.h"
 #include "ObjectPool.h"
 #include "Peak.h"
 #include "Tone.h"
@@ -82,6 +86,7 @@ void TestSuite::singleTest()
 #include "AlgorithmBase.h"
 #include "StftGraph.h"
 #include "DynamicFourier.h"
+#include "Regular2DHistogram.h"
 #include "ResonanceMatrixVisualisation.h"
 #include "FourierTransform.h"
 #include "StftAlgorithm.h"
@@ -89,6 +94,7 @@ void TestSuite::singleTest()
 #include "NoiseGenerator.h"
 #include "TriangleGenerator.h"
 #include "RandomNumberGenerator.h"
+#include "RealMemFunction.h"
 #include "SawtoothGenerator.h"
 #include "StftData.h"
 #include "SpectralReassignmentTransform.h"
@@ -1035,3 +1041,66 @@ void TestSuite::testRandomNumberGenerator()
       }
    }
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// testHist2D
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void TestSuite::testHist2D()
+{
+   Logger msg( "testHist2D" );
+   msg << Msg::Info << "In testHist2D..." << Msg::EndReq;
+
+   Math::Regular2DHistogram hist2D( 250, -5, 5, 250, -5, 5 );
+
+   RandomNumberGenerator rng( 1 );
+   size_t nSamples = 10000000;
+
+   for ( size_t i = 0; i < nSamples; ++i )
+   {
+      double x = rng.gauss( 0, 1 );
+      double y = rng.gauss( 2, 1 );
+      hist2D.add( x, y, 1 );
+   }
+
+   msg << Msg::Debug << "Maximum value = " << hist2D.getMaximum() << Msg::EndReq;
+   msg << Msg::Debug << "Minimum value = " << hist2D.getMinimum() << Msg::EndReq;
+
+   gPlotFactory().createPlot( "testHist2D/gaussianSampling" );
+   gPlotFactory().create2DHist( hist2D );
+
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// testHistogram
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void TestSuite::testHistogram()
+{
+   Logger msg( "testHistogram" );
+   msg << Msg::Info << "In testHistogram..." << Msg::EndReq;
+
+   RandomNumberGenerator rand( 1 );
+
+   size_t nBins = 100;
+   double xMin = -5;
+   double xMax = 5;
+
+   Math::RegularAccumArray hist( nBins, xMin, xMax );
+   size_t nDraws = 5000;
+   double w = ( xMax - xMin ) / nDraws;
+
+   for ( size_t i = 0; i < nDraws; ++i )
+   {
+      double x = rand.gauss( 0, 1 );
+      hist.add( x, w );
+   }
+
+   Math::GaussPdf pdf( 0, 1 );
+   const RealVector& xEval = Utils::createRangeReal( xMin, xMax, 100 );
+   Math::RealMemFunction<Math::GaussPdf> pdfFunc( &Math::GaussPdf::getDensity, &pdf );
+   const RealVector& yEval = pdfFunc.evalMany( xEval );
+
+   gPlotFactory().createPlot( "testHistogram/Gauss sampling" );
+   gPlotFactory().createHistogram( hist );
+   gPlotFactory().createGraph( xEval, yEval, Qt::blue );
+}
+

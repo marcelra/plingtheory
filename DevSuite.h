@@ -16,12 +16,8 @@ class DevSuite
       static void devPeakFinder2();
       static void devRebinSRSpec();
 
-      static void devSamples();
-
       static void devMlp();
       static void devMlp2();
-
-      static void devHist2D();
 
    /**
     * Math
