@@ -146,12 +146,10 @@ void McmcOptimiser::updateStepSize()
       if ( eff < m_effLow )
       {
          m_stepSizeVec[ i ] *= 0.9;
-         // msg << Msg::Info << "---" << i << ": " << m_stepSizeVec[ i ] << Msg::EndReq;
       }
       else if ( eff > m_effHigh )
       {
          m_stepSizeVec[ i ] *= 1.1;
-         // msg << Msg::Info << "+++" << i << ": " << m_stepSizeVec[ i ] << Msg::EndReq;
       }
       m_numAccepted[ i ] = 0;
    }

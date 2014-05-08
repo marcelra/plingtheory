@@ -3,6 +3,8 @@
 
 #include <QColor>
 
+#include <vector>
+
 namespace Plotting
 {
 
