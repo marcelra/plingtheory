@@ -2,6 +2,7 @@
 #define IPLOTFACTORY_H
 
 #include "MarkerDrawAttr.h"
+#include "Palette.h"
 #include "SingletonBase.h"
 
 #include <cassert>
@@ -62,7 +63,11 @@ class IPlotFactory : SingletonBase
       virtual void createStftGraph( const WaveAnalysis::StftData& stftData ) = 0;
       virtual void createHistogram( const Math::IAccumArray& hist, const QColor& colour = Qt::black ) = 0;
 
-      virtual void create2DHist( const Math::Regular2DHistogram& hist ) { assert( &hist ); assert( false ); }
+      virtual void create2DHist( const Math::Regular2DHistogram& hist,
+                                 const Plotting::Palette& palette = Plotting::Palette::heatPalette() )
+      {
+         assert( &hist ); assert( &palette); assert( false );
+      }
 
    protected:
       /**

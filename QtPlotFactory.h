@@ -36,7 +36,7 @@ class QtPlotFactory : public IPlotFactory
 
       void createStftGraph( const WaveAnalysis::StftData& stftData );
       virtual void createHistogram( const Math::IAccumArray& hist, const QColor& colour );
-      virtual void create2DHist( const Math::Regular2DHistogram& hist );
+      virtual void create2DHist( const Math::Regular2DHistogram& hist, const Plotting::Palette& palette );
 
    protected:
       QtPlotFactory();

@@ -120,14 +120,14 @@ void QtPlotFactory::createHistogram( const Math::IAccumArray& hist, const QColor
    m_plotItems.push_back( item );
 }
 
-void QtPlotFactory::create2DHist( const Math::Regular2DHistogram& hist )
+void QtPlotFactory::create2DHist( const Math::Regular2DHistogram& hist, const Plotting::Palette& palette )
 {
    if ( !m_currentPlot )
    {
       ExceptionNoPlotAvailable();
    }
 
-   Plotting::Hist2DItem* item = new Plotting::Hist2DItem( hist, Plotting::Palette::heatPalette() );
+   Plotting::Hist2DItem* item = new Plotting::Hist2DItem( hist, palette );
    m_currentPlot->addItem( item );
    m_currentPlot->setEnableGrid( false );
    m_currentPlot->setViewportConstraintsToData();

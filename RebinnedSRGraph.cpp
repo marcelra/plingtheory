@@ -49,7 +49,6 @@ void RebinnedSRGraph::create( const std::string& name )
 
    for ( size_t iX = 0; iX < m_nBinsX; ++iX )
    {
-      std::cout << "iX = " << iX << ", m_nBinsX = " << m_nBinsX << std::endl;
       const WaveAnalysis::SrSpectrum& srSpec = static_cast< const WaveAnalysis::SrSpectrum& >( m_stftData.getSpectrum( iX ) );
       const Math::RegularAccumArray& binnedSrSpec = srSpec.rebinToFourierLattice();
       for ( size_t iY = 0; iY < m_nBinsY; ++iY )
@@ -60,7 +59,7 @@ void RebinnedSRGraph::create( const std::string& name )
    }
 
    gPlotFactory().createPlot( name );
-   gPlotFactory().create2DHist( *m_hist );
+   gPlotFactory().create2DHist( *m_hist, Plotting::Palette::whiteBlackPalette() );
 
    msg << Msg::Verbose << "Done" << Msg::EndReq;
 }
