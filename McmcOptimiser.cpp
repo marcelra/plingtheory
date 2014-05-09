@@ -16,7 +16,9 @@ McmcOptimiser::McmcOptimiser( const IObjectiveFunction& objFunc ) :
    m_numIterStepUpdate( 100 ),
    m_numIterations( 1000 ),
    m_burnInSkip( 200 ),
-   m_stepMultiply( 1.0000001 ),
+   m_numSamples( 1000 ),
+   m_stepIncrease( 1.1 ),
+   m_stepDecrease( 0.9 ),
    m_effLow( 0.23 ),
    m_effHigh( 0.45 ),
    m_random( 10 )
@@ -60,7 +62,7 @@ void McmcOptimiser::setNumIterations( size_t numIterations )
 RealVectorEnsemble McmcOptimiser::solve()
 {
    RealVectorEnsemble solutions;
-   for ( size_t iIter = 0; iIter < m_numIterations; ++iIter )
+   for ( size_t iIter = 0; iIter < m_numIterations + m_burnInSkip; ++iIter )
    {
       for ( size_t iChain = 0; iChain < m_mcmcChains.size(); ++iChain )
       {
@@ -118,18 +120,7 @@ bool McmcOptimiser::accept( double probNew, double probOld )
    }
    else
    {
-      bool doAccept;
-      if ( probOld < 0 )
-      {
-         /// TODO: heuristics for MLP learning
-         // doAccept = m_random.uniform( probOld, 0 ) > probOld;
-         doAccept = false;
-      }
-      else
-      {
-         doAccept = m_random.uniform( 0, probOld ) < probNew;
-      }
-      return doAccept;
+      return m_random.uniform( 0, probOld ) < probNew;
    }
 }
 
@@ -138,18 +129,16 @@ bool McmcOptimiser::accept( double probNew, double probOld )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void McmcOptimiser::updateStepSize()
 {
-   Logger msg( "McmcOptimiser" );
    for ( size_t i = 0; i < m_stepSizeVec.size(); ++i )
    {
       double eff = static_cast< double >( m_numAccepted[ i ] ) / m_numIterStepUpdate;
-      msg << Msg::Info << "eff = " << m_numAccepted[ i ] << Msg::EndReq;
       if ( eff < m_effLow )
       {
-         m_stepSizeVec[ i ] *= 0.9;
+         m_stepSizeVec[ i ] *= m_stepDecrease;
       }
       else if ( eff > m_effHigh )
       {
-         m_stepSizeVec[ i ] *= 1.1;
+         m_stepSizeVec[ i ] *= m_stepIncrease;
       }
       m_numAccepted[ i ] = 0;
    }

@@ -19,6 +19,7 @@ class McmcOptimiser
       void setStepSize( double stepSize );
       void setNumIterations( size_t numIterations );
       void setBurninSkip( size_t numIterations );
+      void setNumSamples( size_t numSamples );
 
       RealVectorEnsemble solve();
 
@@ -27,6 +28,8 @@ class McmcOptimiser
       bool accept( double probNew, double probOld );
       double calcProb( const RealVector& x );
       void updateStepSize();
+
+      bool storeSolution( size_t iIter );
 
    private:
       const IObjectiveFunction&  m_objFunc;
@@ -37,7 +40,9 @@ class McmcOptimiser
       size_t                     m_numIterStepUpdate;
       size_t                     m_numIterations;
       size_t                     m_burnInSkip;
-      double                     m_stepMultiply;
+      size_t                     m_numSamples;
+      double                     m_stepIncrease;
+      double                     m_stepDecrease;
       double                     m_effLow;
       double                     m_effHigh;
       RandomNumberGenerator      m_random;
