@@ -17,6 +17,9 @@ void DevSuite::execute()
 
    // devPeakFinder2();
    // devMlp();
+
+   devParticleSwarm();
+
    return;
    devPeakFinder2();
    // devNewtonSolver1D();
@@ -76,6 +79,8 @@ void DevSuite::execute()
 #include "MultilayerPerceptron.h"
 #include "RandomNumberGenerator.h"
 #include "RootMlp.h"
+#include "ParticleSwarmOptimiser.h"
+#include "TwoDimExampleObjective.h"
 
 #include <functional>
 #include <cmath>
@@ -241,7 +246,7 @@ void DevSuite::devMlp2()
       msg << Msg::Info << "Input = " << inputData[ i ] << ", eval = " << net.evaluate( inputData[ i ] ) << ", expected = " << outputData[ i ] << Msg::EndReq;
    }
 
-   net.train( inputData, outputData );
+   net.trainMcmc( inputData, outputData );
 
    for ( size_t i = 0; i < inputData.size(); ++i )
    {
@@ -294,7 +299,7 @@ void DevSuite::devMlp()
    network.build();
    // Mva::RootMlp network( "i0,i1:4:2:o0" );
 
-   network.train( inputData, outputData );
+   network.trainMcmc( inputData, outputData );
 
    RealVector test( 2, 1 );
    msg << Msg::Info << "Dimension check: " << network.evaluate( test ) << Msg::EndReq;
@@ -328,5 +333,43 @@ void DevSuite::devMlp()
    gPlotFactory().createScatter( xDownPredicted, yDownPredicted, Plotting::MarkerDrawAttr( Qt::blue ) );
 
    return;
+}
+
+void DevSuite::devParticleSwarm()
+{
+   Logger msg( "devParticleSwarm" );
+   msg << Msg::Info << "Running devParticleSwarm..." << Msg::EndReq;
+
+   RealVector minVec( 2, -10 );
+   RealVector maxVec( 2, 10 );
+   Math::SolutionSpace solutionSpace( minVec, maxVec );
+
+   Math::TwoDimExampleObjective objFunc;
+
+   Math::ParticleSwarmOptimiser pso( objFunc, 100, solutionSpace );
+
+   std::vector< std::vector< RealVector > > swarmTracker;
+   const RealVector& result = pso.solve( 200, &swarmTracker );
+
+   Plotting::Palette pal = Plotting::Palette::heatPalette();
+
+   gPlotFactory().createPlot( "devParticleSwarm/swarmTracking" );
+   for ( size_t i = 0; i < swarmTracker.size(); ++i )
+   {
+      RealVector xData( swarmTracker[ i ].size() );
+      RealVector yData( swarmTracker[ i ].size() );
+
+      for ( size_t j = 0; j < xData.size(); ++j )
+      {
+         xData[ j ] = swarmTracker[ i ][ j ][ 0 ];
+         yData[ j ] = swarmTracker[ i ][ j ][ 1 ];
+      }
+
+      QColor colour = pal.getColour( static_cast< double >( i ) / swarmTracker.size() );
+      gPlotFactory().createScatter( xData, yData, Plotting::MarkerDrawAttr( colour ) );
+   }
+
+   msg << Msg::Info << "Result = " << result << Msg::EndReq;
+
 }
 
