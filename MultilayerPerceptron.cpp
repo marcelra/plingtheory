@@ -3,6 +3,7 @@
 #include "IObjectiveFunction.h"
 #include "Logger.h"
 #include "McmcOptimiser.h"
+#include "ParticleSwarmOptimiser.h"
 #include "SortCache.h"
 
 #include <iostream>
@@ -193,7 +194,21 @@ size_t MultilayerPerceptron::getNumNeuronLayers() const
    return m_neurons.size() + 2;
 }
 
-void MultilayerPerceptron::train( const std::vector< RealVector >& inputData, const std::vector< RealVector >& outputData )
+void MultilayerPerceptron::trainPso( const std::vector< RealVector >& inputData, const std::vector< RealVector >& outputData )
+{
+   std::vector< double* > weightRefVec = getWeights();
+
+   RealVector startValVec( weightRefVec.size() );
+   for ( size_t i = 0; i < weightRefVec.size(); ++i )
+   {
+      startValVec[ i ] = 0; // *weightRefVec[ i ];
+   }
+
+   ::ErrorObjective errorFunc( *this, inputData, outputData );
+   assert( false );
+}
+
+void MultilayerPerceptron::trainMcmc( const std::vector< RealVector >& inputData, const std::vector< RealVector >& outputData )
 {
    Logger msg( "MultilayerPerceptron" );
    msg << Msg::Verbose << "Training neural network." << Msg::EndReq;

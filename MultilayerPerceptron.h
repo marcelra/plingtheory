@@ -21,7 +21,8 @@ class MultilayerPerceptron
       size_t getNumInputNodes() const;
       size_t getNumOutputNodes() const;
 
-      void train( const std::vector< RealVector >& inputData, const std::vector< RealVector >& outputData );
+      void trainPso( const std::vector< RealVector >& inputData, const std::vector< RealVector >& outputData );
+      void trainMcmc( const std::vector< RealVector >& inputData, const std::vector< RealVector >& outputData );
       std::vector< double* > getWeights();
 
    private:
