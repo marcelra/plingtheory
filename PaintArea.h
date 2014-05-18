@@ -73,6 +73,7 @@ class PaintArea : public PaintAreaBase
       std::auto_ptr< QPoint >  m_zoomAreaEnd;
       QPixmap                  m_grabbedWidget;
 
+      static double            s_minSizeAutoScale;
 };
 
 } /// namespace Plotting

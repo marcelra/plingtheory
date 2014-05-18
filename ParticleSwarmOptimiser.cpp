@@ -46,10 +46,10 @@ ParticleSwarmOptimiser::ParticleSwarmOptimiser( const IObjectiveFunction& objFun
    m_particleVelocities( numParticles, RealVector( solutionSpace.getDimensionality(), 1 ) ),
    m_solutionSpace( solutionSpace ),
    m_randGen( 1 ),
-   m_delta( 0.1 ),
-   m_velocityPropagation( 0.1 ),
-   m_localCoupling( 0.4 ),
-   m_globalCoupling( 0.1 )
+   m_delta( 1 ),
+   m_velocityPropagation( 0.5 ),
+   m_localCoupling( -0.5 ),
+   m_globalCoupling( 1 )
 {
    initialise();
 }
@@ -61,7 +61,9 @@ void ParticleSwarmOptimiser::initialise()
       for ( size_t iDim = 0; iDim < m_solutionSpace.getDimensionality(); ++iDim )
       {
          double x = m_randGen.uniform( m_solutionSpace.getMin( iDim ), m_solutionSpace.getMax( iDim ) );
+         double v = m_randGen.uniform();
          m_particlePositions[ iParticle ][ iDim ] = x;
+         m_particleVelocities[ iParticle ][ iDim ] = v;
       }
    }
    updateBestValues();
@@ -97,8 +99,8 @@ void ParticleSwarmOptimiser::updateParticlePositions()
       for ( size_t iPar = 0; iPar < m_objFunc.getNumParameters(); ++iPar )
       {
          currentVel[ iPar ] *= m_velocityPropagation;
-         currentVel[ iPar ] += m_localCoupling * m_randGen.uniform() * ( currentPos[ iPar ] - localBest[ iPar ] );
-         currentVel[ iPar ] += m_globalCoupling * m_randGen.uniform() * ( currentPos[ iPar ] - m_bestSolution[ iPar ] );
+         currentVel[ iPar ] += m_localCoupling * m_randGen.uniform() * ( - currentPos[ iPar ] + localBest[ iPar ] );
+         currentVel[ iPar ] += m_globalCoupling * m_randGen.uniform() * ( - currentPos[ iPar ] + m_bestSolution[ iPar ] );
          currentPos[ iPar ] += m_delta * currentVel[ iPar ];
       }
    }

@@ -346,7 +346,7 @@ void DevSuite::devParticleSwarm()
 
    Math::TwoDimExampleObjective objFunc;
 
-   Math::ParticleSwarmOptimiser pso( objFunc, 100, solutionSpace );
+   Math::ParticleSwarmOptimiser pso( objFunc, 1000, solutionSpace );
 
    std::vector< std::vector< RealVector > > swarmTracker;
    const RealVector& result = pso.solve( 200, &swarmTracker );
@@ -366,7 +366,7 @@ void DevSuite::devParticleSwarm()
       }
 
       QColor colour = pal.getColour( static_cast< double >( i ) / swarmTracker.size() );
-      gPlotFactory().createScatter( xData, yData, Plotting::MarkerDrawAttr( colour ) );
+      gPlotFactory().createScatter( xData, yData, Plotting::MarkerDrawAttr( colour, Plotting::MarkerPlus, 2 ) );
    }
 
    msg << Msg::Info << "Result = " << result << Msg::EndReq;
