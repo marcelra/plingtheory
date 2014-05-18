@@ -170,8 +170,17 @@ void PaintArea::addPaintItem( const IPaintItem* paintItem )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void PaintArea::autoScale()
 {
-   double yBorder = -0.1 * m_dataRange.height();
    double xBorder = 0.1 * m_dataRange.width();
+   double yBorder = -0.1 * m_dataRange.height();
+
+   if ( m_dataRange.width() < s_minSizeAutoScale )
+   {
+      xBorder = 1;
+   }
+   if ( m_dataRange.height() < s_minSizeAutoScale )
+   {
+      yBorder = 1;
+   }
 
    m_viewport.setTop( m_dataRange.top() + yBorder );
    m_viewport.setBottom( m_dataRange.bottom() - yBorder );
@@ -418,5 +427,10 @@ void PaintArea::mousePressEvent( QMouseEvent* event )
       update();
    }
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// Static members
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+double PaintArea::s_minSizeAutoScale = 1e-16;
 
 } /// namespace Plotting

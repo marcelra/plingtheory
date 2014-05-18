@@ -11,6 +11,7 @@
 
 /// Qt includes
 #include <QGridLayout>
+#include <QDebug>
 
 /// STL includes
 #include <cassert>
@@ -125,6 +126,7 @@ void Plot2D::addItem( const IPaintItem* item )
    m_graph->autoScale();
 
    const QRectF& dataRange = m_graph->getDataRange();
+
    m_xScroll->setDataRange( dataRange.left(), dataRange.right() );
    m_yScroll->setDataRange( dataRange.bottom(), dataRange.top() );
    m_xScroll->setViewport( m_graph->getViewport() );
