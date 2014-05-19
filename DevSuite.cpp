@@ -342,14 +342,14 @@ void DevSuite::devParticleSwarm()
 
    RealVector minVec( 2, -10 );
    RealVector maxVec( 2, 10 );
-   Math::SolutionSpace solutionSpace( minVec, maxVec );
+   Math::Hypercube solutionSpace( minVec, maxVec );
 
    Math::TwoDimExampleObjective objFunc;
 
-   Math::ParticleSwarmOptimiser pso( objFunc, 1000, solutionSpace );
+   Math::ParticleSwarmOptimiser pso( objFunc, 400, solutionSpace );
 
    std::vector< std::vector< RealVector > > swarmTracker;
-   const RealVector& result = pso.solve( 200, &swarmTracker );
+   const RealVector& result = pso.solve( 100, &swarmTracker );
 
    Plotting::Palette pal = Plotting::Palette::heatPalette();
 

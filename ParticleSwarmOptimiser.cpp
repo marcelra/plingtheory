@@ -2,8 +2,6 @@
 
 #include <limits>
 
-#include <iostream>
-
 namespace
 {
    double lowestObjFuncVal = -std::numeric_limits< double >::max();
@@ -12,32 +10,7 @@ namespace
 namespace Math
 {
 
-SolutionSpace::SolutionSpace( const RealVector& lowerBounds, const RealVector& upperBounds ) :
-   m_lowerBounds( lowerBounds ),
-   m_upperBounds( upperBounds )
-{}
-
-size_t SolutionSpace::getDimensionality() const
-{
-   return m_lowerBounds.size();
-}
-
-double SolutionSpace::getMin( size_t index ) const
-{
-   return m_lowerBounds[ index ];
-}
-
-double SolutionSpace::getMax( size_t index ) const
-{
-   return m_upperBounds[ index ];
-}
-
-} /// namespace Math
-
-namespace Math
-{
-
-ParticleSwarmOptimiser::ParticleSwarmOptimiser( const IObjectiveFunction& objFunc, size_t numParticles, const SolutionSpace& solutionSpace ) :
+ParticleSwarmOptimiser::ParticleSwarmOptimiser( const IObjectiveFunction& objFunc, size_t numParticles, const Hypercube& solutionSpace ) :
    m_objFunc( objFunc ),
    m_globalBest( lowestObjFuncVal ),
    m_particleBest( numParticles, lowestObjFuncVal ),
@@ -74,7 +47,6 @@ RealVector ParticleSwarmOptimiser::solve( size_t numIterations, std::vector< std
    for ( size_t iIter = 0; iIter < numIterations; ++iIter )
    {
       execIteration();
-      std::cout << "Best objFuncVal = " << m_globalBest << std::endl;
       if ( swarmTracker )
       {
          swarmTracker->push_back( m_particlePositions );

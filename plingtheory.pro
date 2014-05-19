@@ -135,7 +135,8 @@ SOURCES += main.cpp \
     Regular2DHistogram.cpp \
     PcPixmapPaint.cpp \
     Palette.cpp \
-    ParticleSwarmOptimiser.cpp
+    ParticleSwarmOptimiser.cpp \
+    Hypercube.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -266,7 +267,8 @@ HEADERS += \
     Regular2DHistogram.h \
     PcPixmapPaint.h \
     Palette.h \
-    ParticleSwarmOptimiser.h
+    ParticleSwarmOptimiser.h \
+    Hypercube.h
 
 OTHER_FILES += \
     Todos.txt
