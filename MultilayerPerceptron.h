@@ -7,11 +7,11 @@
 namespace Mva
 {
 
-class MultilayerPerceptron
+class MultiLayerPerceptron
 {
    public:
-      MultilayerPerceptron( size_t numInputNodes, size_t numOutputNodes );
-      ~MultilayerPerceptron();
+      MultiLayerPerceptron( size_t numInputNodes, size_t numOutputNodes );
+      ~MultiLayerPerceptron();
 
       void addHiddenLayer( size_t numNeurons );
       void build();
