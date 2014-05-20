@@ -234,7 +234,7 @@ void DevSuite::devMlp2()
    inputData.push_back( realVector( 0, 0 ) );
    outputData.push_back( realVector( 0 ) );
 
-   Mva::MultilayerPerceptron net( 2, 1 );
+   Mva::MultiLayerPerceptron net( 2, 1 );
    net.addHiddenLayer( 4 );
    net.addHiddenLayer( 3 );
    net.addHiddenLayer( 2 );
@@ -293,7 +293,7 @@ void DevSuite::devMlp()
    gPlotFactory().createScatter( xUp, yUp, Plotting::MarkerDrawAttr( Qt::red ) );
    gPlotFactory().createScatter( xDown, yDown, Plotting::MarkerDrawAttr( Qt::blue ) );
 
-   Mva::MultilayerPerceptron network( 2, 1 );
+   Mva::MultiLayerPerceptron network( 2, 1 );
    network.addHiddenLayer( 4 );
    network.addHiddenLayer( 2 );
    network.build();

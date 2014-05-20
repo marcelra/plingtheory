@@ -14,7 +14,7 @@ namespace
 class ErrorObjective : public Math::IObjectiveFunction
 {
    public:
-      ErrorObjective( Mva::MultilayerPerceptron& network, const std::vector< RealVector >& inputData, const std::vector< RealVector >& outputData );
+      ErrorObjective( Mva::MultiLayerPerceptron& network, const std::vector< RealVector >& inputData, const std::vector< RealVector >& outputData );
 
       double evaluate( const RealVector& x ) const;
       size_t getNumParameters() const;
@@ -22,13 +22,13 @@ class ErrorObjective : public Math::IObjectiveFunction
       double calcSumSquaredError( const RealVector& xMeasured, const RealVector& xTruth ) const;
 
    private:
-      Mva::MultilayerPerceptron& m_network;
+      Mva::MultiLayerPerceptron& m_network;
       std::vector< double* >     m_weights;
       const std::vector< RealVector >& m_inputData;
       const std::vector< RealVector >& m_outputData;
 };
 
-ErrorObjective::ErrorObjective( Mva::MultilayerPerceptron& network, const std::vector< RealVector >& inputData, const std::vector< RealVector >& outputData  ) :
+ErrorObjective::ErrorObjective( Mva::MultiLayerPerceptron& network, const std::vector< RealVector >& inputData, const std::vector< RealVector >& outputData  ) :
    m_network( network ),
    m_weights( m_network.getWeights() ),
    m_inputData( inputData ),
@@ -73,7 +73,7 @@ size_t ErrorObjective::getNumParameters() const
 namespace Mva
 {
 
-MultilayerPerceptron::MultilayerPerceptron( size_t numInputNodes, size_t numOutputNodes ) :
+MultiLayerPerceptron::MultiLayerPerceptron( size_t numInputNodes, size_t numOutputNodes ) :
    m_inputLayer( numInputNodes, 0 ),
    m_outputLayer( numOutputNodes, 0 ),
    m_neurons()
@@ -88,7 +88,7 @@ MultilayerPerceptron::MultilayerPerceptron( size_t numInputNodes, size_t numOutp
    }
 }
 
-MultilayerPerceptron::~MultilayerPerceptron()
+MultiLayerPerceptron::~MultiLayerPerceptron()
 {
    for ( size_t i = 0; i < m_inputLayer.size(); ++i )
    {
@@ -107,7 +107,7 @@ MultilayerPerceptron::~MultilayerPerceptron()
    }
 }
 
-void MultilayerPerceptron::addHiddenLayer( size_t numNeurons )
+void MultiLayerPerceptron::addHiddenLayer( size_t numNeurons )
 {
    NeuronLayer newNeuronLayer;
    for ( size_t iNeuron = 0; iNeuron < numNeurons; ++iNeuron )
@@ -117,7 +117,7 @@ void MultilayerPerceptron::addHiddenLayer( size_t numNeurons )
    m_neurons.push_back( newNeuronLayer );
 }
 
-void MultilayerPerceptron::build()
+void MultiLayerPerceptron::build()
 {
    for ( size_t iLayer = 0; iLayer < getNumNeuronLayers() - 1; ++iLayer )
    {
@@ -133,7 +133,7 @@ void MultilayerPerceptron::build()
    }
 }
 
-RealVector MultilayerPerceptron::evaluate( const RealVector& x )
+RealVector MultiLayerPerceptron::evaluate( const RealVector& x )
 {
    assert( x.size() == getNumInputNodes() );
 
@@ -162,17 +162,17 @@ RealVector MultilayerPerceptron::evaluate( const RealVector& x )
    return result;
 }
 
-size_t MultilayerPerceptron::getNumInputNodes() const
+size_t MultiLayerPerceptron::getNumInputNodes() const
 {
    return m_inputLayer.size();
 }
 
-size_t MultilayerPerceptron::getNumOutputNodes() const
+size_t MultiLayerPerceptron::getNumOutputNodes() const
 {
    return m_outputLayer.size();
 }
 
-MultilayerPerceptron::NeuronLayer& MultilayerPerceptron::getNeuronLayer( size_t index )
+MultiLayerPerceptron::NeuronLayer& MultiLayerPerceptron::getNeuronLayer( size_t index )
 {
    if ( index == 0 )
    {
@@ -189,12 +189,12 @@ MultilayerPerceptron::NeuronLayer& MultilayerPerceptron::getNeuronLayer( size_t 
    }
 }
 
-size_t MultilayerPerceptron::getNumNeuronLayers() const
+size_t MultiLayerPerceptron::getNumNeuronLayers() const
 {
    return m_neurons.size() + 2;
 }
 
-void MultilayerPerceptron::trainPso( const std::vector< RealVector >& inputData, const std::vector< RealVector >& outputData )
+void MultiLayerPerceptron::trainPso( const std::vector< RealVector >& inputData, const std::vector< RealVector >& outputData )
 {
    std::vector< double* > weightRefVec = getWeights();
 
@@ -208,7 +208,7 @@ void MultilayerPerceptron::trainPso( const std::vector< RealVector >& inputData,
    assert( false );
 }
 
-void MultilayerPerceptron::trainMcmc( const std::vector< RealVector >& inputData, const std::vector< RealVector >& outputData )
+void MultiLayerPerceptron::trainMcmc( const std::vector< RealVector >& inputData, const std::vector< RealVector >& outputData )
 {
    Logger msg( "MultilayerPerceptron" );
    msg << Msg::Verbose << "Training neural network." << Msg::EndReq;
@@ -273,7 +273,7 @@ void MultilayerPerceptron::trainMcmc( const std::vector< RealVector >& inputData
 
 }
 
-std::vector< double* > MultilayerPerceptron::getWeights()
+std::vector< double* > MultiLayerPerceptron::getWeights()
 {
    std::vector< double* > weights;
 
