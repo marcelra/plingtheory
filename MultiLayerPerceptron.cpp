@@ -1,4 +1,4 @@
-#include "MultilayerPerceptron.h"
+#include "MultiLayerPerceptron.h"
 
 #include "IObjectiveFunction.h"
 #include "Logger.h"
@@ -210,7 +210,7 @@ void MultiLayerPerceptron::trainPso( const std::vector< RealVector >& inputData,
 
 void MultiLayerPerceptron::trainMcmc( const std::vector< RealVector >& inputData, const std::vector< RealVector >& outputData )
 {
-   Logger msg( "MultilayerPerceptron" );
+   Logger msg( "MultiLayerPerceptron" );
    msg << Msg::Verbose << "Training neural network." << Msg::EndReq;
 
    std::vector< double* > weightRefVec = getWeights();

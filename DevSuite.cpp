@@ -76,7 +76,7 @@ void DevSuite::execute()
 #include "IRealFunction.h"
 #include "ComposedRealFuncWithDerivative.h"
 #include "NewtonSolver1D.h"
-#include "MultilayerPerceptron.h"
+#include "MultiLayerPerceptron.h"
 #include "RandomNumberGenerator.h"
 #include "RootMlp.h"
 #include "ParticleSwarmOptimiser.h"
