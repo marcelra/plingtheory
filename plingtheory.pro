@@ -126,7 +126,7 @@ SOURCES += main.cpp \
     HistogramItem.cpp \
     McmcOptimiser.cpp \
     RandomNumberGenerator.cpp \
-    MultilayerPerceptron.cpp \
+    MultiLayerPerceptron.cpp \
     Neuron.cpp \
     Synapse.cpp \
     MarkerDrawAttr.cpp \
@@ -135,7 +135,8 @@ SOURCES += main.cpp \
     Regular2DHistogram.cpp \
     PcPixmapPaint.cpp \
     Palette.cpp \
-    ParticleSwarmOptimiser.cpp
+    ParticleSwarmOptimiser.cpp \
+    Hypercube.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -257,7 +258,7 @@ HEADERS += \
     HistogramItem.h \
     McmcOptimiser.h \
     RandomNumberGenerator.h \
-    MultilayerPerceptron.h \
+    MultiLayerPerceptron.h \
     Neuron.h \
     Synapse.h \
     MarkerDrawAttr.h \
@@ -266,7 +267,8 @@ HEADERS += \
     Regular2DHistogram.h \
     PcPixmapPaint.h \
     Palette.h \
-    ParticleSwarmOptimiser.h
+    ParticleSwarmOptimiser.h \
+    Hypercube.h
 
 OTHER_FILES += \
     Todos.txt

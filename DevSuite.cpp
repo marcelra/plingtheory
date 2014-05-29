@@ -76,7 +76,7 @@ void DevSuite::execute()
 #include "IRealFunction.h"
 #include "ComposedRealFuncWithDerivative.h"
 #include "NewtonSolver1D.h"
-#include "MultilayerPerceptron.h"
+#include "MultiLayerPerceptron.h"
 #include "RandomNumberGenerator.h"
 #include "RootMlp.h"
 #include "ParticleSwarmOptimiser.h"
@@ -234,7 +234,7 @@ void DevSuite::devMlp2()
    inputData.push_back( realVector( 0, 0 ) );
    outputData.push_back( realVector( 0 ) );
 
-   Mva::MultilayerPerceptron net( 2, 1 );
+   Mva::MultiLayerPerceptron net( 2, 1 );
    net.addHiddenLayer( 4 );
    net.addHiddenLayer( 3 );
    net.addHiddenLayer( 2 );
@@ -293,7 +293,7 @@ void DevSuite::devMlp()
    gPlotFactory().createScatter( xUp, yUp, Plotting::MarkerDrawAttr( Qt::red ) );
    gPlotFactory().createScatter( xDown, yDown, Plotting::MarkerDrawAttr( Qt::blue ) );
 
-   Mva::MultilayerPerceptron network( 2, 1 );
+   Mva::MultiLayerPerceptron network( 2, 1 );
    network.addHiddenLayer( 4 );
    network.addHiddenLayer( 2 );
    network.build();
@@ -342,14 +342,14 @@ void DevSuite::devParticleSwarm()
 
    RealVector minVec( 2, -10 );
    RealVector maxVec( 2, 10 );
-   Math::SolutionSpace solutionSpace( minVec, maxVec );
+   Math::Hypercube solutionSpace( minVec, maxVec );
 
    Math::TwoDimExampleObjective objFunc;
 
-   Math::ParticleSwarmOptimiser pso( objFunc, 1000, solutionSpace );
+   Math::ParticleSwarmOptimiser pso( objFunc, 400, solutionSpace );
 
    std::vector< std::vector< RealVector > > swarmTracker;
-   const RealVector& result = pso.solve( 200, &swarmTracker );
+   const RealVector& result = pso.solve( 100, &swarmTracker );
 
    Plotting::Palette pal = Plotting::Palette::heatPalette();
 
