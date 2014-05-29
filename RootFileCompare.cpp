@@ -148,7 +148,7 @@ TStringList RootFileCompare::compareKeys()
          getLogger() << Msg::Warning << "The following keys are new:" << Msg::EndReq;
          for ( size_t i = 0; i < addedKeys.size(); ++i )
          {
-            getLogger() << Msg::Warning << " + " << addedKeys[ i ] << Msg::EndReq;
+            getLogger() << Msg::Warning << " + " << addedKeys[ i ].Data() << Msg::EndReq;
          }
       }
 
@@ -158,7 +158,7 @@ TStringList RootFileCompare::compareKeys()
          getLogger() << Msg::Warning << "The following keys are removed:" << Msg::EndReq;
          for ( size_t i = 0; i < removedKeys.size(); ++i )
          {
-            getLogger() << Msg::Warning << " - " << removedKeys[ i ] << Msg::EndReq;
+            getLogger() << Msg::Warning << " - " << removedKeys[ i ].Data() << Msg::EndReq;
          }
       }
    }
@@ -179,7 +179,7 @@ TStringList RootFileCompare::compareObjectTypes( const TStringList& commonObject
       assert( objOld && objNew );
       if ( objNew->ClassName() != objOld->ClassName() )
       {
-         getLogger() << Msg::Warning << "Object: " << commonObjects[ iObject ] << " has changed type: " << objOld->ClassName() << " (old), " << objNew->ClassName() << " (new)." << Msg::EndReq;
+         getLogger() << Msg::Warning << "Object: " << commonObjects[ iObject ].Data() << " has changed type: " << objOld->ClassName() << " (old), " << objNew->ClassName() << " (new)." << Msg::EndReq;
       }
       commonObjectTypes.push_back( commonObjects[ iObject ] );
    }

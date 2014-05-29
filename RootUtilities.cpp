@@ -140,7 +140,7 @@ void RootUtilities::dressGraph( TGraph* graph )
    RootUtilities& ru = RootUtilities::getInstance();
    TString graphName = ru.generateUniqueName( "graph" );
    graph->SetName( graphName );
-   ru.getLogger() << Msg::Info << "Created graph with name " << graphName << Msg::EndReq;
+   ru.getLogger() << Msg::Info << "Created graph with name " << graphName.Data() << Msg::EndReq;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -187,7 +187,7 @@ void RootUtilities::saveAllRootObjectsToFile( const std::string& fileName )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TString RootUtilities::generateUniqueName( const std::string& baseName )
 {
-   TString tBaseName = baseName;
+   TString tBaseName = baseName.c_str();
    if ( baseName.size() == 0 )
    {
       tBaseName = "auto";
