@@ -3,10 +3,14 @@
 
 #include "LoggerClient.h"
 
+/**
+ * @class AlgorithmBase
+ * @brief Base class for algorithms.
+ */
 class AlgorithmBase : public LoggerClient
 {
    public:
-      AlgorithmBase( const std::string& name, const AlgorithmBase* parent );
+      AlgorithmBase( const std::string& name, const AlgorithmBase* parent = 0 );
       virtual ~AlgorithmBase();
 
    protected:

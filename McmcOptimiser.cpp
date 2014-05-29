@@ -2,9 +2,6 @@
 
 #include "Logger.h"
 
-/// TODO: used for heuristics in MLP learning
-#include <cmath>
-
 namespace Math
 {
 
@@ -34,7 +31,7 @@ void McmcOptimiser::setStartValues( const RealVectorEnsemble& startValues )
    m_probOld.resize( m_mcmcChains.size() );
    for ( size_t i = 0; i < m_mcmcChains.size(); ++i )
    {
-      m_probOld[ i ] = calcProb( m_mcmcChains[ i ] );
+      m_probOld[ i ] = m_objFunc.evaluate( m_mcmcChains[ i ] );
    }
    m_numAccepted.assign( m_mcmcChains.size(), 0 );
    setStepSize( 1 );
@@ -68,7 +65,7 @@ RealVectorEnsemble McmcOptimiser::solve()
       {
          const RealVector& x = proposeNew( m_mcmcChains[ iChain ], m_stepSizeVec[ iChain ] );
 
-         double probNew = calcProb( x );
+         double probNew = m_objFunc.evaluate( x );
          if ( accept( probNew, m_probOld[ iChain ] ) )
          {
             m_mcmcChains[ iChain ] = x;
@@ -99,14 +96,6 @@ RealVector McmcOptimiser::proposeNew( const RealVector& x, double stepSize )
       result[ i ] += stepSize * m_random.uniform( -1, 1 ) * stepSize;
    }
    return result;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// calcProb
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-double McmcOptimiser::calcProb( const RealVector& x )
-{
-   return m_objFunc.evaluate( x );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
