@@ -5,7 +5,7 @@
 #include "RootUtilities.h"
 #include "SineGenerator.h"
 
-#include <math.h>
+#include <cmath>
 
 namespace {
 

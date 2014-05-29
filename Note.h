@@ -100,6 +100,4 @@ class Note
 
 } /// namespace Music
 
-std::ostream& operator<<( std::ostream& os, const Music::Note& note );
-
 #endif // INOTE_H

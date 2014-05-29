@@ -272,16 +272,17 @@ OTHER_FILES += \
     Todos.txt
 
 
+QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.8
+
 ### BOOST
-macx: LIBS += -L/usr/local/lib/devTools/boost_1_50_0/lib -lboost_filesystem -lboost_system -lboost_thread
+macx: LIBS += L/usr/local/lib/ -lboost_filesystem -lboost_system -lboost_thread
 linux: LIBS += -L/usr/local/lib/ -lboost_filesystem -lboost_system -lboost_thread
-#INCLUDEPATH += /Users/marcelra/devTools/boost_1_50_0/
-#DEPENDPATH += /Users/marcelra/devTools/boost_1_50_0/stage
 
 ### ROOT
 macx: LIBS += -L/usr/local/lib/root -lCore -lCint -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lz -pthread -Wl -lm -ldl -lMLP
 linux: LIBS += -L/usr/local/lib/root -m64 -lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -pthread -lm -ldl -rdynamic -lMLP -lCint -lTreePlayer
 macx: INCLUDEPATH += /usr/local/include/root
+macx: INCLUDEPATH += /usr/local/include
 linux: INCLUDEPATH += /usr/local/include/root
 DEPENDPATH += /usr/local/include/root
 
@@ -289,8 +290,7 @@ DEPENDPATH += /usr/local/include/root
 macx: LIBS += -L/usr/local/lib/ -lfftw3
 linux: LIBS += -L/usr/local/lib/ -lfftw3
 
-QMAKE_CXXFLAGS += -g -ffast-math -mfpmath=387 -O3
+macx: QMAKE_CXXFLAGS += -g -ffast-math -O3
+linux: QMAKE_CXXFLAGS += -g -ffast-math -mfpmath=387 -O3
 QMAKE_CXXFLAGS_RELEASE -= -O2
-
-# macx: PRE_TARGETDEPS += $$PWD/usr/root/lib/libAfterImage.a
 
