@@ -1,6 +1,7 @@
 #ifndef MULTILAYERPERCEPTRON_H
 #define MULTILAYERPERCEPTRON_H
 
+#include "AlgorithmBase.h"
 #include "Neuron.h"
 #include "RealVector.h"
 
@@ -11,7 +12,7 @@ namespace Mva
  * @class MultiLayerPerceptron
  * @brief MultiLayerPerceptron feed-forward neural network.
  */
-class MultiLayerPerceptron
+class MultiLayerPerceptron : public AlgorithmBase
 {
    public:
       /**
