@@ -275,7 +275,7 @@ OTHER_FILES += \
 QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.8
 
 ### BOOST
-macx: LIBS += L/usr/local/lib/ -lboost_filesystem -lboost_system -lboost_thread
+macx: LIBS += -L/usr/local/lib/ -lboost_filesystem -lboost_system -lboost_thread
 linux: LIBS += -L/usr/local/lib/ -lboost_filesystem -lboost_system -lboost_thread
 
 ### ROOT
