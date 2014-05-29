@@ -78,6 +78,7 @@ namespace Mva
 /// constructor
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 MultiLayerPerceptron::MultiLayerPerceptron( size_t numInputNodes, size_t numOutputNodes ) :
+   AlgorithmBase( "MultiLayerPerceptron", 0 ),
    m_inputLayer( numInputNodes, 0 ),
    m_outputLayer( numOutputNodes, 0 ),
    m_neurons()
@@ -244,8 +245,7 @@ void MultiLayerPerceptron::trainPso( const std::vector< RealVector >& inputData,
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void MultiLayerPerceptron::trainMcmc( const std::vector< RealVector >& inputData, const std::vector< RealVector >& outputData )
 {
-   Logger msg( "MultiLayerPerceptron" );
-   msg << Msg::Verbose << "Training neural network." << Msg::EndReq;
+   getLogger() << Msg::Verbose << "Training neural network." << Msg::EndReq;
 
    std::vector< double* > weightRefVec = getWeights();
 
@@ -288,7 +288,7 @@ void MultiLayerPerceptron::trainMcmc( const std::vector< RealVector >& inputData
    for ( size_t iSolution = 0; iSolution < sortCache.getSize(); ++iSolution )
    {
       size_t index = sortCache.getSortedIndex( iSolution );
-      msg << Msg::Info << "Solution " << index << ": error = " << errorFunc.evaluate( solutions[ index ] ) << Msg::EndReq; // << ", vec = " << solutions[ index ] << Msg::EndReq;
+      getLogger() << Msg::Info << "Solution " << index << ": error = " << errorFunc.evaluate( solutions[ index ] ) << Msg::EndReq; // << ", vec = " << solutions[ index ] << Msg::EndReq;
    }
 
    size_t bestIndex = sortCache.getReverseSortedIndex( 0 );
@@ -302,7 +302,7 @@ void MultiLayerPerceptron::trainMcmc( const std::vector< RealVector >& inputData
 
    for ( size_t i = 0; i < weightRefVec.size(); ++i )
    {
-      msg << Msg::Info << "weights[ " << i << " ] = " << *weightRefVec[ i ] << Msg::EndReq;
+      getLogger() << Msg::Info << "weights[ " << i << " ] = " << *weightRefVec[ i ] << Msg::EndReq;
    }
 
 }
