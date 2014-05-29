@@ -7,3 +7,4 @@ moc_*
 plingtheory.pro.user
 plingtheory
 Makefile
+.qmake.stash
