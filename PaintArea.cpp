@@ -10,6 +10,7 @@
 #include <QRectF>
 
 #include <cassert>
+#include <cmath>
 #include <limits>
 
 #include <QDebug>
@@ -216,7 +217,14 @@ void PaintArea::wheelEvent( QWheelEvent* event )
    const QRectF& viewport = getViewport();
 
    QRectF newViewport;
-   double zoomFactor = event->delta() > 0 ? 0.75 : 1.25;
+   double zoomFactor = 1 - event->delta() / 10.0;
+   zoomFactor = zoomFactor < 0.75 ? 0.75 : zoomFactor;
+   zoomFactor = zoomFactor > 1.25 ? 1.25 : zoomFactor;
+   if ( fabs( zoomFactor - 1 ) < 0.01 )
+   {
+      event->accept();
+      return;
+   }
 
    if ( m_zoomMode == ZoomHorizontal )
    {
