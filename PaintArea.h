@@ -69,8 +69,8 @@ class PaintArea : public PaintAreaBase
 
       ZoomMode                 m_zoomMode;
 
-      std::auto_ptr< QPoint >  m_zoomAreaStart;
-      std::auto_ptr< QPoint >  m_zoomAreaEnd;
+      std::unique_ptr< QPoint >  m_zoomAreaStart;
+      std::unique_ptr< QPoint >  m_zoomAreaEnd;
       QPixmap                  m_grabbedWidget;
 
       static double            s_minSizeAutoScale;

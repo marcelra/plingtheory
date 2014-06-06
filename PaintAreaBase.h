@@ -107,8 +107,8 @@ class PaintAreaBase : public QWidget
       QRectF                     m_viewport;
       QRect                      m_canvas;
       QPainter*                  m_painter;
-      std::auto_ptr< QPoint >    m_oldMousePos;
-      std::auto_ptr< QRectF >    m_viewportConstraints;
+      std::unique_ptr< QPoint >    m_oldMousePos;
+      std::unique_ptr< QRectF >    m_viewportConstraints;
 };
 
 

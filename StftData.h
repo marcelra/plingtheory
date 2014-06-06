@@ -22,7 +22,7 @@ class StftData
       /**
        * Readability typedef.
        */
-      typedef std::auto_ptr< StftData > Ptr;
+      typedef std::unique_ptr< StftData > Ptr;
    public:
       /**
        * @class WindowLocation

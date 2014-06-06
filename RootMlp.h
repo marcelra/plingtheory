@@ -24,7 +24,7 @@ class RootMlp
 
    private:
       std::string                                m_networkLayout;
-      std::auto_ptr< TMultiLayerPerceptron >     m_mlp;
+      std::unique_ptr< TMultiLayerPerceptron >     m_mlp;
 
 };
 

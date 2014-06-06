@@ -21,7 +21,7 @@ class INTuple
       /**
        * Readability typedef
        */
-      typedef std::auto_ptr< INTuple > Ptr;
+      typedef std::unique_ptr< INTuple > Ptr;
 
    public:
       /**

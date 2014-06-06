@@ -77,7 +77,7 @@ class RawPcmData : private std::vector<double>
       RealVectorPtr copyToVectorData() const;
 
       typedef std::vector<double> vecD;
-      typedef std::auto_ptr<RawPcmData> Ptr;
+      typedef std::unique_ptr<RawPcmData> Ptr;
 
    /**
     * Expose parts of the vector interface

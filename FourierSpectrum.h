@@ -93,7 +93,7 @@ class FourierSpectrum : private ComplexVector
        */
       RealVector getPhase() const;
 
-      typedef std::auto_ptr< FourierSpectrum > Ptr;
+      typedef std::unique_ptr< FourierSpectrum > Ptr;
 
    private:
       FourierConfig::CSPtr    m_config;      //! Pointer to the configuration of the transform

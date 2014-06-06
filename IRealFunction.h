@@ -16,9 +16,9 @@ class IRealFunction
 {
    public:
       /**
-       * Readability typedef of auto_ptr.
+       * Readability typedef of unique_ptr.
        */
-      typedef std::auto_ptr< IRealFunction > Ptr;
+      typedef std::unique_ptr< IRealFunction > Ptr;
 
    public:
       /**

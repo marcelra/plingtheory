@@ -16,8 +16,8 @@ namespace Math
 class IPdf
 {
    public:
-      typedef std::auto_ptr< IPdf > Ptr;
-      typedef std::auto_ptr< const IPdf > CPtr;
+      typedef std::unique_ptr< IPdf > Ptr;
+      typedef std::unique_ptr< const IPdf > CPtr;
 
    public:
       /**
