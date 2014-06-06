@@ -275,6 +275,8 @@ OTHER_FILES += \
 
 
 QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.9
+# QMAKE_MAC_SDK = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk
+QMAKE_MAC_SDK=macosx
 
 ### BOOST
 macx: LIBS += -L/usr/local/lib -lboost_filesystem -lboost_system -lboost_thread
@@ -291,7 +293,9 @@ linux: INCLUDEPATH += /usr/local/include/root
 macx: LIBS += -L/usr/local/lib -lfftw3
 linux: LIBS += -L/usr/local/lib -lfftw3
 
-macx: QMAKE_CXXFLAGS += -g
+macx: QMAKE_CXXFLAGS += -g -O3 -ffast-math
 linux: QMAKE_CXXFLAGS += -g -ffast-math -mfpmath=387 -O3
 # QMAKE_CXXFLAGS_RELEASE -= -O2
+
+QMAKE_CXXFLAGS += -std=c++11
 
