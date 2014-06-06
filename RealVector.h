@@ -10,7 +10,7 @@
  * RealVector typedef
  */
 typedef std::vector< double > RealVector;
-typedef std::auto_ptr< RealVector > RealVectorPtr;
+typedef std::unique_ptr< RealVector > RealVectorPtr;
 
 /**
  * Operator overloading for RealVector.

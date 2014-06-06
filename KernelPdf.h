@@ -10,6 +10,7 @@ namespace Math
 class KernelPdf : public IPdf
 {
    public:
+      /// TODO: change signature (pass bare pointer instead of CPtr?)
       KernelPdf( IPdf::CPtr kernel, const RealVector& sampling );
       KernelPdf( IPdf::CPtr kernel, const RealVector& sampling, const RealVector& weights );
 

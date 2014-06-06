@@ -24,8 +24,7 @@ namespace Plotting
 PaintArea::PaintArea( QWidget* parent ) :
    PaintAreaBase( parent ),
    m_gridItem( 0 ),
-   m_zoomMode( ZoomBoth ),
-   m_zoomAreaStart( 0 )
+   m_zoomMode( ZoomBoth )
 {
    m_dataRange = QRectF( QPointF( -1, 1 ), QPointF( 1, -1 ) );
    QRectF initialViewport( QPointF( -1, 1 ), QPointF( 1, -1 ) );

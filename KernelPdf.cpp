@@ -8,7 +8,7 @@ namespace Math
 {
 
 KernelPdf::KernelPdf( IPdf::CPtr kernel, const RealVector& sampling ) :
-   m_kernel( kernel ),
+   m_kernel( kernel.release() ),
    m_sampling( sampling ),
    m_weights( sampling.size(), 1.0 / m_sampling.size() )
 {
@@ -16,7 +16,7 @@ KernelPdf::KernelPdf( IPdf::CPtr kernel, const RealVector& sampling ) :
 }
 
 KernelPdf::KernelPdf( IPdf::CPtr kernel, const RealVector& sampling, const RealVector& weights ) :
-   m_kernel( kernel ),
+   m_kernel( kernel.release() ),
    m_sampling( sampling ),
    m_weights( weights )
 {

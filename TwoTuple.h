@@ -17,7 +17,7 @@ class TwoTuple : public INTuple
       /**
        * Readability typedef.
        */
-      typedef std::auto_ptr< TwoTuple > Ptr;
+      typedef std::unique_ptr< TwoTuple > Ptr;
 
    public:
       /**

@@ -7,8 +7,7 @@ namespace Mva
 {
 
 RootMlp::RootMlp( const std::string& networkLayout ) :
-   m_networkLayout( networkLayout ),
-   m_mlp( 0 )
+   m_networkLayout( networkLayout )
 {}
 
 void RootMlp::train( const std::vector< RealVector >& inputData, const std::vector< RealVector >& outputData )

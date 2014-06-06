@@ -16,9 +16,7 @@ namespace Plotting
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 PaintAreaBase::PaintAreaBase( QWidget* parent ) :
    QWidget( parent ),
-   m_name( "Undefined" ),
-   m_oldMousePos( 0 ),
-   m_viewportConstraints( 0 )
+   m_name( "Undefined" )
 {
    setBackgroundRole( QPalette::Base );
    setAutoFillBackground( true );

@@ -23,7 +23,7 @@ class LoggerClient
       LoggerClientId getLoggerClientId() const;
 
    private:
-      std::auto_ptr< Logger >    m_logger;
+      std::unique_ptr< Logger >    m_logger;
       LoggerClientId             m_loggerClientId;
       static LoggerClientId      s_loggerClientId;
 };

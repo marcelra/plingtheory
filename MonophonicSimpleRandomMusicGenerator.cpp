@@ -64,7 +64,7 @@ RawPcmData::Ptr MonophonicSimpleRandomMusicGenerator::generateRandomMusic( size_
 
    /// Construct a default synthesizer of no synthesizer is given
    Synthesizer::IGenerator* generator = m_synth;
-   std::auto_ptr< Synthesizer::SineGenerator > defaultSynth( 0 );
+   std::unique_ptr< Synthesizer::SineGenerator > defaultSynth;
    if ( !generator )
    {
       defaultSynth.reset( new Synthesizer::SineGenerator( samplingInfo ) );
