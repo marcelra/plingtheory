@@ -3,6 +3,7 @@
 
 #include "Interval.h"
 
+#include <cstddef>
 #include <vector>
 
 namespace Math
