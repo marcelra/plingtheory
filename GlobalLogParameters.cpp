@@ -75,7 +75,7 @@ size_t GlobalLogParameters::getLoggerIdFieldWidth() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// getSpaceWidth
+/// getSpacerWidth
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 size_t GlobalLogParameters::getSpacerWidth() const
 {
@@ -88,7 +88,7 @@ size_t GlobalLogParameters::getSpacerWidth() const
 const Msg::LogLevel& GlobalLogParameters::getThreshold( size_t loggerId ) const
 {
    // std::cout << "getTheshold for " << loggerId << ", mapsize = " << m_inspectMap.size() << std::endl;
-   InspectMap::const_iterator it = m_inspectMap.find( loggerId );
+   auto it = m_inspectMap.find( loggerId );
    if ( it != m_inspectMap.end() )
    {
       // std::cout << "Found override for " << loggerId << " with value " << it->second << std::endl;
