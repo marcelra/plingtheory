@@ -3,6 +3,7 @@
 
 #include "Synapse.h"
 
+#include <cstddef>
 #include <vector>
 
 namespace Mva
