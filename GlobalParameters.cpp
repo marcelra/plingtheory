@@ -1,7 +1,9 @@
 #include "GlobalParameters.h"
 
-#include "boost/filesystem.hpp"
+#include <boost/filesystem.hpp>
 // #include <boost/filesystem>
+
+#include "Logger.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// getTrunkPath
@@ -16,8 +18,10 @@ std::string GlobalParameters::getTrunkPath()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 std::string GlobalParameters::getRunDir()
 {
+   // gLog() << Msg::Warning << "Fix for Mac effective." << Msg::EndReq;
    const boost::filesystem::path& path = boost::filesystem::initial_path();
    return path.string() + "/";
+   // return "/Users/marcelra/dev/plingtheory/";
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -49,5 +53,5 @@ const std::string& GlobalParameters::getTestDataDir()
 }
 
 /// Convenience predefined test directories
-std::string GlobalParameters::s_testDataDir = "/Users/marcelra/Dev/Suite_soundArchive/";
+std::string GlobalParameters::s_testDataDir = "/Users/marcelra/Dropbox/Suite_soundArchive/";
 // std::string GlobalParameters::s_testDataDir = "/home/marcelra/mac/Dev/Suite_soundArchive/";

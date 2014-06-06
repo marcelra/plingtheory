@@ -78,8 +78,8 @@ std::vector< DynamicFourier::Complex > DynamicFourier::getIntegrand( const RawPc
 
    for ( size_t iSample = 0; iSample < data.size(); ++iSample)
    {
-      result[iSample].real() = data[iSample]*cos( phase )*frequency;
-      result[iSample].imag() = data[iSample]*sin( phase )*frequency;
+      result[iSample].real( data[iSample]*cos( phase )*frequency );
+      result[iSample].imag( data[iSample]*sin( phase )*frequency );
       phase += phaseAdvance;
    }
 
@@ -98,21 +98,21 @@ std::vector< DynamicFourier::Complex > DynamicFourier::integrate( const std::vec
    /// Get initial integral
    for ( size_t i = 0; i < nSamplesInt; ++i )
    {
-      z.real() += integrand[i].real();
-      z.imag() += integrand[i].imag();
+      z.real( z.real() + integrand[i].real() );
+      z.imag( z.imag() + integrand[i].imag() );
    }
    result[0] = z;
 
    for ( size_t iSample = 1; iSample < integrand.size() - nSamplesInt; ++iSample )
    {
-      result[iSample].real() = result[iSample-1].real() - integrand[iSample-1].real() + integrand[iSample + nSamplesInt -1].real();
-      result[iSample].imag() = result[iSample-1].imag() - integrand[iSample-1].imag() + integrand[iSample + nSamplesInt -1].imag();
+      result[iSample].real( result[iSample-1].real() - integrand[iSample-1].real() + integrand[iSample + nSamplesInt -1].real() );
+      result[iSample].imag( result[iSample-1].imag() - integrand[iSample-1].imag() + integrand[iSample + nSamplesInt -1].imag() );
    }
 
    for ( size_t iSample = integrand.size() - nSamplesInt; iSample < integrand.size(); ++iSample )
    {
-      result[iSample].real() = result[iSample-1].real() - integrand[iSample-1].real();
-      result[iSample].imag() = result[iSample-1].imag() - integrand[iSample-1].imag();
+      result[iSample].real( result[iSample-1].real() - integrand[iSample-1].real() );
+      result[iSample].imag( result[iSample-1].imag() - integrand[iSample-1].imag() );
    }
 
    return result;

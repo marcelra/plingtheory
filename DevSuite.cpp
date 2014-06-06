@@ -366,7 +366,7 @@ void DevSuite::devParticleSwarm()
       }
 
       QColor colour = pal.getColour( static_cast< double >( i ) / swarmTracker.size() );
-      gPlotFactory().createScatter( xData, yData, Plotting::MarkerDrawAttr( colour, Plotting::MarkerPlus, 2 ) );
+      gPlotFactory().createScatter( xData, yData, Plotting::MarkerDrawAttr( colour, Plotting::MarkerPlus, 3 ) );
    }
 
    msg << Msg::Info << "Result = " << result << Msg::EndReq;
