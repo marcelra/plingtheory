@@ -83,6 +83,7 @@ void DevSuite::execute()
 #include "ParticleSwarmOptimiser.h"
 #include "TwoDimExampleObjective.h"
 #include "Mlp2.h"
+#include "MlpTrainer.h"
 
 #include <functional>
 #include <cmath>
@@ -251,8 +252,6 @@ void DevSuite::devMlp2()
       msg << Msg::Info << eval[ i ] << Msg::EndReq;
       x[ 0 ] = eval[ i ];
       mlp2.calcErrorAndGradient( x, realVector( 2 ), error, gradient );
-      msg << Msg::Info << "error = " << error << Msg::EndReq;
-      msg << Msg::Info << "gradient = " << gradient << Msg::EndReq;
       grError.push_back( error );
       if ( i == 0 )
       {
@@ -286,7 +285,7 @@ void DevSuite::devMlp2()
    msg << Msg::Info << "Correct = " << grad << Msg::EndReq;
    msg << Msg::Info << "Test    = " << gradient << Msg::EndReq;
 
-
+   // Mva::MlpTrainer mlpTrainer( mlp2 );
 }
 
 void DevSuite::devMlp()

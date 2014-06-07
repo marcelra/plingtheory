@@ -137,7 +137,8 @@ SOURCES += main.cpp \
     Palette.cpp \
     ParticleSwarmOptimiser.cpp \
     Hypercube.cpp \
-    Mlp2.cpp
+    Mlp2.cpp \
+    MlpTrainer.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -270,7 +271,8 @@ HEADERS += \
     Palette.h \
     ParticleSwarmOptimiser.h \
     Hypercube.h \
-    Mlp2.h
+    Mlp2.h \
+    MlpTrainer.h
 
 OTHER_FILES += \
     Todos.txt
