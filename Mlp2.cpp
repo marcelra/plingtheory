@@ -11,7 +11,7 @@ namespace Mva
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Constructor
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-Mlp2::Mlp2( size_t numInputNodes, size_t numOutputNodes, const std::vector< size_t >& hiddenLayerStructure ) :
+Mlp2::Mlp2( size_t numInputNodes, size_t numOutputNodes, const std::vector< size_t >& hiddenLayerStructure, bool useBiasNodes ) :
    m_input( numInputNodes ),
    m_output( numOutputNodes ),
    m_deltaEInput( numInputNodes ),
@@ -46,6 +46,8 @@ Mlp2::Mlp2( size_t numInputNodes, size_t numOutputNodes, const std::vector< size
    }
 
    m_weightDerivatives = m_weights;
+
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
