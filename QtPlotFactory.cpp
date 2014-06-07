@@ -49,7 +49,7 @@ void QtPlotFactory::createGraph( const std::vector< double >& xData, const std::
 {
    if ( !m_currentPlot )
    {
-      ExceptionNoPlotAvailable();
+      throw ExceptionNoPlotAvailable();
    }
 
    Plotting::CurveItem* item = new Plotting::CurveItem( xData, yData );
@@ -63,7 +63,7 @@ void QtPlotFactory::drawPcmData( const RawPcmData& pcmData, const QColor& colour
 {
    if ( !m_currentPlot )
    {
-      ExceptionNoPlotAvailable();
+      throw ExceptionNoPlotAvailable();
    }
    const RealVectorPtr yData = pcmData.copyToVectorData();
    RealVector xData( yData->size() );
@@ -86,7 +86,7 @@ void QtPlotFactory::createScatter( const std::vector< double >& xData,
 {
    if ( !m_currentPlot )
    {
-      ExceptionNoPlotAvailable();
+      throw ExceptionNoPlotAvailable();
    }
 
    Plotting::ScatterItem * item = new Plotting::ScatterItem( xData, yData, markerDrawAttr );
@@ -98,7 +98,7 @@ void QtPlotFactory::createStftGraph( const WaveAnalysis::StftData& stftData )
 {
    if ( !m_currentPlot )
    {
-      ExceptionNoPlotAvailable();
+      throw ExceptionNoPlotAvailable();
    }
 
    Plotting::StftPaintItem* item = new Plotting::StftPaintItem( stftData );
@@ -110,7 +110,7 @@ void QtPlotFactory::createHistogram( const Math::IAccumArray& hist, const QColor
 {
    if ( !m_currentPlot )
    {
-      ExceptionNoPlotAvailable();
+      throw ExceptionNoPlotAvailable();
    }
 
    Plotting::HistogramItem* item = new Plotting::HistogramItem( hist );
@@ -124,7 +124,7 @@ void QtPlotFactory::create2DHist( const Math::Regular2DHistogram& hist, const Pl
 {
    if ( !m_currentPlot )
    {
-      ExceptionNoPlotAvailable();
+      throw ExceptionNoPlotAvailable();
    }
 
    Plotting::Hist2DItem* item = new Plotting::Hist2DItem( hist, palette );
