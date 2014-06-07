@@ -15,15 +15,20 @@ Mlp2::Mlp2( size_t numInputNodes, size_t numOutputNodes, const std::vector< size
    m_input( numInputNodes ),
    m_output( numOutputNodes ),
    m_deltaEInput( numInputNodes ),
-   m_deltaEOutput( numOutputNodes )
+   m_deltaEOutput( numOutputNodes ),
+   m_useBiasNodes( useBiasNodes )
 {
+
+   assert( numInputNodes > 0 && numOutputNodes > 0 );
 
    /// Initialise neuron quantities
    for ( auto it = hiddenLayerStructure.begin(); it != hiddenLayerStructure.end(); ++it )
    {
+      assert( *it > 0 );
       m_y.push_back( RealVector( *it ) );
-      m_x.push_back( RealVector( *it ) );
       m_dfdy.push_back( RealVector( *it ) );
+
+      m_x.push_back( RealVector( *it ) );
       m_deltaE.push_back( RealVector( *it ) );
    }
 
@@ -45,8 +50,30 @@ Mlp2::Mlp2( size_t numInputNodes, size_t numOutputNodes, const std::vector< size
       m_weights.push_back( std::vector< RealVector >( m_y.back().size(), RealVector( m_output.size(), 1 ) ) );
    }
 
-   m_weightDerivatives = m_weights;
+   if ( useBiasNodes )
+   {
+      for ( size_t i = 0; i < m_x.size(); ++i )
+      {
+         m_x[ i ].push_back( 1 );
+         m_deltaE[ i ].push_back( 0 );
+      }
 
+      m_deltaEOutput.push_back( 0 );
+      m_input.push_back( 1 );
+
+      for ( size_t iLayer = 0; iLayer < m_weights.size(); ++iLayer )
+      {
+         m_weights[ iLayer ].push_back( m_weights[ iLayer ][ 0 ] );
+
+         /// Initialise bias weights with 0
+         for ( size_t i = 0; i < m_weights[ iLayer ].back().size(); ++i )
+         {
+            m_weights[ iLayer ].back()[ i ] = 0;
+         }
+      }
+   }
+
+   m_weightDerivatives = m_weights;
 
 }
 
@@ -55,11 +82,12 @@ Mlp2::Mlp2( size_t numInputNodes, size_t numOutputNodes, const std::vector< size
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 RealVector Mlp2::evaluate( const RealVector& x )
 {
-   assert( x.size() == m_input.size() );
+   assert( !m_useBiasNodes && x.size() == m_input.size() || m_useBiasNodes && x.size() == m_input.size() - 1 );
 
-   m_input = x;
-
-   /// Input scaling and offset (TODO)
+   for ( size_t i = 0; i < x.size(); ++i )
+   {
+      m_input[ i ] = x[ i ];
+   }
 
    /// No hidden layers
    if ( m_y.size() == 0 )
@@ -68,8 +96,6 @@ RealVector Mlp2::evaluate( const RealVector& x )
    }
    else
    {
-      calcDerivativesActivationFunc();
-
       propagateForward( m_input, m_y[ 0 ], m_weights[ 0 ] );
 
       applyActivationFunc( m_y[ 0 ], m_x[ 0 ] );
@@ -176,12 +202,15 @@ void Mlp2::propagateForward( const RealVector& sourceLayer, RealVector& destLaye
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void Mlp2::propagateBackward( const RealVector& sourceLayer, RealVector& destLayer, const std::vector< RealVector >& weights )
 {
+   //// FIXME bias
    assert( weights.size() == destLayer.size() );
    for ( size_t iDestNeuron = 0; iDestNeuron < destLayer.size(); ++iDestNeuron )
    {
       destLayer[ iDestNeuron ] = 0;
-      assert( weights[ iDestNeuron ].size() == sourceLayer.size() );
-      for ( size_t iSourceNeuron = 0; iSourceNeuron < sourceLayer.size(); ++iSourceNeuron )
+      size_t sourceSize = m_useBiasNodes ? sourceLayer.size() - 1 : sourceLayer.size();
+
+      assert( weights[ iDestNeuron ].size() == sourceSize );
+      for ( size_t iSourceNeuron = 0; iSourceNeuron < sourceSize; ++iSourceNeuron )
       {
          destLayer[ iDestNeuron ] += sourceLayer[ iSourceNeuron ] * weights[ iDestNeuron ][ iSourceNeuron ];
       }

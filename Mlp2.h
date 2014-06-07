@@ -48,6 +48,7 @@ class Mlp2
       std::vector< std::vector< RealVector > > m_weights;
 
       std::vector< std::vector< RealVector > > m_weightDerivatives;
+      bool												  m_useBiasNodes;
 };
 
 #include "IObjectiveFunction.h"
