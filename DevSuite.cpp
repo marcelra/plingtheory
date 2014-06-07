@@ -228,8 +228,8 @@ void DevSuite::devMlp2()
 
    std::vector< size_t > hiddenLayerStructure;
    hiddenLayerStructure.push_back( 1 );
-   hiddenLayerStructure.push_back( 2 );
-   hiddenLayerStructure.push_back( 4 );
+   hiddenLayerStructure.push_back( 10 );
+   hiddenLayerStructure.push_back( 40 );
 
    RealVector x = realVector( 1, 1 );
 
