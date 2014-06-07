@@ -14,23 +14,26 @@ class Mlp2
 
       RealVector evaluate( const RealVector& x );
 
-      void calcErrorAndGradient( const RealVector& input, const RealVector& target, double& error, RealVector& gradient );
       std::vector< double > getWeights();
       void setWeights( const std::vector< double >& weights );
+      void randomiseWeights( const Interval& interval );
 
+   /// TODO: will be private.
+   public:
+      void calcErrorAndGradient( const RealVector& input, const RealVector& target, double& error, RealVector& gradient );
+
+   private:
       void propagateForward( const RealVector& sourceLayer, RealVector& destLayer, const std::vector< RealVector >& weights );
       void propagateBackward( const RealVector& sourceLayer, RealVector& destLayer, const std::vector< RealVector >& weights );
 
       void applyActivationFunc( const RealVector& neuronActivation, RealVector& neuronResponse );
       void calcDerivativesActivationFunc();
 
-      void randomiseWeights( const Interval& interval );
-
+   private:
       void composeGradient( RealVector& gradient );
 
    /// TODO: public for development
    public:
-      std::vector< std::vector< RealVector > > m_weights;
 
    private:
       RealVector						              m_input;
@@ -42,6 +45,7 @@ class Mlp2
       RealVector              					  m_deltaEInput;
       RealVector              					  m_deltaEOutput;
       std::vector< RealVector >					  m_dfdy;
+      std::vector< std::vector< RealVector > > m_weights;
 
       /// TODO: not used yet
       std::vector< RealVector >					  m_inputScale;

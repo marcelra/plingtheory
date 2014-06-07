@@ -134,12 +134,6 @@ void Mlp2::calcErrorAndGradient( const RealVector& input, const RealVector& targ
 
       }
 
-      for ( size_t iNeuron = 0; iNeuron < m_deltaE[ 0 ].size(); ++iNeuron )
-      {
-         // m_deltaE[ 0 ][ iNeuron ] *= m_dfdy[ 0 ][ iNeuron ];
-      }
-
-
       for ( size_t iLayer = 0; iLayer < m_weights.size(); ++iLayer )
       {
          const RealVector& sourceNeuronActivations = iLayer != 0 ? m_x[ iLayer - 1 ] : m_input;
@@ -199,8 +193,7 @@ void Mlp2::applyActivationFunc( const RealVector& neuronActivation, RealVector& 
 {
    for ( size_t i = 0; i < neuronActivation.size(); ++i )
    {
-      // neuronResponse[ i ] = tanh( neuronActivation[ i ] );
-      neuronResponse[ i ] = 2 * neuronActivation[ i ];
+      neuronResponse[ i ] = tanh( neuronActivation[ i ] );
    }
 }
 
@@ -213,9 +206,8 @@ void Mlp2::calcDerivativesActivationFunc()
    {
       for ( size_t iNeuron = 0; iNeuron < m_y[ iLayer ].size(); ++iNeuron )
       {
-         double y = m_y[ iLayer ][ iNeuron ];
-         // m_dfdy[ iLayer ][ iNeuron ] = 1 - y * y;
-         m_dfdy[ iLayer ][ iNeuron ] = 2;
+         double tanhY = m_x[ iLayer ][ iNeuron ];
+         m_dfdy[ iLayer ][ iNeuron ] = 1 - tanhY * tanhY;
       }
    }
 }
@@ -244,7 +236,7 @@ void Mlp2::composeGradient( RealVector& gradient )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void Mlp2::randomiseWeights( const Interval& interval )
 {
-   RandomNumberGenerator rng( 0 );
+   RandomNumberGenerator rng( 2 );
    for ( size_t i = 0; i < m_weights.size(); ++i )
    {
       for ( size_t j = 0; j < m_weights[ i ].size(); ++j )
@@ -276,6 +268,9 @@ std::vector< double > Mlp2::getWeights()
    return result;
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// setWeights
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void Mlp2::setWeights( const std::vector< double >& weights )
 {
    size_t l = 0;
