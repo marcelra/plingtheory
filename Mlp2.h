@@ -10,7 +10,7 @@ namespace Mva
 class Mlp2
 {
    public:
-      Mlp2( size_t numInputNodes, size_t numOutputNodes, const std::vector< size_t >& hiddenLayerStructure );
+      Mlp2( size_t numInputNodes, size_t numOutputNodes, const std::vector< size_t >& hiddenLayerStructure, bool useBiasNodes = true );
 
       RealVector evaluate( const RealVector& x );
 
@@ -46,12 +46,6 @@ class Mlp2
       RealVector              					  m_deltaEOutput;
       std::vector< RealVector >					  m_dfdy;
       std::vector< std::vector< RealVector > > m_weights;
-
-      /// TODO: not used yet
-      std::vector< RealVector >					  m_inputScale;
-      std::vector< RealVector >					  m_inputOffset;
-      std::vector< RealVector >					  m_outputScale;
-      std::vector< RealVector >					  m_outputOffset;
 
       std::vector< std::vector< RealVector > > m_weightDerivatives;
 };
