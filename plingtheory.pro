@@ -136,7 +136,8 @@ SOURCES += main.cpp \
     PcPixmapPaint.cpp \
     Palette.cpp \
     ParticleSwarmOptimiser.cpp \
-    Hypercube.cpp
+    Hypercube.cpp \
+    Mlp2.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -268,7 +269,8 @@ HEADERS += \
     PcPixmapPaint.h \
     Palette.h \
     ParticleSwarmOptimiser.h \
-    Hypercube.h
+    Hypercube.h \
+    Mlp2.h
 
 OTHER_FILES += \
     Todos.txt
@@ -293,7 +295,7 @@ linux: INCLUDEPATH += /usr/local/include/root
 macx: LIBS += -L/usr/local/lib -lfftw3
 linux: LIBS += -L/usr/local/lib -lfftw3
 
-macx: QMAKE_CXXFLAGS += -g -O3 -ffast-math
+macx: QMAKE_CXXFLAGS += -g -ffast-math
 linux: QMAKE_CXXFLAGS += -g -ffast-math -mfpmath=387 -O3
 # QMAKE_CXXFLAGS_RELEASE -= -O2
 

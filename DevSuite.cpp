@@ -18,7 +18,8 @@ void DevSuite::execute()
    // devPeakFinder2();
    // devMlp();
 
-   devParticleSwarm();
+   // devParticleSwarm();
+   devMlp2();
 
    return;
    devPeakFinder2();
@@ -81,6 +82,7 @@ void DevSuite::execute()
 #include "RootMlp.h"
 #include "ParticleSwarmOptimiser.h"
 #include "TwoDimExampleObjective.h"
+#include "Mlp2.h"
 
 #include <functional>
 #include <cmath>
@@ -224,34 +226,68 @@ void DevSuite::devMlp2()
    Logger msg( "devMlp2" );
    msg << Msg::Info << "In devMlp2..." << Msg::EndReq;
 
-   std::vector< RealVector > inputData, outputData;
-   inputData.push_back( realVector( 1, 1 ) );
-   outputData.push_back( realVector( 1 ) );
-   inputData.push_back( realVector( 1, 0 ) );
-   outputData.push_back( realVector( 0 ) );
-   inputData.push_back( realVector( 0, 1 ) );
-   outputData.push_back( realVector( 0 ) );
-   inputData.push_back( realVector( 0, 0 ) );
-   outputData.push_back( realVector( 0 ) );
+   std::vector< size_t > hiddenLayerStructure;
+   hiddenLayerStructure.push_back( 1 );
+   hiddenLayerStructure.push_back( 2 );
+   hiddenLayerStructure.push_back( 4 );
 
-   Mva::MultiLayerPerceptron net( 2, 1 );
-   net.addHiddenLayer( 4 );
-   net.addHiddenLayer( 3 );
-   net.addHiddenLayer( 2 );
-   net.addHiddenLayer( 2 );
-   net.build();
+   RealVector x = realVector( 1, 1 );
 
-   for ( size_t i = 0; i < inputData.size(); ++i )
+   Mva::Mlp2 mlp2( 2, 1, hiddenLayerStructure );
+   const RealVector& y = mlp2.evaluate( x );
+   msg << Msg::Info << "y = " << y << Msg::EndReq;
+
+   RealVector gradient;
+   double error;
+
+   RealVector eval = Utils::createRangeReal( -4, 4, 100 );
+
+   mlp2.randomiseWeights( Interval( -1, 1 ) );
+
+   RealVector grError;
+   std::vector< RealVector > derivs;
+
+   for ( size_t i = 0; i < eval.size(); ++i )
    {
-      msg << Msg::Info << "Input = " << inputData[ i ] << ", eval = " << net.evaluate( inputData[ i ] ) << ", expected = " << outputData[ i ] << Msg::EndReq;
+      msg << Msg::Info << eval[ i ] << Msg::EndReq;
+      x[ 0 ] = eval[ i ];
+      mlp2.calcErrorAndGradient( x, realVector( 2 ), error, gradient );
+      msg << Msg::Info << "error = " << error << Msg::EndReq;
+      msg << Msg::Info << "gradient = " << gradient << Msg::EndReq;
+      grError.push_back( error );
+      if ( i == 0 )
+      {
+         derivs.resize( gradient.size(), RealVector( eval.size() ) );
+      }
+      for ( size_t j = 0; j < derivs.size(); ++j )
+      {
+         derivs[ j ][ i ] = gradient[ j ];
+      }
    }
 
-   net.trainMcmc( inputData, outputData );
-
-   for ( size_t i = 0; i < inputData.size(); ++i )
+   gPlotFactory().createPlot( "devMlp2/error" );
+   gPlotFactory().createGraph( eval, grError, Qt::red );
+   for ( size_t j = 0; j < derivs.size(); ++j )
    {
-      msg << Msg::Info << "Input = " << inputData[ i ] << ", eval = " << net.evaluate( inputData[ i ] ) << ", expected = " << outputData[ i ] << Msg::EndReq;
+      gPlotFactory().createGraph( eval, derivs[ j ], Qt::blue );
    }
+
+   RealVector weightsCache = mlp2.getWeights();
+
+   RealVector target = realVector( 2 );
+   Mva::MlpPerturbative mp( mlp2, x, target );
+   const RealVector& grad = mp.calculateGradient( mlp2.getWeights(), 1e-6 );
+
+   mlp2.setWeights( weightsCache );
+   mlp2.calcErrorAndGradient( x, target, error, gradient );
+
+   RealVector diff = grad - gradient;
+   msg << Msg::Info << diff << Msg::EndReq;
+
+   msg << Msg::Info << "Correct = " << grad << Msg::EndReq;
+   msg << Msg::Info << "Test    = " << gradient << Msg::EndReq;
+
+
 }
 
 void DevSuite::devMlp()
