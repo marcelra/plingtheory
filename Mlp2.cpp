@@ -18,10 +18,9 @@ Mlp2::Mlp2( size_t numInputNodes, size_t numOutputNodes, const std::vector< size
    m_deltaEOutput( numOutputNodes ),
    m_useBiasNodes( useBiasNodes )
 {
-
    assert( numInputNodes > 0 && numOutputNodes > 0 );
 
-   /// Initialise neuron quantities
+   /// Initialise neuron quantities.
    for ( auto it = hiddenLayerStructure.begin(); it != hiddenLayerStructure.end(); ++it )
    {
       assert( *it > 0 );
@@ -32,11 +31,11 @@ Mlp2::Mlp2( size_t numInputNodes, size_t numOutputNodes, const std::vector< size
       m_deltaE.push_back( RealVector( *it ) );
    }
 
-   /// Initialise first layer weights
+   /// Initialise first layer weights.
    size_t numFirstLayerTargetNeurons = m_y.size() > 0 ? m_y[0].size() : m_output.size();
    m_weights.push_back( std::vector< RealVector >( m_input.size(), RealVector( numFirstLayerTargetNeurons, 1 ) ) );
 
-   /// Initialise hidden layer weights
+   /// Initialise hidden layer weights.
    for ( int i = 0; i < static_cast< int >( m_y.size() ) - 1; ++i )
    {
       size_t nNeurons = m_y[ i ].size();
@@ -44,12 +43,13 @@ Mlp2::Mlp2( size_t numInputNodes, size_t numOutputNodes, const std::vector< size
       m_weights.push_back( std::vector< RealVector >( nNeurons, RealVector( nNeuronsNext, 1 ) ) );
    }
 
-   /// Initialse final layer weights
+   /// Initialse final layer weights.
    if ( hiddenLayerStructure.size() != 0 )
    {
       m_weights.push_back( std::vector< RealVector >( m_y.back().size(), RealVector( m_output.size(), 1 ) ) );
    }
 
+   /// Initialise Bias nodes.
    if ( useBiasNodes )
    {
       for ( size_t i = 0; i < m_x.size(); ++i )
@@ -82,34 +82,37 @@ Mlp2::Mlp2( size_t numInputNodes, size_t numOutputNodes, const std::vector< size
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 RealVector Mlp2::evaluate( const RealVector& x )
 {
+   /// Assert validity of input.
    assert( !m_useBiasNodes && x.size() == m_input.size() || m_useBiasNodes && x.size() == m_input.size() - 1 );
 
+   /// Set input.
    for ( size_t i = 0; i < x.size(); ++i )
    {
       m_input[ i ] = x[ i ];
    }
 
-   /// No hidden layers
+   /// Simple forward propagation when there are no hidden layers.
    if ( m_y.size() == 0 )
    {
       propagateForward( m_input, m_output, m_weights[ 0 ] );
    }
    else
    {
+      /// Propage from input node to first hidden layer.
       propagateForward( m_input, m_y[ 0 ], m_weights[ 0 ] );
-
       applyActivationFunc( m_y[ 0 ], m_x[ 0 ] );
 
+      /// Propagate to last hidden layer.
       for ( size_t iHiddenLayer = 0; iHiddenLayer < m_y.size() - 1; ++iHiddenLayer )
       {
          propagateForward( m_x[ iHiddenLayer ], m_y[ iHiddenLayer + 1 ], m_weights[ iHiddenLayer + 1 ] );
          applyActivationFunc( m_y[ iHiddenLayer + 1 ], m_x[ iHiddenLayer + 1 ] );
       }
-      propagateForward( m_x.back(), m_output, m_weights.back() );
 
+      /// Propagate to output nodes.
+      propagateForward( m_x.back(), m_output, m_weights.back() );
    }
 
-   /// Output scaling (TODO)
    return m_output;
 }
 
@@ -118,10 +121,12 @@ RealVector Mlp2::evaluate( const RealVector& x )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void Mlp2::calcErrorAndGradient( const RealVector& input, const RealVector& target, double& error, RealVector& gradient )
 {
+   /// The current state on the nodes will be used for backpropagation.
    const RealVector& response = evaluate( input );
 
    assert( target.size() == response.size() );
 
+   /// Calculate the error and deltas on the output nodes.
    error = 0;
    for ( size_t i = 0; i < response.size(); ++i )
    {
@@ -133,6 +138,7 @@ void Mlp2::calcErrorAndGradient( const RealVector& input, const RealVector& targ
 
    if ( m_deltaE.size() == 0 )
    {
+      /// Calculate the gradient components with a single backward propagation if there are no hidden layers.
       propagateBackward( m_deltaEOutput, m_deltaEInput, m_weights[ 0 ] );
       for ( size_t iInput = 0; iInput < m_weights[ 0 ].size(); ++iInput )
       {
@@ -144,14 +150,20 @@ void Mlp2::calcErrorAndGradient( const RealVector& input, const RealVector& targ
    }
    else
    {
+      /// Calculate the derivatives of the activation function on all the hidden nodes. This is independent of
+      /// backpropagation.
       calcDerivativesActivationFunc();
 
+      /// Propagate output deltas to first hidden node.
       propagateBackward( m_deltaEOutput, m_deltaE.back(), m_weights.back() );
       for ( size_t i = 0; i < m_deltaE.back().size(); ++i )
       {
          m_deltaE.back()[ i ] *= m_dfdy.back()[ i ];
       }
 
+      /// Calculate deltas for all hidden nodes.
+      /// delta_nk = f'(y_nk) * sum_i w_nki delta_(n+1)i
+      /// propageBackward calculates the sum.
       for ( size_t iHiddenLayer = m_deltaE.size() - 1; iHiddenLayer > 0; --iHiddenLayer )
       {
          propagateBackward( m_deltaE[ iHiddenLayer ], m_deltaE[ iHiddenLayer - 1 ], m_weights[ iHiddenLayer ] );
@@ -159,9 +171,9 @@ void Mlp2::calcErrorAndGradient( const RealVector& input, const RealVector& targ
          {
             m_deltaE[ iHiddenLayer - 1 ][ iNeuron ] *= m_dfdy[ iHiddenLayer - 1 ][ iNeuron ];
          }
-
       }
 
+      /// Calculate the derivatives. dE/dw_nij = x_(n-1)j * delta_i
       for ( size_t iLayer = 0; iLayer < m_weights.size(); ++iLayer )
       {
          const RealVector& sourceNeuronActivations = iLayer != 0 ? m_x[ iLayer - 1 ] : m_input;
@@ -176,6 +188,7 @@ void Mlp2::calcErrorAndGradient( const RealVector& input, const RealVector& targ
       }
    }
 
+   /// @see composeGradient
    composeGradient( gradient );
 }
 
@@ -202,7 +215,6 @@ void Mlp2::propagateForward( const RealVector& sourceLayer, RealVector& destLaye
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void Mlp2::propagateBackward( const RealVector& sourceLayer, RealVector& destLayer, const std::vector< RealVector >& weights )
 {
-   //// FIXME bias
    assert( weights.size() == destLayer.size() );
    for ( size_t iDestNeuron = 0; iDestNeuron < destLayer.size(); ++iDestNeuron )
    {
@@ -237,6 +249,7 @@ void Mlp2::calcDerivativesActivationFunc()
    {
       for ( size_t iNeuron = 0; iNeuron < m_y[ iLayer ].size(); ++iNeuron )
       {
+         /// NB. m_x = f(m_y).
          double tanhY = m_x[ iLayer ][ iNeuron ];
          m_dfdy[ iLayer ][ iNeuron ] = 1 - tanhY * tanhY;
       }

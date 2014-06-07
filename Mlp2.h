@@ -32,23 +32,20 @@ class Mlp2
    private:
       void composeGradient( RealVector& gradient );
 
-   /// TODO: public for development
-   public:
-
    private:
-      RealVector						              m_input;
-      RealVector						              m_output;
-      std::vector< RealVector >	              m_y;
-      std::vector< RealVector >	              m_x;
+      RealVector						              m_input;		         //! Input nodes values.
+      RealVector						              m_output;	         	//! Output nodes values.
+      std::vector< RealVector >	              m_y;			         //! Hidden layer neuron activations. First index layer, second index neuron in layer.
+      std::vector< RealVector >	              m_x;			         //! Hidden layer neuron values. First index layers, second index neuron in layer.
 
-      std::vector< RealVector >					  m_deltaE;
-      RealVector              					  m_deltaEInput;
-      RealVector              					  m_deltaEOutput;
-      std::vector< RealVector >					  m_dfdy;
-      std::vector< std::vector< RealVector > > m_weights;
+      std::vector< RealVector >					  m_deltaE;				   //! Backpropagation delta values (dE/dy) on hidden nodes.
+      RealVector              					  m_deltaEInput;   		//! Backpropagation delta values on input nodes.
+      RealVector              					  m_deltaEOutput;  		//! Backpropagation delta values on output nodes.
+      std::vector< RealVector >					  m_dfdy;				   //! Derivative of activation function on hidden nodes.
+      std::vector< std::vector< RealVector > > m_weights;			   //! All weights. Indexing: layer, source node, dest node.
 
-      std::vector< std::vector< RealVector > > m_weightDerivatives;
-      bool												  m_useBiasNodes;
+      std::vector< std::vector< RealVector > > m_weightDerivatives;	//! Derivates of all weights.
+      bool												  m_useBiasNodes;			//! Indicator whether or not to include bias nodes.
 };
 
 #include "IObjectiveFunction.h"
