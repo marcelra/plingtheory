@@ -227,13 +227,12 @@ void DevSuite::devMlp2()
    msg << Msg::Info << "In devMlp2..." << Msg::EndReq;
 
    std::vector< size_t > hiddenLayerStructure;
-   hiddenLayerStructure.push_back( 1 );
    hiddenLayerStructure.push_back( 2 );
-   hiddenLayerStructure.push_back( 4 );
+   hiddenLayerStructure.push_back( 2 );
 
    RealVector x = realVector( 1, 1 );
 
-   Mva::Mlp2 mlp2( 2, 1, hiddenLayerStructure );
+   Mva::Mlp2 mlp2( 2, 1, hiddenLayerStructure, true );
    const RealVector& y = mlp2.evaluate( x );
    msg << Msg::Info << "y = " << y << Msg::EndReq;
 
