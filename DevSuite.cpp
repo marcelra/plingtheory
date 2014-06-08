@@ -19,7 +19,7 @@ void DevSuite::execute()
    devMlp();
 
    // devParticleSwarm();
-   // devMlp2();
+   devMlp2();
 
    return;
    devPeakFinder2();
