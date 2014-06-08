@@ -166,4 +166,14 @@ class ExceptionNoPlotAvailable : public BaseException
       const char* getType() const;
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// Exception raised when accessing the plot factory when no plot factory is initialised.
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class ExceptionUninitialisedPlotFactory : public BaseException
+{
+   public:
+      ExceptionUninitialisedPlotFactory();
+      const char* getType() const;
+};
+
 #endif // EXCEPTIONS_H

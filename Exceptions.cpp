@@ -266,3 +266,17 @@ const char* ExceptionNoPlotAvailable::getType() const
 {
    return "ExceptionNoPlotSelected";
 }
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// ExceptionUninitialisedPlotFactory
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ExceptionUninitialisedPlotFactory::ExceptionUninitialisedPlotFactory() :
+   BaseException( "No plot factory is available." )
+{}
+
+const char* ExceptionUninitialisedPlotFactory::getType() const
+{
+   return "ExceptionUninitialisedPlotFactory";
+}

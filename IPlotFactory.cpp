@@ -1,5 +1,6 @@
 #include "IPlotFactory.h"
 
+#include "Exceptions.h"
 #include "Logger.h"
 
 namespace PlotInterface
@@ -29,7 +30,10 @@ IPlotFactory::~IPlotFactory()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 IPlotFactory& IPlotFactory::getInstance()
 {
-   assert( s_instance );
+   if ( !s_instance )
+   {
+      throw ExceptionUninitialisedPlotFactory();
+   }
    return *s_instance;
 }
 
