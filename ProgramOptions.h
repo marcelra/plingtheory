@@ -63,7 +63,6 @@ class ProgramOptions
       bool                    m_useRootInterface;
       bool                    m_useQtInterface;
       bool                    m_doUseColorLogger;
-      bool                    m_doSaveRootObjects;
       bool                    m_useRegressionLogConfig;
       std::string             m_rootFileNameOld;
       std::string             m_rootFileNameNew;
