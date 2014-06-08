@@ -36,7 +36,7 @@ std::vector< size_t > GradDescMlpTrainer::makeBatch( bool makeFullBatch )
    else
    {
       result.resize( m_batchSize );
-      for ( size_t i = 0; i < m_batchSize; ++i )
+      for ( int i = 0; i < m_batchSize; ++i )
       {
          result.push_back( m_rng.uniform( 0, m_trainDataInput->size() ) );
       }
