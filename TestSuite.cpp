@@ -583,7 +583,7 @@ void TestSuite::testIntegration()
             msg << Msg::Info << " - harmonic with relative amp: " << tone.getHarmonics()[iHarmonic] << Msg::EndReq;
          }
          double freq = spec.getFrequency( tone.getBaseFreq() );
-         Music::Note note( freq, Music::Duration( 0.125 ) );
+         Music::Note note( freq, Music::Duration( 0.125 / 2 ) );
          // msg << Msg::Always << note.toString() << Msg::EndReq;
          detectedNotes.push_back( note );
          // synth.setFrequency( detectedNotes[iNote].getFrequency() );

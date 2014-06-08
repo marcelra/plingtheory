@@ -16,10 +16,10 @@ void DevSuite::execute()
    // devSamples();
 
    // devPeakFinder2();
-   // devMlp();
+   devMlp();
 
    // devParticleSwarm();
-   devMlp2();
+   // devMlp2();
 
    return;
    devPeakFinder2();
@@ -83,7 +83,7 @@ void DevSuite::execute()
 #include "ParticleSwarmOptimiser.h"
 #include "TwoDimExampleObjective.h"
 #include "Mlp2.h"
-#include "MlpTrainer.h"
+#include "GradDescMlpTrainer.h"
 
 #include <functional>
 #include <cmath>
@@ -229,7 +229,7 @@ void DevSuite::devMlp2()
 
    std::vector< size_t > hiddenLayerStructure;
    hiddenLayerStructure.push_back( 2 );
-   hiddenLayerStructure.push_back( 2 );
+   hiddenLayerStructure.push_back( 4 );
 
    RealVector x = realVector( 1, 1 );
 
@@ -285,7 +285,31 @@ void DevSuite::devMlp2()
    msg << Msg::Info << "Correct = " << grad << Msg::EndReq;
    msg << Msg::Info << "Test    = " << gradient << Msg::EndReq;
 
-   // Mva::MlpTrainer mlpTrainer( mlp2 );
+   std::vector< RealVector > inputData;
+   std::vector< RealVector > outputData;
+
+   /// XOR training pattern
+   inputData.push_back( realVector( 0, 0 ) );
+   inputData.push_back( realVector( 1, 0 ) );
+   inputData.push_back( realVector( 0, 1 ) );
+   inputData.push_back( realVector( 1, 1 ) );
+
+   outputData.push_back( realVector( 0 ) );
+   outputData.push_back( realVector( 0 ) );
+   outputData.push_back( realVector( 0 ) );
+   outputData.push_back( realVector( 1 ) );
+
+   Mva::GradDescMlpTrainer mlpTrainer( mlp2 );
+   mlpTrainer.setInputData( inputData, outputData );
+   mlpTrainer.setEta( 1 );
+   mlpTrainer.setNumIterations( 1000 );
+   mlpTrainer.train();
+
+   for ( size_t i = 0; i < inputData.size(); ++i )
+   {
+      msg << Msg::Info << "XOR trained NN: " << inputData[ i ] << " -> " << mlp2.evaluate( inputData[ i ] ) << Msg::EndReq;
+   }
+
 }
 
 void DevSuite::devMlp()
@@ -327,13 +351,24 @@ void DevSuite::devMlp()
    gPlotFactory().createScatter( xUp, yUp, Plotting::MarkerDrawAttr( Qt::red ) );
    gPlotFactory().createScatter( xDown, yDown, Plotting::MarkerDrawAttr( Qt::blue ) );
 
-   Mva::MultiLayerPerceptron network( 2, 1 );
-   network.addHiddenLayer( 4 );
-   network.addHiddenLayer( 2 );
-   network.build();
-   // Mva::RootMlp network( "i0,i1:4:2:o0" );
+   // Mva::MultiLayerPerceptron network( 2, 1 );
+   // network.addHiddenLayer( 4 );
+   // network.addHiddenLayer( 2 );
+   // network.build();
 
-   network.trainMcmc( inputData, outputData );
+   std::vector< size_t > hiddenLayers( 1, 3 );
+   hiddenLayers.push_back( 2 );
+   Mva::Mlp2 network( 2, 1, hiddenLayers, true );
+   network.randomiseWeights( Interval( -1, 1 ) );
+   Mva::GradDescMlpTrainer mlpTrainer( network );
+   mlpTrainer.setInputData( inputData, outputData );
+   mlpTrainer.setEta( 0.25 );
+   mlpTrainer.setBatchSize( 10, 1000 );
+   mlpTrainer.setErrorTolerance( 0.01 );
+   mlpTrainer.setNumIterations( 20000 );
+   mlpTrainer.train();
+
+   // network.trainMcmc( inputData, outputData );
 
    RealVector test( 2, 1 );
    msg << Msg::Info << "Dimension check: " << network.evaluate( test ) << Msg::EndReq;
