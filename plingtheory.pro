@@ -126,9 +126,6 @@ SOURCES += main.cpp \
     HistogramItem.cpp \
     McmcOptimiser.cpp \
     RandomNumberGenerator.cpp \
-    MultiLayerPerceptron.cpp \
-    Neuron.cpp \
-    Synapse.cpp \
     MarkerDrawAttr.cpp \
     RootMlp.cpp \
     Hist2DItem.cpp \
@@ -261,9 +258,6 @@ HEADERS += \
     HistogramItem.h \
     McmcOptimiser.h \
     RandomNumberGenerator.h \
-    MultiLayerPerceptron.h \
-    Neuron.h \
-    Synapse.h \
     MarkerDrawAttr.h \
     RootMlp.h \
     Hist2DItem.h \
