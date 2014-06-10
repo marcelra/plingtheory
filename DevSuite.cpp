@@ -81,7 +81,7 @@ void DevSuite::execute()
 #include "RootMlp.h"
 #include "ParticleSwarmOptimiser.h"
 #include "TwoDimExampleObjective.h"
-#include "Mlp2.h"
+#include "MultiLayerPerceptron.h"
 #include "GradDescMlpTrainer.h"
 
 #include <functional>
@@ -232,7 +232,7 @@ void DevSuite::devMlp2()
 
    RealVector x = realVector( 1, 1 );
 
-   Mva::Mlp2 mlp2( 2, 1, hiddenLayerStructure, true );
+   Mva::MultiLayerPerceptron mlp2( 2, 1, hiddenLayerStructure, true );
    const RealVector& y = mlp2.evaluate( x );
    msg << Msg::Info << "y = " << y << Msg::EndReq;
 
@@ -250,7 +250,7 @@ void DevSuite::devMlp2()
    {
       msg << Msg::Info << eval[ i ] << Msg::EndReq;
       x[ 0 ] = eval[ i ];
-      mlp2.calcErrorAndGradient( x, realVector( 2 ), error, gradient );
+      gradient = mlp2.calcErrorAndGradient( x, realVector( 2 ), error );
       grError.push_back( error );
       if ( i == 0 )
       {
@@ -276,7 +276,7 @@ void DevSuite::devMlp2()
    const RealVector& grad = mp.calculateGradient( mlp2.getWeights(), 1e-6 );
 
    mlp2.setWeights( weightsCache );
-   mlp2.calcErrorAndGradient( x, target, error, gradient );
+   gradient = mlp2.calcErrorAndGradient( x, target, error );
 
    RealVector diff = grad - gradient;
    msg << Msg::Info << diff << Msg::EndReq;
@@ -347,8 +347,8 @@ void DevSuite::devMlp()
    }
 
    gPlotFactory().createPlot( "devMlp/trainingSet" );
-   gPlotFactory().createScatter( xUp, yUp, Plotting::MarkerDrawAttr( Qt::red ) );
-   gPlotFactory().createScatter( xDown, yDown, Plotting::MarkerDrawAttr( Qt::blue ) );
+   gPlotFactory().createScatter( xUp, yUp, Plotting::MarkerDrawAttr( Qt::red, Plotting::MarkerPlus ) );
+   gPlotFactory().createScatter( xDown, yDown, Plotting::MarkerDrawAttr( Qt::blue, Plotting::MarkerPlus ) );
 
    // Mva::MultiLayerPerceptron network( 2, 1 );
    // network.addHiddenLayer( 4 );
@@ -357,7 +357,7 @@ void DevSuite::devMlp()
 
    std::vector< size_t > hiddenLayers( 1, 3 );
    hiddenLayers.push_back( 2 );
-   Mva::Mlp2 network( 2, 1, hiddenLayers, true );
+   Mva::MultiLayerPerceptron network( 2, 1, hiddenLayers, true );
    network.randomiseWeights( Interval( -1, 1 ) );
    Mva::GradDescMlpTrainer mlpTrainer( network );
    mlpTrainer.setInputData( inputData, outputData );
@@ -383,7 +383,6 @@ void DevSuite::devMlp()
    for ( size_t i = 0; i < inputData.size(); ++i )
    {
       RealVector output = network.evaluate( inputData[ i ] );
-      // msg << Msg::Info << "output = " << output << ", desired = " << outputData[ i ] << Msg::EndReq;
       if ( output [ 0 ] > 0 )
       {
          xUpPredicted.push_back( inputData[ i ][ 0 ] );
@@ -397,8 +396,8 @@ void DevSuite::devMlp()
    }
 
    gPlotFactory().createPlot( "devMlp/testSet" );
-   gPlotFactory().createScatter( xUpPredicted, yUpPredicted, Plotting::MarkerDrawAttr( Qt::red ) );
-   gPlotFactory().createScatter( xDownPredicted, yDownPredicted, Plotting::MarkerDrawAttr( Qt::blue ) );
+   gPlotFactory().createScatter( xUpPredicted, yUpPredicted, Plotting::MarkerDrawAttr( Qt::red, Plotting::MarkerPlus ) );
+   gPlotFactory().createScatter( xDownPredicted, yDownPredicted, Plotting::MarkerDrawAttr( Qt::blue, Plotting::MarkerPlus ) );
 
    return;
 }

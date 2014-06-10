@@ -1,4 +1,4 @@
-#include "Mlp2.h"
+#include "MultiLayerPerceptron.h"
 
 #include "RandomNumberGenerator.h"
 
@@ -11,12 +11,13 @@ namespace Mva
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Constructor
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-Mlp2::Mlp2( size_t numInputNodes, size_t numOutputNodes, const std::vector< size_t >& hiddenLayerStructure, bool useBiasNodes ) :
+MultiLayerPerceptron::MultiLayerPerceptron( size_t numInputNodes, size_t numOutputNodes, const std::vector< size_t >& hiddenLayerStructure, bool useBiasNodes ) :
    m_input( numInputNodes ),
    m_output( numOutputNodes ),
    m_deltaEInput( numInputNodes ),
    m_deltaEOutput( numOutputNodes ),
-   m_useBiasNodes( useBiasNodes )
+   m_useBiasNodes( useBiasNodes ),
+   m_numWeights( 0 )
 {
    assert( numInputNodes > 0 && numOutputNodes > 0 );
 
@@ -75,12 +76,21 @@ Mlp2::Mlp2( size_t numInputNodes, size_t numOutputNodes, const std::vector< size
 
    m_weightDerivatives = m_weights;
 
+   /// Count the number of weights.
+   for ( size_t i = 0; i < m_weights.size(); ++i )
+   {
+      for ( size_t j = 0; j < m_weights[ i ].size(); ++j )
+      {
+         m_numWeights += m_weights[ i ][ j ].size();
+      }
+   }
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// evaluate
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-RealVector Mlp2::evaluate( const RealVector& x )
+RealVector MultiLayerPerceptron::evaluate( const RealVector& x )
 {
    /// Assert validity of input.
    assert( !m_useBiasNodes && x.size() == m_input.size() || m_useBiasNodes && x.size() == m_input.size() - 1 );
@@ -119,7 +129,7 @@ RealVector Mlp2::evaluate( const RealVector& x )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// getErrorDerivative
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void Mlp2::calcErrorAndGradient( const RealVector& input, const RealVector& target, double& error, RealVector& gradient )
+RealVector MultiLayerPerceptron::calcErrorAndGradient( const RealVector& input, const RealVector& target, double& error )
 {
    /// The current state on the nodes will be used for backpropagation.
    const RealVector& response = evaluate( input );
@@ -189,13 +199,13 @@ void Mlp2::calcErrorAndGradient( const RealVector& input, const RealVector& targ
    }
 
    /// @see composeGradient
-   composeGradient( gradient );
+   return composeGradient();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// propagateFwd
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void Mlp2::propagateForward( const RealVector& sourceLayer, RealVector& destLayer, const std::vector< RealVector >& weights )
+void MultiLayerPerceptron::propagateForward( const RealVector& sourceLayer, RealVector& destLayer, const std::vector< RealVector >& weights )
 {
    assert( weights.size() == sourceLayer.size() );
 
@@ -213,7 +223,7 @@ void Mlp2::propagateForward( const RealVector& sourceLayer, RealVector& destLaye
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// propagateBackward
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void Mlp2::propagateBackward( const RealVector& sourceLayer, RealVector& destLayer, const std::vector< RealVector >& weights )
+void MultiLayerPerceptron::propagateBackward( const RealVector& sourceLayer, RealVector& destLayer, const std::vector< RealVector >& weights )
 {
    assert( weights.size() == destLayer.size() );
    for ( size_t iDestNeuron = 0; iDestNeuron < destLayer.size(); ++iDestNeuron )
@@ -232,7 +242,7 @@ void Mlp2::propagateBackward( const RealVector& sourceLayer, RealVector& destLay
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// applyActivationFunc
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void Mlp2::applyActivationFunc( const RealVector& neuronActivation, RealVector& neuronResponse )
+void MultiLayerPerceptron::applyActivationFunc( const RealVector& neuronActivation, RealVector& neuronResponse )
 {
    for ( size_t i = 0; i < neuronActivation.size(); ++i )
    {
@@ -243,7 +253,7 @@ void Mlp2::applyActivationFunc( const RealVector& neuronActivation, RealVector& 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// calcDerivativesActivationFunc
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void Mlp2::calcDerivativesActivationFunc()
+void MultiLayerPerceptron::calcDerivativesActivationFunc()
 {
    for ( size_t iLayer = 0; iLayer < m_y.size(); ++iLayer )
    {
@@ -259,26 +269,28 @@ void Mlp2::calcDerivativesActivationFunc()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// composeGradient
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void Mlp2::composeGradient( RealVector& gradient )
+RealVector MultiLayerPerceptron::composeGradient()
 {
-   gradient.clear();
+   RealVector result( getNumWeights() );
 
+   size_t index = 0;
    for ( size_t iLayer = 0; iLayer < m_weightDerivatives.size(); ++iLayer )
    {
       for ( size_t iSource = 0; iSource < m_weightDerivatives[ iLayer ].size(); ++iSource )
       {
-         for ( size_t iDest = 0; iDest < m_weightDerivatives[ iLayer ][ iSource ].size(); ++iDest )
+         for ( size_t iDest = 0; iDest < m_weightDerivatives[ iLayer ][ iSource ].size(); ++iDest, ++index )
          {
-            gradient.push_back( m_weightDerivatives[ iLayer ][ iSource ][ iDest ] );
+            result[ index ] = m_weightDerivatives[ iLayer ][ iSource ][ iDest ];
          }
       }
    }
+   return result;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// randomiseWeights
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void Mlp2::randomiseWeights( const Interval& interval )
+void MultiLayerPerceptron::randomiseWeights( const Interval& interval )
 {
    RandomNumberGenerator rng( 2 );
    for ( size_t i = 0; i < m_weights.size(); ++i )
@@ -296,7 +308,7 @@ void Mlp2::randomiseWeights( const Interval& interval )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// getWeightReference
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-std::vector< double > Mlp2::getWeights()
+std::vector< double > MultiLayerPerceptron::getWeights()
 {
    std::vector< double > result;
    for ( size_t i = 0; i < m_weights.size(); ++i )
@@ -315,7 +327,7 @@ std::vector< double > Mlp2::getWeights()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// setWeights
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void Mlp2::setWeights( const std::vector< double >& weights )
+void MultiLayerPerceptron::setWeights( const std::vector< double >& weights )
 {
    size_t l = 0;
    for ( size_t i = 0; i < m_weights.size(); ++i )
@@ -329,7 +341,14 @@ void Mlp2::setWeights( const std::vector< double >& weights )
          }
       }
    }
+}
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// getNumWeights
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+size_t MultiLayerPerceptron::getNumWeights() const
+{
+   return m_numWeights;
 }
 
 } /// namespace Mva
