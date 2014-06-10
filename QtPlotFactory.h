@@ -34,6 +34,12 @@ class QtPlotFactory : public IPlotFactory
                           const std::vector< double >& yData,
                           const Plotting::MarkerDrawAttr& markerDrawAttr );
 
+      void createZScatter( const std::vector< double >& xData,
+                           const std::vector< double >& yData,
+                           const std::vector< double >& zData,
+                           const Plotting::Palette& palette,
+                           const Plotting::MarkerDrawAttr& markerDrawAttr = Plotting::MarkerDrawAttr() );
+
       void createStftGraph( const WaveAnalysis::StftData& stftData );
       virtual void createHistogram( const Math::IAccumArray& hist, const QColor& colour );
       virtual void create2DHist( const Math::Regular2DHistogram& hist, const Plotting::Palette& palette );

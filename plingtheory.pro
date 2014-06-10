@@ -136,7 +136,9 @@ SOURCES += main.cpp \
     Hypercube.cpp \
     MlpTrainer.cpp \
     GradDescMlpTrainer.cpp \
-    MultiLayerPerceptron.cpp
+    MultiLayerPerceptron.cpp \
+    ZScatterItem.cpp \
+    MlpErrorObjective.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -268,7 +270,9 @@ HEADERS += \
     Hypercube.h \
     MlpTrainer.h \
     GradDescMlpTrainer.h \
-    MultiLayerPerceptron.h
+    MultiLayerPerceptron.h \
+    ZScatterItem.h \
+    MlpErrorObjective.h
 
 OTHER_FILES += \
     Todos.txt

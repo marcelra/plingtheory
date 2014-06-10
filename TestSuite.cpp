@@ -13,7 +13,7 @@ bool checkTodos = false;
 ////////////////////////////////////////////////////////////////////////////////
 void TestSuite::execute()
 {
-   // singleTest();
+   singleTest(); return;
    runTestMath();
 
    /// Utilities
@@ -45,6 +45,10 @@ void TestSuite::execute()
    /// Feature algorithms
    testPeakDetection();
 
+   /// Multivariate analysis algorithms
+   testMlpGradients();
+   testMultiLayerPerceptron();
+
    /// Everything together
    testIntegration();
 
@@ -59,7 +63,8 @@ void TestSuite::execute()
 
 void TestSuite::singleTest()
 {
-   testFindMinima();
+   testMlpGradients();
+   testMultiLayerPerceptron();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -73,16 +78,19 @@ void TestSuite::singleTest()
 #include "WaveFile.h"
 #include "MultiChannelRawPcmData.h"
 
+#include "FftwAlgorithm.h"
+#include "FocalTones.h"
+#include "GaussPdf.h"
+#include "GradDescMlpTrainer.h"
 #include "Note.h"
 #include "NoteList.h"
-#include "FftwAlgorithm.h"
-#include "GaussPdf.h"
+#include "MultiLayerPerceptron.h"
+#include "MlpErrorObjective.h"
 #include "ObjectPool.h"
 #include "Peak.h"
 #include "Tone.h"
 #include "TestMath.h"
 #include "NaivePeaks.h"
-#include "FocalTones.h"
 #include "AlgorithmBase.h"
 #include "StftGraph.h"
 #include "DynamicFourier.h"
@@ -1105,3 +1113,166 @@ void TestSuite::testHistogram()
    gPlotFactory().createGraph( xEval, yEval, Qt::blue );
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// testMlpGradients
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void TestSuite::testMlpGradients()
+{
+   Logger msg( "testMlpGradients" );
+   msg << Msg::Info << "In testMlpGradients..." << Msg::EndReq;
+
+   std::vector< size_t > hiddenLayerStructure;
+   hiddenLayerStructure.push_back( 2 );
+   hiddenLayerStructure.push_back( 4 );
+
+   RealVector x = realVector( 1, 1 );
+
+   Mva::MultiLayerPerceptron mlp2( 2, 1, hiddenLayerStructure, true );
+   const RealVector& y = mlp2.evaluate( x );
+   msg << Msg::Info << "y = " << y << Msg::EndReq;
+
+   RealVector gradient;
+   double error;
+
+   RealVector eval = Utils::createRangeReal( -4, 4, 100 );
+
+   mlp2.randomiseWeights( Interval( -1, 1 ) );
+
+   RealVector grError;
+   std::vector< RealVector > derivs;
+
+   for ( size_t i = 0; i < eval.size(); ++i )
+   {
+      msg << Msg::Info << eval[ i ] << Msg::EndReq;
+      x[ 0 ] = eval[ i ];
+      gradient = mlp2.calcErrorAndGradient( x, realVector( 2 ), error );
+      grError.push_back( error );
+      if ( i == 0 )
+      {
+         derivs.resize( gradient.size(), RealVector( eval.size() ) );
+      }
+      for ( size_t j = 0; j < derivs.size(); ++j )
+      {
+         derivs[ j ][ i ] = gradient[ j ];
+      }
+   }
+
+   gPlotFactory().createPlot( "testMlpGradients/error" );
+   gPlotFactory().createGraph( eval, grError, Qt::red );
+   for ( size_t j = 0; j < derivs.size(); ++j )
+   {
+      gPlotFactory().createGraph( eval, derivs[ j ], Qt::blue );
+   }
+
+   RealVector weightsCache = mlp2.getWeights();
+
+   RealVector target = realVector( 2 );
+   Mva::MlpErrorObjective mlpError( mlp2, x, target );
+   const RealVector& grad = mlpError.calculateGradient( mlp2.getWeights(), 1e-6 );
+
+   mlp2.setWeights( weightsCache );
+   gradient = mlp2.calcErrorAndGradient( x, target, error );
+
+   RealVector diff = grad - gradient;
+   msg << Msg::Info << diff << Msg::EndReq;
+
+   msg << Msg::Info << "Correct = " << grad << Msg::EndReq;
+   msg << Msg::Info << "Test    = " << gradient << Msg::EndReq;
+
+   std::vector< RealVector > inputData;
+   std::vector< RealVector > outputData;
+
+   /// XOR training pattern
+   inputData.push_back( realVector( 0, 0 ) );
+   inputData.push_back( realVector( 1, 0 ) );
+   inputData.push_back( realVector( 0, 1 ) );
+   inputData.push_back( realVector( 1, 1 ) );
+
+   outputData.push_back( realVector( 0 ) );
+   outputData.push_back( realVector( 0 ) );
+   outputData.push_back( realVector( 0 ) );
+   outputData.push_back( realVector( 1 ) );
+
+   Mva::GradDescMlpTrainer mlpTrainer( mlp2 );
+   mlpTrainer.setInputData( inputData, outputData );
+   mlpTrainer.setEta( 1 );
+   mlpTrainer.setNumIterations( 1000 );
+   mlpTrainer.train();
+
+   for ( size_t i = 0; i < inputData.size(); ++i )
+   {
+      msg << Msg::Info << "XOR trained NN: " << inputData[ i ] << " -> " << mlp2.evaluate( inputData[ i ] ) << Msg::EndReq;
+   }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// testMultiLayerPerceptron
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void TestSuite::testMultiLayerPerceptron()
+{
+   Logger msg( "testMultiLayerPerceptron" );
+   msg << Msg::Info << "In testMultiLayerPerceptron..." << Msg::EndReq;
+
+   TRandom3 rand( 1 );
+
+   std::vector< RealVector > inputData;
+   std::vector< RealVector > outputData;
+
+   RealVector xData;
+   RealVector yData;
+   RealVector zData;
+
+   size_t nTrainSamples = 10000;
+   for ( size_t iTrainSample = 0; iTrainSample < nTrainSamples; ++iTrainSample )
+   {
+      double x = rand.Uniform( -1, 1 );
+      double y = rand.Uniform( -1, 1 );
+      double z = -1;
+      if ( x * y > 0 )
+      {
+         z = 1;
+      }
+      RealVector v;
+      v.push_back( x );
+      v.push_back( y );
+      inputData.push_back( v );
+      outputData.push_back( RealVector( 1, z ) );
+
+      xData.push_back( x );
+      yData.push_back( y );
+      zData.push_back( z );
+   }
+
+   /// Create plot of training set.
+   gPlotFactory().createPlot( "testMultiLayerPerceptron/trainingSet" );
+   gPlotFactory().createZScatter( xData, yData, zData, Plotting::Palette::heatPalette(), Plotting::MarkerDrawAttr( Qt::red, Plotting::MarkerPlus ) );
+
+   /// Create neural network.
+   std::vector< size_t > hiddenLayers;
+   hiddenLayers.push_back( 4 );
+   hiddenLayers.push_back( 2 );
+   Mva::MultiLayerPerceptron network( 2, 1, hiddenLayers, true );
+
+   /// Train network.
+   network.randomiseWeights( Interval( -1, 1 ) );
+   Mva::GradDescMlpTrainer mlpTrainer( network );
+   mlpTrainer.setInputData( inputData, outputData );
+   mlpTrainer.setEta( 0.25 );
+   mlpTrainer.setBatchSize( 10, 1000 );
+   mlpTrainer.setErrorTolerance( 0.01 );
+   mlpTrainer.setNumIterations( 20000 );
+   mlpTrainer.train();
+
+   /// Test neural network output.
+   RealVector zPred;
+   for ( size_t i = 0; i < inputData.size(); ++i )
+   {
+      RealVector output = network.evaluate( inputData[ i ] );
+      zPred.push_back( output[ 0 ] );
+   }
+
+   gPlotFactory().createPlot( "testMultiLayerPerceptron/testSet" );
+   gPlotFactory().createZScatter( xData, yData, zPred, Plotting::Palette::heatPalette(), Plotting::MarkerDrawAttr( Qt::red, Plotting::MarkerPlus ) );
+
+   return;
+}

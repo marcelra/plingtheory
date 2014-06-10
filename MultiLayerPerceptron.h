@@ -43,7 +43,6 @@ class MultiLayerPerceptron
        */
      size_t getNumWeights() const;
 
-   /// TODO: will be private.
    public:
       /**
        * Calculate the error and gradient (@param[out] error and @return) for a sample @param input and
@@ -51,7 +50,6 @@ class MultiLayerPerceptron
        */
       RealVector calcErrorAndGradient( const RealVector& input, const RealVector& target, double& error );
 
-   private:
       /**
        * Propagate neuron response from @param sourceLayer to activate @param destLayer.
        */
@@ -94,41 +92,6 @@ class MultiLayerPerceptron
       std::vector< std::vector< RealVector > > m_weightDerivatives;	//! Derivates of all weights.
       bool												  m_useBiasNodes;			//! Indicator whether or not to include bias nodes.
       size_t											  m_numWeights;		   //! The number of weights in this MLP.
-};
-
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// TODO: Temp class for testing gradients.
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#include "IObjectiveFunction.h"
-
-class MlpPerturbative : public Math::IObjectiveFunction
-{
-   public:
-      MlpPerturbative( MultiLayerPerceptron& mlp2, RealVector& eval, RealVector& target ) :
-         m_mlp( mlp2 ),
-         m_eval( eval ),
-         m_target( target )
-      {}
-
-      double evaluate( const RealVector& weights ) const
-      {
-         double error;
-         m_mlp.setWeights( weights );
-         RealVector&& grad = m_mlp.calcErrorAndGradient( m_eval, m_target, error );
-         return error;
-      }
-
-      size_t getNumParameters() const
-      {
-         return m_mlp.getWeights().size();
-      }
-
-   private:
-      MultiLayerPerceptron&   m_mlp;
-      RealVector			      m_eval;
-      RealVector			      m_target;
 };
 
 } /// namespace Mva
