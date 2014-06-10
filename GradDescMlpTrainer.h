@@ -10,7 +10,7 @@ namespace Mva
 class GradDescMlpTrainer : public Mva::MlpTrainer
 {
    public:
-      GradDescMlpTrainer( Mlp2& mlp, const std::string& algName = "GradDescMlpTrainer", const AlgorithmBase* parent = 0 );
+      GradDescMlpTrainer( MultiLayerPerceptron& mlp, const std::string& algName = "GradDescMlpTrainer", const AlgorithmBase* parent = 0 );
 
       void setEta( double eta );
       void setBatchSize( size_t batchSize, size_t numIterationsPerEpoch );

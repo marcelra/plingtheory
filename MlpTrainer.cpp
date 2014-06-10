@@ -6,7 +6,7 @@ namespace Mva
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// constructor
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-MlpTrainer::MlpTrainer( Mlp2& mlp, const std::string& algName, const AlgorithmBase* parent ) :
+MlpTrainer::MlpTrainer( MultiLayerPerceptron& mlp, const std::string& algName, const AlgorithmBase* parent ) :
    AlgorithmBase( algName, parent ),
    m_mlp( mlp ),
    m_error( std::numeric_limits< double >::max() ),

@@ -134,9 +134,9 @@ SOURCES += main.cpp \
     Palette.cpp \
     ParticleSwarmOptimiser.cpp \
     Hypercube.cpp \
-    Mlp2.cpp \
     MlpTrainer.cpp \
-    GradDescMlpTrainer.cpp
+    GradDescMlpTrainer.cpp \
+    MultiLayerPerceptron.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -266,9 +266,9 @@ HEADERS += \
     Palette.h \
     ParticleSwarmOptimiser.h \
     Hypercube.h \
-    Mlp2.h \
     MlpTrainer.h \
-    GradDescMlpTrainer.h
+    GradDescMlpTrainer.h \
+    MultiLayerPerceptron.h
 
 OTHER_FILES += \
     Todos.txt

@@ -1,13 +1,13 @@
 #include "GradDescMlpTrainer.h"
 
 #include "Logger.h"
-#include "Mlp2.h"
+#include "MultiLayerPerceptron.h"
 #include "Utils.h"
 
 namespace Mva
 {
 
-GradDescMlpTrainer::GradDescMlpTrainer( Mlp2& mlp, const std::string& algName, const AlgorithmBase* parent ) :
+GradDescMlpTrainer::GradDescMlpTrainer( MultiLayerPerceptron& mlp, const std::string& algName, const AlgorithmBase* parent ) :
    MlpTrainer( mlp, algName, parent ),
    m_eta( 0.01 ),
    m_batchSize( -1 ),
@@ -61,9 +61,8 @@ void GradDescMlpTrainer::train()
 
       for ( size_t iSample = 0; iSample < batch.size(); ++iSample )
       {
-         RealVector sampleGradient;
          double sampleError;
-         m_mlp.calcErrorAndGradient( (*m_trainDataInput)[ batch[ iSample ] ], (*m_trainDataOutput)[ batch[ iSample ] ], sampleError, sampleGradient );
+         RealVector sampleGradient = m_mlp.calcErrorAndGradient( (*m_trainDataInput)[ batch[ iSample ] ], (*m_trainDataOutput)[ batch[ iSample ] ], sampleError );
          gradient = gradient + sampleGradient;
          error += sampleError;
       }
