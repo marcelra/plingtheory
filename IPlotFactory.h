@@ -60,6 +60,17 @@ class IPlotFactory : SingletonBase
                                   const std::vector< double >& yData,
                                   const Plotting::MarkerDrawAttr& markerDrawAttr = Plotting::MarkerDrawAttr() ) = 0;
 
+      virtual void createZScatter( const std::vector< double >& xData,
+                                   const std::vector< double >& yData,
+                                   const std::vector< double >& zData,
+                                   const Plotting::Palette& palette,
+                                   const Plotting::MarkerDrawAttr& markerDrawAttr = Plotting::MarkerDrawAttr() )
+      {
+         /// Use params in order to suppress compiler warnings.
+         assert( &xData && &yData && &zData && &palette && &markerDrawAttr );
+         assert( false );
+      }
+
       virtual void createStftGraph( const WaveAnalysis::StftData& stftData ) = 0;
       virtual void createHistogram( const Math::IAccumArray& hist, const QColor& colour = Qt::black ) = 0;
 

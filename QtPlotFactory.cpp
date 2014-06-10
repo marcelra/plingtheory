@@ -13,6 +13,7 @@
 #include "ScatterItem.h"
 #include "StftPaintItem.h"
 #include "Utils.h"
+#include "ZScatterItem.h"
 
 #include <cassert>
 
@@ -131,6 +132,22 @@ void QtPlotFactory::create2DHist( const Math::Regular2DHistogram& hist, const Pl
    m_currentPlot->addItem( item );
    m_currentPlot->setEnableGrid( false );
    m_currentPlot->setViewportConstraintsToData();
+   m_plotItems.push_back( item );
+}
+
+void QtPlotFactory::createZScatter( const std::vector< double >& xData,
+                                    const std::vector< double >& yData,
+                                    const std::vector< double >& zData,
+                                    const Plotting::Palette& palette,
+                                    const Plotting::MarkerDrawAttr& markerDrawAttr )
+{
+   if ( !m_currentPlot )
+   {
+      throw ExceptionNoPlotAvailable();
+   }
+
+   Plotting::ZScatterItem * item = new Plotting::ZScatterItem( xData, yData, zData, palette, markerDrawAttr );
+   m_currentPlot->addItem( item );
    m_plotItems.push_back( item );
 }
 

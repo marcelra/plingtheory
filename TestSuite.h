@@ -71,6 +71,12 @@ class TestSuite
       static void testPeakDetection();
 
       /**
+       * Multi Variate Analysis algorithms
+       */
+      static void testMlpGradients();
+      static void testMultiLayerPerceptron();
+
+      /**
        * Integration (coupling of algorithms)
        */
       static void testIntegration();
