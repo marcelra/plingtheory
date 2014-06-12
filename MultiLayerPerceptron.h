@@ -37,7 +37,7 @@ class MultiLayerPerceptron
       /**
        * Randomise the weights.
        */
-      void randomiseWeights( const Interval& interval );
+      void randomiseWeights( const Interval& interval, size_t seed );
       /**
        * Get the number of weights
        */

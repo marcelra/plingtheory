@@ -1136,7 +1136,7 @@ void TestSuite::testMlpGradients()
 
    RealVector eval = Utils::createRangeReal( -4, 4, 100 );
 
-   mlp2.randomiseWeights( Interval( -1, 1 ) );
+   mlp2.randomiseWeights( Interval( -1, 1 ), 2 );
 
    RealVector grError;
    std::vector< RealVector > derivs;
@@ -1197,7 +1197,7 @@ void TestSuite::testMlpGradients()
    mlpTrainer.setInputData( inputData, outputData );
    mlpTrainer.setEta( 1 );
    mlpTrainer.setNumIterations( 100 );
-   mlpTrainer.setBatchSize( 0, 1);
+   mlpTrainer.setBatchSize( 0, 1 );
    mlpTrainer.train();
 
    for ( size_t i = 0; i < inputData.size(); ++i )
@@ -1223,16 +1223,12 @@ void TestSuite::testMultiLayerPerceptron()
    RealVector yData;
    RealVector zData;
 
-   size_t nTrainSamples = 100000;
+   size_t nTrainSamples = 10000;
    for ( size_t iTrainSample = 0; iTrainSample < nTrainSamples; ++iTrainSample )
    {
-      double x = rand.Uniform( -1, 1 );
-      double y = rand.Uniform( -1, 1 );
-      double z = -1;
-      if ( x * y > 0 )
-      {
-         z = 1;
-      }
+      double x = rand.Uniform( 0, 4 );
+      double y = rand.Uniform( 0, 4 );
+      double z = size_t( x ) % 2 + size_t( y ) % 2;
       RealVector v;
       v.push_back( x );
       v.push_back( y );
@@ -1250,19 +1246,21 @@ void TestSuite::testMultiLayerPerceptron()
 
    /// Create neural network.
    std::vector< size_t > hiddenLayers;
+   hiddenLayers.push_back( 8 );
    hiddenLayers.push_back( 4 );
-   hiddenLayers.push_back( 2 );
    Mva::MultiLayerPerceptron network( 2, 1, hiddenLayers, true );
 
    /// Train network.
-   network.randomiseWeights( Interval( -1, 1 ) );
+   network.randomiseWeights( Interval( -1, 1 ), 2 );
    Mva::StochasticGradDescMlpTrainer mlpTrainer( network );
    mlpTrainer.setInputData( inputData, outputData );
    mlpTrainer.setEta( 0.25 );
    mlpTrainer.setBatchSize( 100, 1000 );
-   mlpTrainer.setErrorTolerance( 0.01 );
+   mlpTrainer.setErrorTolerance( 0.03 );
    mlpTrainer.setNumIterations( 20 );
    mlpTrainer.train();
+
+   Plotting::
 
    /// Test neural network output.
    RealVector zPred;
