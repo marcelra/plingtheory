@@ -23,6 +23,7 @@ void DevSuite::execute()
 #include "AccumArrayPeakAlgorithm.h"
 #include "GroundtoneHypothesisBuilder.h"
 #include "IPlotFactory.h"
+#include "NoteList.h"
 #include "RootUtilities.h"
 #include "SortCache.h"
 #include "SpectralReassignmentTransform.h"
