@@ -78,10 +78,10 @@ void TestSuite::singleTest()
 #include "WaveFile.h"
 #include "MultiChannelRawPcmData.h"
 
+#include "AlgorithmBase.h"
 #include "FftwAlgorithm.h"
 #include "FocalTones.h"
 #include "GaussPdf.h"
-#include "GradDescMlpTrainer.h"
 #include "Note.h"
 #include "NoteList.h"
 #include "MultiLayerPerceptron.h"
@@ -91,7 +91,7 @@ void TestSuite::singleTest()
 #include "Tone.h"
 #include "TestMath.h"
 #include "NaivePeaks.h"
-#include "AlgorithmBase.h"
+#include "StochasticGradDescMlpTrainer.h"
 #include "StftGraph.h"
 #include "DynamicFourier.h"
 #include "Regular2DHistogram.h"
@@ -1193,10 +1193,11 @@ void TestSuite::testMlpGradients()
    outputData.push_back( realVector( 0 ) );
    outputData.push_back( realVector( 1 ) );
 
-   Mva::GradDescMlpTrainer mlpTrainer( mlp2 );
+   Mva::StochasticGradDescMlpTrainer mlpTrainer( mlp2 );
    mlpTrainer.setInputData( inputData, outputData );
    mlpTrainer.setEta( 1 );
-   mlpTrainer.setNumIterations( 1000 );
+   mlpTrainer.setNumIterations( 100 );
+   mlpTrainer.setBatchSize( 0, 1);
    mlpTrainer.train();
 
    for ( size_t i = 0; i < inputData.size(); ++i )
@@ -1222,7 +1223,7 @@ void TestSuite::testMultiLayerPerceptron()
    RealVector yData;
    RealVector zData;
 
-   size_t nTrainSamples = 10000;
+   size_t nTrainSamples = 100000;
    for ( size_t iTrainSample = 0; iTrainSample < nTrainSamples; ++iTrainSample )
    {
       double x = rand.Uniform( -1, 1 );
@@ -1255,12 +1256,12 @@ void TestSuite::testMultiLayerPerceptron()
 
    /// Train network.
    network.randomiseWeights( Interval( -1, 1 ) );
-   Mva::GradDescMlpTrainer mlpTrainer( network );
+   Mva::StochasticGradDescMlpTrainer mlpTrainer( network );
    mlpTrainer.setInputData( inputData, outputData );
    mlpTrainer.setEta( 0.25 );
-   mlpTrainer.setBatchSize( 10, 1000 );
+   mlpTrainer.setBatchSize( 100, 1000 );
    mlpTrainer.setErrorTolerance( 0.01 );
-   mlpTrainer.setNumIterations( 20000 );
+   mlpTrainer.setNumIterations( 20 );
    mlpTrainer.train();
 
    /// Test neural network output.
