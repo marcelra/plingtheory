@@ -134,10 +134,10 @@ SOURCES += main.cpp \
     ParticleSwarmOptimiser.cpp \
     Hypercube.cpp \
     MlpTrainer.cpp \
-    GradDescMlpTrainer.cpp \
     MultiLayerPerceptron.cpp \
     ZScatterItem.cpp \
-    MlpErrorObjective.cpp
+    MlpErrorObjective.cpp \
+    StochasticGradDescMlpTrainer.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -175,7 +175,6 @@ HEADERS += \
     IObjectiveFunction.h \
     TestMath.h \
     TwoDimExampleObjective.h \
-    GradDescOptimiser.h \
     RealVector.h \
     LineSearchObjective.h \
     Utils.h \
@@ -268,10 +267,11 @@ HEADERS += \
     ParticleSwarmOptimiser.h \
     Hypercube.h \
     MlpTrainer.h \
-    GradDescMlpTrainer.h \
     MultiLayerPerceptron.h \
     ZScatterItem.h \
-    MlpErrorObjective.h
+    MlpErrorObjective.h \
+    GradDescOptimiser.h \
+    StochasticGradDescMlpTrainer.h
 
 OTHER_FILES += \
     Todos.txt
