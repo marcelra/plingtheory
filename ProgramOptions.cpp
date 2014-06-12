@@ -61,9 +61,13 @@ void ProgramOptions::parseArguments()
       {
          m_doRunDevelopmentCode = true;
       }
-      else if ( opt == "testall" )
+      else if ( opt == "test" )
       {
          m_doRunTests = true;
+      }
+      else if ( opt == "singletest" )
+      {
+         m_doRunSingleTest = true;
       }
       else if ( opt == "compare" )
       {
@@ -181,7 +185,8 @@ void ProgramOptions::printOptions( std::ostream& os )
 {
    os << "Commands:\n";
    os << "develop             : Run development code.\n";
-   os << "testall             : Run all tests.\n";
+   os << "test                : Run all tests.\n";
+   os << "singletest          : Run single test.\n";
    os << "compare <old> <new> : Compare root-files.\n";
    os << "\n";
    os << "Options:\n";
@@ -203,6 +208,14 @@ void ProgramOptions::printOptions( std::ostream& os )
 bool ProgramOptions::doRunTests() const
 {
    return m_doRunTests;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// doRunSingleTest
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+bool ProgramOptions::doRunSingleTest() const
+{
+   return m_doRunSingleTest;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

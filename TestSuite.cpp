@@ -13,23 +13,23 @@ bool checkTodos = false;
 ////////////////////////////////////////////////////////////////////////////////
 void TestSuite::execute()
 {
-   singleTest(); return;
+   /// Test math algorithms.
    runTestMath();
 
-   /// Utilities
+   /// Test Utilities.
    testFindMinima();
    testRandomNumberGenerator();
 
-   /// Base classes
+   /// Test base classes.
    testSoundData();
    testWaveFile();
    testNote();
 
-   /// Infrastucture
+   /// Test infrastucture.
    testObjectPool();
    testThreading();
 
-   /// Generators
+   /// Test generators.
    testEnvelope();
    testSineGenerator();
    testNoiseGenerator();
@@ -37,22 +37,22 @@ void TestSuite::execute()
    testSawtoothGenerator();
    testRandomMusic();
 
-   /// WaveAnalysis
+   /// Test waveAnalysis.
    testAdvancedFourier();
    testStftAlgorithm();
    testSpectralReassignment();
 
-   /// Feature algorithms
+   /// Test feature algorithms.
    testPeakDetection();
 
-   /// Multivariate analysis algorithms
+   /// Test multivariate analysis algorithms.
    testMlpGradients();
    testMultiLayerPerceptron();
 
-   /// Everything together
+   /// Test everything together.
    testIntegration();
 
-   /// Plotting
+   /// Test plotting.
    testHist2D();
    testHistogram();
 

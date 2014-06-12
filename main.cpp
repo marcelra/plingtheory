@@ -227,6 +227,10 @@ int main( int argc, char* argv[] )
          {
             runTests( programOptions );
          }
+         if ( programOptions->doRunSingleTest() )
+         {
+            runTests( programOptions );
+         }
          if ( programOptions->doRunDevelopmentCode() )
          {
             runDevelopmentCode( programOptions );
@@ -305,7 +309,14 @@ void runTests( const ProgramOptions* programOptions )
    assert( programStatus == PS_OK );
    try
    {
-      TestSuite::execute();
+      if ( programOptions->doRunTests() )
+      {
+         TestSuite::execute();
+      }
+      else if ( programOptions->doRunSingleTest() )
+      {
+         TestSuite::singleTest();
+      }
    }
    catch ( ExceptionTestFailed exc )
    {
