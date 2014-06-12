@@ -10,101 +10,26 @@ void DevSuite::execute()
    Logger msg( "DevSuite" );
    msg << Msg::Info << "Running development code..." << Msg::EndReq;
 
-   // devHistogram();
    // devRebinSRSpec();
-   // devFourierTemplates();
-   // devSamples();
-
    // devPeakFinder2();
 
-   // devParticleSwarm();
    return;
-   devPeakFinder2();
-   // devNewtonSolver1D();
-
-   /// Can move to test functions
-   // testPdf();
-
-   /// PARKED
-   // devSidelobeSubtraction();
-   // devEntropyPeaks();
-
-   /// PARKED AND INTERESTING
-   // devFourierPeakFinder1();
-
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Include section
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-#include <set>
-#include <cassert>
-#include "Regular2DHistogram.h"
-#include "GaussPdf.h"
-#include "IObjectiveFunction.h"
-#include "McmcOptimiser.h"
-#include "NoteList.h"
 #include "AccumArrayPeakAlgorithm.h"
 #include "GroundtoneHypothesisBuilder.h"
-#include "RebinnedSRGraph.h"
-#include "RegularAccumArray.h"
-#include "SortCache.h"
-#include "TwoTuple.h"
-#include "SampledMovingAverage.h"
-#include "TLine.h"
-#include "WaveFile.h"
-#include "MultiChannelRawPcmData.h"
-#include "StftGraph.h"
-#include "RawPcmData.h"
-#include "FourierSpectrum.h"
-#include "FourierTransform.h"
-#include "SineGenerator.h"
-#include "SquareGenerator.h"
-#include "RootUtilities.h"
-#include "Utils.h"
-#include "SpectralReassignmentTransform.h"
-#include "KernelPdf.h"
 #include "IPlotFactory.h"
-#include "IThread.h"
-#include "UniformPdf.h"
-#include "RealMemFunction.h"
-#include "RealFunctionPtr.h"
-#include "IRealFunction.h"
-#include "ComposedRealFuncWithDerivative.h"
-#include "NewtonSolver1D.h"
-#include "RandomNumberGenerator.h"
-#include "RootMlp.h"
-#include "ParticleSwarmOptimiser.h"
-#include "TwoDimExampleObjective.h"
-#include "MultiLayerPerceptron.h"
-#include "GradDescMlpTrainer.h"
+#include "RootUtilities.h"
+#include "SortCache.h"
+#include "SpectralReassignmentTransform.h"
 
-#include <functional>
-#include <cmath>
+#include "TCanvas.h"
+#include "TGraph.h"
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// Parked code fragments
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#include "DevSuite.parked.cpp"
-
-void DevSuite::devNewtonSolver1D()
-{
-   Logger msg( "devNewtonSolver1D" );
-   msg << Msg::Info << "Running devNewtonSolver1D..." << Msg::EndReq;
-
-   Math::GaussPdf gaussPdf( 0, 1 );
-   Math::RealMemFunction< Math::GaussPdf > integral( &Math::GaussPdf::getIntegral, &gaussPdf );
-   Math::RealMemFunction< Math::GaussPdf > density( &Math::GaussPdf::getDensity, &gaussPdf );
-   Math::ComposedRealFuncWithDerivative pdfAsFunc( integral, density );
-
-   Math::NewtonSolver1D newtonSolver;
-   Math::NewtonSolver1D::Result result = newtonSolver.solve( pdfAsFunc, 0.95, 0 );
-   msg << Msg::Info << "Solution = " << result.getSolution() << Msg::EndReq;
-
-   return;
-}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// devRebinSRSpec
@@ -216,44 +141,5 @@ void DevSuite::devPeakFinder2()
    // stftGraph.create();
 
    return;
-}
-
-
-void DevSuite::devParticleSwarm()
-{
-   Logger msg( "devParticleSwarm" );
-   msg << Msg::Info << "Running devParticleSwarm..." << Msg::EndReq;
-
-   RealVector minVec( 2, -10 );
-   RealVector maxVec( 2, 10 );
-   Math::Hypercube solutionSpace( minVec, maxVec );
-
-   Math::TwoDimExampleObjective objFunc;
-
-   Math::ParticleSwarmOptimiser pso( objFunc, 400, solutionSpace );
-
-   std::vector< std::vector< RealVector > > swarmTracker;
-   const RealVector& result = pso.solve( 100, &swarmTracker );
-
-   Plotting::Palette pal = Plotting::Palette::heatPalette();
-
-   gPlotFactory().createPlot( "devParticleSwarm/swarmTracking" );
-   for ( size_t i = 0; i < swarmTracker.size(); ++i )
-   {
-      RealVector xData( swarmTracker[ i ].size() );
-      RealVector yData( swarmTracker[ i ].size() );
-
-      for ( size_t j = 0; j < xData.size(); ++j )
-      {
-         xData[ j ] = swarmTracker[ i ][ j ][ 0 ];
-         yData[ j ] = swarmTracker[ i ][ j ][ 1 ];
-      }
-
-      QColor colour = pal.getColour( static_cast< double >( i ) / swarmTracker.size() );
-      gPlotFactory().createScatter( xData, yData, Plotting::MarkerDrawAttr( colour, Plotting::MarkerPlus, 3 ) );
-   }
-
-   msg << Msg::Info << "Result = " << result << Msg::EndReq;
-
 }
 

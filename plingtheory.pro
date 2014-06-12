@@ -63,7 +63,6 @@ SOURCES += main.cpp \
     FourierConfig.cpp \
     DevSuite.cpp \
     SpectralReassignmentTransform.cpp \
-    DevSuite.parked.cpp \
     TestDataSupply.cpp \
     TwoTuple.cpp \
     INTuple.cpp \

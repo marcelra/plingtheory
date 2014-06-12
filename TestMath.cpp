@@ -1,22 +1,25 @@
 #include "TestMath.h"
 
+/// Helper classes.
 #include "IPlotFactory.h"
 #include "Logger.h"
 #include "RootUtilities.h"
 #include "TestDataSupply.h"
 
+/// Algorithms being tested.
 #include "ComposedRealFuncWithDerivative.h"
 #include "GaussPdf.h"
 #include "GradDescOptimiser.h"
+#include "Hypercube.h"
 #include "KernelPdf.h"
 #include "McmcOptimiser.h"
 #include "NewtonSolver1D.h"
+#include "ParticleSwarmOptimiser.h"
 #include "RealMemFunction.h"
 #include "SampledMovingAverage.h"
 #include "TwoDimExampleObjective.h"
 #include "UniformPdf.h"
 
-#include "TGraph.h"
 
 #include <cmath>
 
@@ -29,13 +32,24 @@ void TestMath::execute()
 {
    Logger msg( "TestMath::execute" );
    msg << Msg::Info << "Executing Math namespace tests..." << Msg::EndReq;
-   testTwoDimExampleObjective();
+
+   /// Gradient-based optimisation algorithms.
    testGradDescOptimiser();
+   testTwoDimExampleObjective();
+
+   /// Stochastic optimisation algorithms.
+   testParticleSwarm();
+   testMcmc();
    testSampledMovingAverage();
+
+   /// Math containers.
    testTwoTuple();
    testRegularAccumArray();
-   testMcmc();
+
+   /// Other/uncategorized.
+   testNewtonSolver1D();
    testPdf();
+
    msg << Msg::Info << "Math tests done." << Msg::EndReq;
 }
 
@@ -373,6 +387,47 @@ class MultivariateGaussObjective : public Math::IObjectiveFunction
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// testParticleSwarm
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void TestMath::testParticleSwarm()
+{
+   Logger msg( "testParticleSwarm" );
+   msg << Msg::Info << "Running testParticleSwarm..." << Msg::EndReq;
+
+   RealVector minVec( 2, -10 );
+   RealVector maxVec( 2, 10 );
+   Math::Hypercube solutionSpace( minVec, maxVec );
+
+   Math::TwoDimExampleObjective objFunc;
+
+   Math::ParticleSwarmOptimiser pso( objFunc, 400, solutionSpace );
+
+   std::vector< std::vector< RealVector > > swarmTracker;
+   const RealVector& result = pso.solve( 100, &swarmTracker );
+
+   Plotting::Palette pal = Plotting::Palette::heatPalette();
+
+   gPlotFactory().createPlot( "testParticleSwarm/swarmTracking" );
+   for ( size_t i = 0; i < swarmTracker.size(); ++i )
+   {
+      RealVector xData( swarmTracker[ i ].size() );
+      RealVector yData( swarmTracker[ i ].size() );
+
+      for ( size_t j = 0; j < xData.size(); ++j )
+      {
+         xData[ j ] = swarmTracker[ i ][ j ][ 0 ];
+         yData[ j ] = swarmTracker[ i ][ j ][ 1 ];
+      }
+
+      QColor colour = pal.getColour( static_cast< double >( i ) / swarmTracker.size() );
+      gPlotFactory().createScatter( xData, yData, Plotting::MarkerDrawAttr( colour, Plotting::MarkerPlus, 3 ) );
+   }
+
+   msg << Msg::Info << "Result = " << result << Msg::EndReq;
+
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// testMcmc
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void TestMath::testMcmc()
@@ -487,4 +542,3 @@ void TestMath::testPdf()
    gPlotFactory().createGraph( xEvalKern, kernEval );
    gPlotFactory().createGraph( xEvalKern, uniformEval, Qt::red );
 }
-
