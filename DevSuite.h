@@ -16,20 +16,6 @@ class DevSuite
       static void devPeakFinder2();
       static void devRebinSRSpec();
 
-      static void devParticleSwarm();
-
-   /**
-    * Math
-    */
-   public:
-      static void testPdf();
-      static void devNewtonSolver1D();
-
-   /// Parked.
-   public:
-      static void devSidelobeSubtraction();
-      static void devEntropyPeaks();
-
    /// Parked and interesting.
    public:
       static void devFourierPeakFinder1();
