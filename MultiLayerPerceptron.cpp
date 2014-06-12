@@ -290,9 +290,9 @@ RealVector MultiLayerPerceptron::composeGradient()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// randomiseWeights
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void MultiLayerPerceptron::randomiseWeights( const Interval& interval )
+void MultiLayerPerceptron::randomiseWeights( const Interval& interval, size_t seed )
 {
-   RandomNumberGenerator rng( 2 );
+   RandomNumberGenerator rng( seed );
    for ( size_t i = 0; i < m_weights.size(); ++i )
    {
       for ( size_t j = 0; j < m_weights[ i ].size(); ++j )
