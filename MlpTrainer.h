@@ -19,6 +19,7 @@ class MlpTrainer : public AlgorithmBase
       virtual ~MlpTrainer();
 
       void setInputData( const std::vector< RealVector >& inputData, const std::vector< RealVector >& outputData );
+      void setTestData( const std::vector< RealVector >& inputData, const std::vector< RealVector >& outputData );
 
       void setNumIterations( size_t nIter );
       void setErrorTolerance( double errorTolerance );
@@ -28,12 +29,19 @@ class MlpTrainer : public AlgorithmBase
       virtual void train() = 0;
 
    protected:
-      MultiLayerPerceptron&											m_mlp;
+      double calculateErrorTestSet();
+
+   protected:
+      MultiLayerPerceptron&					m_mlp;
 
       const std::vector< RealVector >*		m_trainDataInput;
       const std::vector< RealVector >*  	m_trainDataOutput;
 
+      const std::vector< RealVector >* 	m_testDataInput;
+      const std::vector< RealVector >* 	m_testDataOutput;
+
       double 										m_error;
+      double										m_errorTest;
 
       size_t										m_numIterations;
       double 										m_errorTolerance;

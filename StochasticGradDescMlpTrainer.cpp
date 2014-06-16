@@ -86,8 +86,7 @@ double StochasticGradDescMlpTrainer::calculateErrorsFullSet()
 
    for ( size_t iSample = 0; iSample < m_trainDataInput->size(); ++iSample )
    {
-      double sampleError;
-      m_mlp.calcErrorAndGradient( (*m_trainDataInput)[ iSample ], (*m_trainDataOutput)[ iSample ], sampleError );
+      double sampleError = m_mlp.calcError( (*m_trainDataInput)[ iSample ], (*m_trainDataOutput)[ iSample ] );
       updateSampleError( iSample, sampleError );
       totalError += sampleError;
    }
@@ -134,7 +133,9 @@ void StochasticGradDescMlpTrainer::train()
          weights = weights - gradient * m_eta;
          m_mlp.setWeights( weights );
       }
+
       double error = calculateErrorsFullSet();
+      double testError = calculateErrorTestSet();
 
       if ( error > 10 * m_error )
       {
@@ -144,6 +145,10 @@ void StochasticGradDescMlpTrainer::train()
 
       m_error = error;
       getLogger() << Msg::Debug << "Training epoch " << iIter << ": error = " << m_error << Msg::EndReq;
+      if ( testError != 0 )
+      {
+         getLogger() << Msg::Debug << " => Test sample performance: " << testError << Msg::EndReq;
+      }
 
       if ( isConverged() )
       {

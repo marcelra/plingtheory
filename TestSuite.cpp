@@ -1216,62 +1216,80 @@ void TestSuite::testMultiLayerPerceptron()
 
    TRandom3 rand( 1 );
 
-   std::vector< RealVector > inputData;
-   std::vector< RealVector > outputData;
+   std::vector< RealVector > trainInputData;
+   std::vector< RealVector > trainOutputData;
+   std::vector< RealVector > testInputData;
+   std::vector< RealVector > testOutputData;
 
-   RealVector xData;
-   RealVector yData;
-   RealVector zData;
+   RealVector xTrain;
+   RealVector yTrain;
+   RealVector zTrain;
 
    size_t nTrainSamples = 10000;
-   for ( size_t iTrainSample = 0; iTrainSample < nTrainSamples; ++iTrainSample )
+   size_t nTestSamples = 10000;
+   for ( size_t iTrainSample = 0; iTrainSample < nTrainSamples + nTestSamples; ++iTrainSample )
    {
       double x = rand.Uniform( 0, 4 );
       double y = rand.Uniform( 0, 4 );
       double z = size_t( x ) % 2 + size_t( y ) % 2;
-      RealVector v;
-      v.push_back( x );
-      v.push_back( y );
-      inputData.push_back( v );
-      outputData.push_back( RealVector( 1, z ) );
 
-      xData.push_back( x );
-      yData.push_back( y );
-      zData.push_back( z );
+      double xPrime = x - 0.5*y;
+      double yPrime = y + 0.5*x;
+      RealVector v;
+      v.push_back( xPrime );
+      v.push_back( yPrime );
+
+      if ( iTrainSample < nTrainSamples )
+      {
+         trainInputData.push_back( v );
+         trainOutputData.push_back( RealVector( 1, z ) );
+         xTrain.push_back( v[ 0 ] );
+         yTrain.push_back( v[ 1 ] );
+         zTrain.push_back( z );
+      }
+      else
+      {
+         testInputData.push_back( v );
+         testOutputData.push_back( RealVector( 1, z ) );
+      }
    }
 
    /// Create plot of training set.
    gPlotFactory().createPlot( "testMultiLayerPerceptron/trainingSet" );
-   gPlotFactory().createZScatter( xData, yData, zData, Plotting::Palette::heatPalette(), Plotting::MarkerDrawAttr( Qt::red, Plotting::MarkerPlus ) );
+   gPlotFactory().createZScatter( xTrain, yTrain, zTrain, Plotting::Palette::heatPalette(), Plotting::MarkerDrawAttr( Qt::red, Plotting::MarkerPlus ) );
 
    /// Create neural network.
    std::vector< size_t > hiddenLayers;
    hiddenLayers.push_back( 8 );
-   hiddenLayers.push_back( 4 );
+   hiddenLayers.push_back( 8 );
    Mva::MultiLayerPerceptron network( 2, 1, hiddenLayers, true );
 
    /// Train network.
    network.randomiseWeights( Interval( -1, 1 ), 2 );
    Mva::StochasticGradDescMlpTrainer mlpTrainer( network );
-   mlpTrainer.setInputData( inputData, outputData );
+   mlpTrainer.setInputData( trainInputData, trainOutputData );
+   mlpTrainer.setTestData( testInputData, testOutputData );
    mlpTrainer.setEta( 0.25 );
    mlpTrainer.setBatchSize( 100, 1000 );
-   mlpTrainer.setErrorTolerance( 0.03 );
+   mlpTrainer.setErrorTolerance( 0.01 );
    mlpTrainer.setNumIterations( 20 );
    mlpTrainer.train();
 
-   Plotting::
+   RealVector xData;
+   RealVector yData;
+   RealVector zData;
 
    /// Test neural network output.
-   RealVector zPred;
-   for ( size_t i = 0; i < inputData.size(); ++i )
+   for ( size_t i = 0; i < testInputData.size(); ++i )
    {
-      RealVector output = network.evaluate( inputData[ i ] );
-      zPred.push_back( output[ 0 ] );
+      xData.push_back( testInputData[ i ][ 0 ] );
+      yData.push_back( testInputData[ i ][ 1 ] );
+      RealVector output = network.evaluate( testInputData[ i ] );
+      zData.push_back( output[ 0 ] );
    }
 
    gPlotFactory().createPlot( "testMultiLayerPerceptron/testSet" );
-   gPlotFactory().createZScatter( xData, yData, zPred, Plotting::Palette::heatPalette(), Plotting::MarkerDrawAttr( Qt::red, Plotting::MarkerPlus ) );
+   gPlotFactory().createZScatter( xData, yData, zData, Plotting::Palette::heatPalette(), Plotting::MarkerDrawAttr( Qt::red, Plotting::MarkerPlus ) );
 
    return;
 }
