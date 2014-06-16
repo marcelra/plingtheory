@@ -51,6 +51,11 @@ class MultiLayerPerceptron
       RealVector calcErrorAndGradient( const RealVector& input, const RealVector& target, double& error );
 
       /**
+       * Calculate the error for an individual sample.
+       */
+      double calcError( const RealVector& input, const RealVector& target );
+
+      /**
        * Propagate neuron response from @param sourceLayer to activate @param destLayer.
        */
       void propagateForward( const RealVector& sourceLayer, RealVector& destLayer, const std::vector< RealVector >& weights );

@@ -127,17 +127,16 @@ RealVector MultiLayerPerceptron::evaluate( const RealVector& x )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// getErrorDerivative
+/// calcError
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-RealVector MultiLayerPerceptron::calcErrorAndGradient( const RealVector& input, const RealVector& target, double& error )
+double MultiLayerPerceptron::calcError( const RealVector& input, const RealVector& target )
 {
-   /// The current state on the nodes will be used for backpropagation.
    const RealVector& response = evaluate( input );
 
    assert( target.size() == response.size() );
 
    /// Calculate the error and deltas on the output nodes.
-   error = 0;
+   double error = 0;
    for ( size_t i = 0; i < response.size(); ++i )
    {
       double diff = response[ i ] - target[ i ];
@@ -145,6 +144,16 @@ RealVector MultiLayerPerceptron::calcErrorAndGradient( const RealVector& input, 
       m_deltaEOutput[ i ] = diff;
    }
    error *= 0.5;
+   return error;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// getErrorDerivative
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+RealVector MultiLayerPerceptron::calcErrorAndGradient( const RealVector& input, const RealVector& target, double& error )
+{
+   /// The current state on the nodes will be used for backpropagation.
+   error = calcError( input, target );
 
    if ( m_deltaE.size() == 0 )
    {
