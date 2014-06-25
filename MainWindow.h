@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include <QModelIndex>
 
+class IThread;
+
 class QListView;
 class QPushButton;
 
@@ -34,7 +36,6 @@ class DummyPlotWidget : public QWidget
       virtual ~DummyPlotWidget() {}
 
       QLabel*     m_label;
-
 };
 
 class MainWindow : public QMainWindow
@@ -47,14 +48,21 @@ class MainWindow : public QMainWindow
 
       void buildPlotList();
 
+      void startWorkerThread( IThread* thread );
+
    private slots:
       void quitClickedSlot();
       void plotSelectedSlot( QModelIndex index );
+      void lowFreqUpdate();
+      void highFreqUpdate();
 
    private:
-      QPushButton*         m_quitButton;
-      QListView*           m_plotsListView;
-      QWidget*             m_plotWidget;
+      QPushButton*         	m_quitButton;
+      QListView*           	m_plotsListView;
+      QWidget*             	m_plotWidget;
+      QTimer*						m_lowFreqTimer;
+      QTimer*						m_highFreqTimer;
+      std::vector< IThread*>	m_runningThreads;
 };
 
 } /// namespace Gui

@@ -98,7 +98,7 @@ class IThread
     */
    private:
       bool     m_isFinished;
-      bool		m_isKilled;
+      bool     m_isKilled;
       bool     m_isRunning;
       size_t   m_pollTimeMilliSeconds;
 

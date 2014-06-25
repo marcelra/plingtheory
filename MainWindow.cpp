@@ -1,12 +1,15 @@
 #include "MainWindow.h"
 
 #include "AvailablePlotsList.h"
+#include "IThread.h"
 #include "Plot2D.h"
 
+#include <QDebug>
 #include <QHBoxLayout>
 #include <QListWidget>
 #include <QPushButton>
 #include <QStandardItemModel>
+#include <QTimer>
 #include <QVBoxLayout>
 
 #include <cassert>
@@ -14,6 +17,9 @@
 namespace Gui
 {
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// constructor
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 MainWindow::MainWindow( QWidget* parent ) :
    QMainWindow( parent )
 {
@@ -52,17 +58,44 @@ MainWindow::MainWindow( QWidget* parent ) :
    connect( m_plotsListView, SIGNAL( entered( QModelIndex ) ), this, SLOT( plotSelectedSlot( QModelIndex ) ) );
    connect( m_plotsListView, SIGNAL( pressed( QModelIndex ) ), this, SLOT( plotSelectedSlot( QModelIndex ) ) );
 
-   buildPlotList();
+   m_lowFreqTimer  = new QTimer( this );
+   m_lowFreqTimer->setInterval( 500 );
+   connect( m_lowFreqTimer, SIGNAL( timeout() ), this, SLOT( lowFreqUpdate() ) );
+   m_lowFreqTimer->start();
+
+   m_highFreqTimer = new QTimer( this );
+   m_highFreqTimer->setInterval( 10 );
+   connect( m_highFreqTimer, SIGNAL( timeout() ), this, SLOT( highFreqUpdate() ) );
+   m_highFreqTimer->start();
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// destructor
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 MainWindow::~MainWindow()
-{}
+{
+   /// Clean up worker threads
+   for ( size_t i = 0; i < m_runningThreads.size(); ++i )
+   {
+      m_runningThreads[ i ]->kill();
+   }
+   for ( size_t i = 0; i < m_runningThreads.size(); ++i )
+   {
+      delete m_runningThreads[ i ];
+   }
+}
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// quitClickedSlot
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void MainWindow::quitClickedSlot()
 {
    close();
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// plotSelectedSlot
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void MainWindow::plotSelectedSlot( QModelIndex index )
 {
    QStandardItemModel* model = static_cast< QStandardItemModel* >( m_plotsListView->model() );
@@ -83,14 +116,58 @@ void MainWindow::plotSelectedSlot( QModelIndex index )
    m_plotWidget->setMinimumHeight( 400 );
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// buildPlotLists
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void MainWindow::buildPlotList()
 {
-   delete m_plotsListView->model();
    AvailablePlotsList& plotsProvider = AvailablePlotsList::getInstance();
-
    QStandardItemModel* model = plotsProvider.buildModel();
 
-   m_plotsListView->setModel( model );
+   if ( model )
+   {
+      QModelIndex currentIndex = m_plotsListView->currentIndex();
+      delete m_plotsListView->model();
+      m_plotsListView->setModel( model );
+      m_plotsListView->setCurrentIndex( currentIndex );
+   }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// startWorkerThread
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void MainWindow::startWorkerThread( IThread* thread )
+{
+   thread->start();
+   m_runningThreads.push_back( thread );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// lowFreqUpdate
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void MainWindow::lowFreqUpdate()
+{
+   for ( auto it = m_runningThreads.begin(); it != m_runningThreads.end(); )
+   {
+      if ( !(*it)->isRunning() )
+      {
+         delete *it;
+         it = m_runningThreads.erase( it );
+      }
+      else
+      {
+         ++it;
+      }
+   }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// updateThreadResults
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void MainWindow::highFreqUpdate()
+{
+   buildPlotList();
+   AvailablePlotsList::getInstance().handleNewPlotRequest();
 }
 
 } /// namespace Gui

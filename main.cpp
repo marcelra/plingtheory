@@ -4,6 +4,7 @@
 #include "Exceptions.h"
 #include "GlobalLogParameters.h"
 #include "GlobalParameters.h"
+#include "IThread.h"
 #include "Logger.h"
 #include "MainWindow.h"
 #include "ProgramOptions.h"
@@ -196,6 +197,42 @@ void finaliseApplication()
    }
 }
 
+class MainWorkerThread : public IThread
+{
+   public:
+      MainWorkerThread( const ProgramOptions* programOptions ) :
+         IThread( "MainWorkerThread" ),
+         m_programOptions( programOptions )
+      {}
+
+      void run()
+      {
+         if ( m_programOptions->doRunTests() )
+         {
+            runTests( m_programOptions );
+         }
+         if ( m_programOptions->doRunSingleTest() )
+         {
+            runTests( m_programOptions );
+         }
+         if ( m_programOptions->doRunDevelopmentCode() )
+         {
+            runDevelopmentCode( m_programOptions );
+         }
+         if ( m_programOptions->getRootFileOutput() != "" )
+         {
+            saveRootFileOutput( m_programOptions );
+         }
+         if ( m_programOptions->doCompareRootFiles() )
+         {
+            compareRootFiles( m_programOptions );
+         }
+      }
+
+   private:
+      const ProgramOptions*		m_programOptions;
+};
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Main program
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -222,28 +259,6 @@ int main( int argc, char* argv[] )
             gApp = new QApplication( argc, argv );
          }
 
-         /// Run tests
-         if ( programOptions->doRunTests() )
-         {
-            runTests( programOptions );
-         }
-         if ( programOptions->doRunSingleTest() )
-         {
-            runTests( programOptions );
-         }
-         if ( programOptions->doRunDevelopmentCode() )
-         {
-            runDevelopmentCode( programOptions );
-         }
-         if ( programOptions->getRootFileOutput() != "" )
-         {
-            saveRootFileOutput( programOptions );
-         }
-         if ( programOptions->doCompareRootFiles() )
-         {
-            compareRootFiles( programOptions );
-         }
-
          /// TODO: Temp for development of PlotFactory
          if ( programOptions->useRootInterface() || programOptions->useQtInterface() )
          {
@@ -268,6 +283,7 @@ int main( int argc, char* argv[] )
             if ( programStatus == PS_OK )
             {
                Gui::MainWindow mainWindow;
+               mainWindow.startWorkerThread( new MainWorkerThread( programOptions ) );
                mainWindow.show();
 
                if ( gApp->exec() != 0 )

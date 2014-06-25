@@ -27,11 +27,19 @@ class AvailablePlotsList : public SingletonBase
       /**
        * Add a plot.
        */
-      void addPlot( const std::string& name, Plotting::Plot2D* plot );
+      Plotting::Plot2D* addPlot( const std::string& name );
       /**
        * Build the Qt model for the QListView.
        */
-      QStandardItemModel* buildModel() const;
+      QStandardItemModel* buildModel();
+
+      /**
+       * Creates new plots. This method is intended to be called regularly from the main (GUI) thread.
+       * The Qt object should be created on the main thread otherwise they cannot handle signals etc.
+       * This method is protected by a mutex and only one new plot can be requested. This method should not be
+       * called from the main thread.
+       */
+      void handleNewPlotRequest();
 
    private:
       /**
@@ -43,11 +51,23 @@ class AvailablePlotsList : public SingletonBase
        */
       virtual ~AvailablePlotsList();
 
-      static AvailablePlotsList*     s_instance;      //! Singleton instance.
+      /**
+       * Request the main thread to create a new default plot.
+       */
+      Plotting::Plot2D* requestNewPlot();
 
-  private:
-      std::vector< Plotting::Plot2D* > m_plots;       //! Store of plots.
-      std::vector< std::string >       m_plotNames;   //! Names of plots.
+   private:
+      static AvailablePlotsList*     s_instance;            //! Singleton instance.
+
+   private:
+      std::vector< Plotting::Plot2D* > m_plots;             //! Store of plots.
+      std::vector< std::string >       m_plotNames;         //! Names of plots.
+      QStandardItemModel*              m_model;             //! The StandardItemModel. This pointer is updated after every
+                                                            //! call to buildModel. The pointer is invalidated if a new plot
+                                                            //! is requested.
+      bool                             m_newPlotRequested;  //! True iff a new plot is requested.
+      bool                             m_newPlotReady;      //! True iff a new plot is created.
+      Plotting::Plot2D*                m_newPlot;           //! Pointer to the new plot.
 };
 
 } /// namespace Gui

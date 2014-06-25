@@ -27,7 +27,7 @@ void TestSuite::execute()
 
    /// Test infrastucture.
    testObjectPool();
-   testThreading();
+   // testThreading();
 
    /// Test generators.
    testEnvelope();
@@ -1272,7 +1272,7 @@ void TestSuite::testMultiLayerPerceptron()
    mlpTrainer.setEta( 0.1 );
    mlpTrainer.setBatchSize( 100, 50 );
    mlpTrainer.setErrorTolerance( 0.05 );
-   mlpTrainer.setNumIterations( 500 );
+   mlpTrainer.setNumIterations( 10 );
    mlpTrainer.train();
 
    RealVector xData;
