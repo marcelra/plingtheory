@@ -40,9 +40,8 @@ void QtPlotFactory::initialise()
 
 void QtPlotFactory::createPlot( const std::string& name )
 {
-   Plotting::Plot2D* plot2D = new Plotting::Plot2D();
    Gui::AvailablePlotsList& plotsList = Gui::AvailablePlotsList::getInstance();
-   plotsList.addPlot( name, plot2D );
+   Plotting::Plot2D* plot2D = plotsList.addPlot( name );
    m_currentPlot = plot2D;
 }
 

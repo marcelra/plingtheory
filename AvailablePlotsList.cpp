@@ -2,6 +2,15 @@
 
 #include <QStandardItemModel>
 
+#include <boost/chrono.hpp>
+#include <boost/thread.hpp>
+#include <boost/thread/mutex.hpp>
+
+namespace
+{
+boost::mutex modelMutex;
+} /// anonymous namespace
+
 namespace Gui
 {
 
@@ -9,7 +18,11 @@ namespace Gui
 /// constructor
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 AvailablePlotsList::AvailablePlotsList() :
-   SingletonBase( "AvailablePlotsList" )
+   SingletonBase( "AvailablePlotsList" ),
+   m_model( 0 ),
+   m_newPlotRequested( false ),
+   m_newPlotReady( false ),
+   m_newPlot( 0 )
 {}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -36,18 +49,34 @@ AvailablePlotsList* AvailablePlotsList::s_instance = 0;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// addPlot
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void AvailablePlotsList::addPlot( const std::string& name, Plotting::Plot2D* plot )
+Plotting::Plot2D* AvailablePlotsList::addPlot( const std::string& name )
 {
+   boost::mutex::scoped_lock lock( ::modelMutex );
+   m_model = 0;
+   Plotting::Plot2D* plot = requestNewPlot();
+   m_newPlot = 0;
    m_plots.push_back( plot );
    m_plotNames.push_back( name );
+   return plot;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// buildModel
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-QStandardItemModel* AvailablePlotsList::buildModel() const
+QStandardItemModel* AvailablePlotsList::buildModel()
 {
-   QStandardItemModel* model = new QStandardItemModel();
+   boost::mutex::scoped_try_lock lock( ::modelMutex );
+   if ( !lock )
+   {
+      return 0;
+   }
+
+   if ( m_model )
+   {
+      return 0;
+   }
+
+   m_model = new QStandardItemModel();
 
    for ( size_t iPlot = 0; iPlot < m_plots.size(); ++iPlot )
    {
@@ -55,9 +84,40 @@ QStandardItemModel* AvailablePlotsList::buildModel() const
       item->setText( m_plotNames[ iPlot ].c_str() );
       item->setData( QVariant::fromValue< Plotting::Plot2D* >( m_plots[ iPlot ] ) );
       item->setEditable( false );
-      model->insertRow( iPlot, item );
+      m_model->insertRow( iPlot, item );
    }
-   return model;
+   return m_model;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// requestNewPlot
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Plotting::Plot2D* AvailablePlotsList::requestNewPlot()
+{
+   m_newPlotRequested = true;
+   while ( !m_newPlotReady )
+   {
+      boost::this_thread::sleep_for( boost::chrono::milliseconds( 10 ) );
+   }
+   m_newPlotReady = false;
+   return m_newPlot;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// handleNewPlotRequest
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void AvailablePlotsList::handleNewPlotRequest()
+{
+   boost::mutex::scoped_lock lock;
+   if ( !m_newPlotRequested )
+   {
+      return;
+   }
+
+   assert ( m_newPlot == 0 );
+   m_newPlot = new Plotting::Plot2D();
+   m_newPlotRequested = false;
+   m_newPlotReady = true;
 }
 
 } /// namespace Gui

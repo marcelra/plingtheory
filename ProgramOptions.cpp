@@ -12,6 +12,7 @@
 ProgramOptions::ProgramOptions( int argc, char* argv[] ) :
    m_hasErrors( false ),
    m_doRunTests( false ),
+   m_doRunSingleTest( false ),
    m_doRunDevelopmentCode( false ),
    m_doCompareRootFiles( false ),
    m_useRootInterface( false ),
