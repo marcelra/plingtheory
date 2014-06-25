@@ -52,9 +52,13 @@ class IThread
        */
       void start();
       /**
-       * Wait for thread finished at this method.
+       * Wait for thread to be finished at this method.
        */
       void join();
+      /**
+       * Kill the thread. This will stop the execution, but the user still needs to destroy the thread object.
+       */
+      void kill();
 
       /**
        * Check if the thread has started already.
@@ -68,6 +72,10 @@ class IThread
        * Check if the thread is finished.
        */
       bool isFinished() const;
+      /**
+       * Check if the thread is killed.
+       */
+      bool isKilled() const;
 
    private:
       /**
@@ -90,6 +98,7 @@ class IThread
     */
    private:
       bool     m_isFinished;
+      bool		m_isKilled;
       bool     m_isRunning;
       size_t   m_pollTimeMilliSeconds;
 
@@ -114,7 +123,7 @@ class IThread
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 inline bool IThread::hasStarted() const
 {
-   return m_isRunning || m_isFinished;
+   return m_isRunning || m_isFinished || m_isKilled;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -133,6 +142,12 @@ inline bool IThread::isFinished() const
    return m_isFinished;
 }
 
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// isKilled
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+inline bool IThread::isKilled() const
+{
+   return m_isKilled;
+}
 
 #endif // ITHREAD_H

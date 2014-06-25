@@ -4,17 +4,18 @@
 
 /// boost includes
 #include <boost/chrono.hpp>
-#include <stdint.h>
 #include <boost/thread.hpp>
 
 /// STL includes
 #include <cassert>
+#include <stdint.h>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// constructor
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 IThread::IThread( const std::string& threadName ) :
    m_isFinished( false ),
+   m_isKilled( false ),
    m_isRunning( false ),
    m_pollTimeMilliSeconds( 1 ),
    m_logger( new Logger( threadName ) )
@@ -28,9 +29,12 @@ IThread::~IThread()
    delete m_logger;
    if ( hasStarted() )
    {
-      assert( isFinished() );
-      assert( m_thread != 0 );
-      delete m_thread;
+      if ( !isKilled() )
+      {
+         assert( isFinished() );
+         assert( m_thread != 0 );
+         delete m_thread;
+      }
    }
 }
 
@@ -48,6 +52,7 @@ Logger& IThread::getLogger()
 void IThread::start()
 {
    assert( !hasStarted() );
+   m_isRunning = true;
    m_thread = new boost::thread( IThread::runWrapper, this );
 }
 
@@ -56,7 +61,6 @@ void IThread::start()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void IThread::runWrapper( IThread* instance )
 {
-   instance->m_isRunning = true;
    instance->run();
    instance->m_isRunning = false;
    instance->m_isFinished = true;
@@ -96,5 +100,17 @@ void IThread::run()
    {
       getLogger() << Msg::Verbose << "i = " << i << ": cos( i ) = " << cos( i ) << Msg::EndReq;
    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// kill
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void IThread::kill()
+{
+   getLogger() << Msg::Verbose << "Killing thread with id " << m_thread->get_id() << Msg::EndReq;
+   delete m_thread;
+   m_thread = 0;
+   m_isRunning = false;
+   m_isKilled = true;
 }
 
