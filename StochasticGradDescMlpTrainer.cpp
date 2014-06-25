@@ -56,7 +56,7 @@ std::vector< size_t > StochasticGradDescMlpTrainer::makeBatch()
          for ( size_t iTry = 0; iTry < s_numTriesAddSampleToBatch; ++iTry )
          {
             proposedIndex = m_rng.uniform( 0, m_trainDataInput->size() );
-            double acceptDraw = m_rng.uniform( 0, m_largestSampleError );
+            double acceptDraw = m_rng.uniform( 0, m_error );
             if ( acceptDraw < m_sampleErrors[ proposedIndex ] )
             {
                accepted = true;
