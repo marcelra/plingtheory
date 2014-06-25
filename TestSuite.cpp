@@ -1202,7 +1202,7 @@ void TestSuite::testMlpGradients()
 
    for ( size_t i = 0; i < inputData.size(); ++i )
    {
-      msg << Msg::Info << "XOR trained NN: " << inputData[ i ] << " -> " << mlp2.evaluate( inputData[ i ] ) << Msg::EndReq;
+      msg << Msg::Info << "AND trained NN: " << inputData[ i ] << " -> " << mlp2.evaluate( inputData[ i ] ) << Msg::EndReq;
    }
 }
 
@@ -1225,16 +1225,16 @@ void TestSuite::testMultiLayerPerceptron()
    RealVector yTrain;
    RealVector zTrain;
 
-   size_t nTrainSamples = 10000;
-   size_t nTestSamples = 10000;
+   size_t nTrainSamples = 5000;
+   size_t nTestSamples = 5000;
    for ( size_t iTrainSample = 0; iTrainSample < nTrainSamples + nTestSamples; ++iTrainSample )
    {
-      double x = rand.Uniform( 0, 4 );
-      double y = rand.Uniform( 0, 4 );
+      double x = rand.Uniform( 0, 5 );
+      double y = rand.Uniform( 0, 5 );
       double z = size_t( x ) % 2 + size_t( y ) % 2;
 
-      double xPrime = x - 0.5*y;
-      double yPrime = y + 0.5*x;
+      double xPrime = x - 0.5*log( y );
+      double yPrime = y + 0.5*sin( x );
       RealVector v;
       v.push_back( xPrime );
       v.push_back( yPrime );
@@ -1260,19 +1260,19 @@ void TestSuite::testMultiLayerPerceptron()
 
    /// Create neural network.
    std::vector< size_t > hiddenLayers;
-   hiddenLayers.push_back( 8 );
+   hiddenLayers.push_back( 16 );
    hiddenLayers.push_back( 8 );
    Mva::MultiLayerPerceptron network( 2, 1, hiddenLayers, true );
 
    /// Train network.
-   network.randomiseWeights( Interval( -1, 1 ), 2 );
+   network.randomiseWeights( Interval( -1, 1 ), 3 );
    Mva::StochasticGradDescMlpTrainer mlpTrainer( network );
    mlpTrainer.setInputData( trainInputData, trainOutputData );
    mlpTrainer.setTestData( testInputData, testOutputData );
-   mlpTrainer.setEta( 0.25 );
-   mlpTrainer.setBatchSize( 100, 1000 );
-   mlpTrainer.setErrorTolerance( 0.01 );
-   mlpTrainer.setNumIterations( 20 );
+   mlpTrainer.setEta( 0.1 );
+   mlpTrainer.setBatchSize( 100, 50 );
+   mlpTrainer.setErrorTolerance( 0.05 );
+   mlpTrainer.setNumIterations( 500 );
    mlpTrainer.train();
 
    RealVector xData;
