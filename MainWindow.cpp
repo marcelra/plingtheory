@@ -17,6 +17,8 @@ namespace Gui
 MainWindow::MainWindow( QWidget* parent ) :
    QMainWindow( parent )
 {
+   this->setGeometry( 0, 0, 1000, 700 );
+
    /// Build widgets.
    m_quitButton = new QPushButton( "Quit" );
    m_plotsListView = new QListView();
@@ -27,8 +29,8 @@ MainWindow::MainWindow( QWidget* parent ) :
    m_plotsListView->setFixedWidth( 300 );
 
    m_plotWidget = new DummyPlotWidget( this );
-   m_plotWidget->setMinimumWidth( 800 );
-   m_plotWidget->setMinimumHeight( 600 );
+   m_plotWidget->setMinimumWidth( 400 );
+   m_plotWidget->setMinimumHeight( 400 );
 
    /// Set layout.
    QWidget* centralWidget = new QWidget( this );
@@ -77,8 +79,8 @@ void MainWindow::plotSelectedSlot( QModelIndex index )
    m_plotWidget = item->data().value< Plotting::Plot2D* >();
    layout->addWidget( m_plotWidget, 1 );
    m_plotWidget->show();
-   m_plotWidget->setMinimumWidth( 800 );
-   m_plotWidget->setMinimumHeight( 600 );
+   m_plotWidget->setMinimumWidth( 400 );
+   m_plotWidget->setMinimumHeight( 400 );
 }
 
 void MainWindow::buildPlotList()
