@@ -1,6 +1,7 @@
 #include "MlpTrainer.h"
 
 #include "MultiLayerPerceptron.h"
+#include <limits>
 
 namespace Mva
 {
