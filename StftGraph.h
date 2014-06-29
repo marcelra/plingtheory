@@ -9,6 +9,11 @@
 class TCanvas;
 class TH2F;
 
+namespace Math
+{
+   class Regular2DHistogram;
+}
+
 namespace WaveAnalysis
 {
    class StftData;
@@ -21,25 +26,16 @@ namespace Visualisation
 class StftGraph
 {
    public:
-      StftGraph( const WaveAnalysis::StftData& fftwData, size_t nBinsX = 0, size_t nBinsY = 0 );
+      StftGraph( const WaveAnalysis::StftData& fftwData );
       virtual ~StftGraph();
 
-      TCanvas* create();
-
-      const TCanvas* getCanvas() const;
-      TCanvas* getCanvas();
-
-      const TH2F* getGraph() const;
-      TH2F* getGraph();
+      void create( const std::string& name );
 
    private:
       const WaveAnalysis::StftData&  m_stftData;
 
    private:
-      TCanvas*  m_canvas;
-      TH2F*     m_hist;
-      size_t    m_nBinsX;
-      size_t    m_nBinsY;
+      Math::Regular2DHistogram*  m_hist;
 
    private:
       StftGraph( const StftGraph& other );

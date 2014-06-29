@@ -63,8 +63,7 @@ void TestSuite::execute()
 
 void TestSuite::singleTest()
 {
-   testMlpGradients();
-   testMultiLayerPerceptron();
+   testSpectralReassignment();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -757,8 +756,8 @@ void TestSuite::testStftAlgorithm()
    {
       assert( !"Uncomment STFT graph code" );
    }
-   // Visualisation::StftGraph stftGraph( *stftData );
-   // stftGraph.create();
+   Visualisation::StftGraph graph( *stftData );
+   graph.create( "testStftAlgorithm/Stft" );
 
    RawPcmData::Ptr reverse = stftAlg.reverseExecute( *stftData );
 
@@ -943,12 +942,12 @@ void TestSuite::testSpectralReassignment()
    Synthesizer::SquareGenerator sineGen( samplingInfo );
    sineGen.setAmplitude( 0.5 );
    sineGen.setFrequency( freq );
-   RawPcmData::Ptr data = sineGen.generate( 44100 );
+   // RawPcmData::Ptr data = sineGen.generate( 44100 );
 
-   // MultiChannelRawPcmData* waveFile = WaveFile::read( GlobalParameters::getTestDataDir() + "atc_intro.wav" );
-   // RawPcmData* data = &waveFile->getChannel( 0 );
+   MultiChannelRawPcmData* waveFile = WaveFile::read( GlobalParameters::getTestDataDir() + "atc_intro.wav" );
+   RawPcmData* data = &waveFile->getChannel( 0 );
 
-   WaveAnalysis::SpectralReassignmentTransform specTrans( samplingInfo, fourierSize, fourierSize*3, 2 );
+   WaveAnalysis::SpectralReassignmentTransform specTrans( samplingInfo, fourierSize, fourierSize*8, 4 );
    WaveAnalysis::StftData::Ptr trans = specTrans.execute( *data );
 
    const WaveAnalysis::SrSpectrum& specReass = dynamic_cast< const WaveAnalysis::SrSpectrum& >( trans->getSpectrum( 0 ) );
@@ -972,6 +971,8 @@ void TestSuite::testSpectralReassignment()
 
    Visualisation::RebinnedSRGraph graph( *trans );
    graph.create( "testSpectralReassignment/Stft" );
+
+   delete waveFile;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1264,32 +1265,39 @@ void TestSuite::testMultiLayerPerceptron()
    hiddenLayers.push_back( 8 );
    Mva::MultiLayerPerceptron network( 2, 1, hiddenLayers, true );
 
-   /// Train network.
    network.randomiseWeights( Interval( -1, 1 ), 3 );
-   Mva::StochasticGradDescMlpTrainer mlpTrainer( network );
-   mlpTrainer.setInputData( trainInputData, trainOutputData );
-   mlpTrainer.setTestData( testInputData, testOutputData );
-   mlpTrainer.setEta( 0.1 );
-   mlpTrainer.setBatchSize( 100, 50 );
-   mlpTrainer.setErrorTolerance( 0.05 );
-   mlpTrainer.setNumIterations( 10 );
-   mlpTrainer.train();
 
-   RealVector xData;
-   RealVector yData;
-   RealVector zData;
-
-   /// Test neural network output.
-   for ( size_t i = 0; i < testInputData.size(); ++i )
+   /// Train network.
+   for ( size_t iIter = 0; iIter < 10; ++iIter )
    {
-      xData.push_back( testInputData[ i ][ 0 ] );
-      yData.push_back( testInputData[ i ][ 1 ] );
-      RealVector output = network.evaluate( testInputData[ i ] );
-      zData.push_back( output[ 0 ] );
-   }
+      Mva::StochasticGradDescMlpTrainer mlpTrainer( network );
+      mlpTrainer.setInputData( trainInputData, trainOutputData );
+      mlpTrainer.setTestData( testInputData, testOutputData );
+      mlpTrainer.setEta( 0.1 );
+      mlpTrainer.setBatchSize( 100, 50 );
+      mlpTrainer.setErrorTolerance( 0.05 );
+      mlpTrainer.setNumIterations( 10 );
+      mlpTrainer.train();
 
-   gPlotFactory().createPlot( "testMultiLayerPerceptron/testSet" );
-   gPlotFactory().createZScatter( xData, yData, zData, Plotting::Palette::heatPalette(), Plotting::MarkerDrawAttr( Qt::red, Plotting::MarkerPlus ) );
+      RealVector xData;
+      RealVector yData;
+      RealVector zData;
+
+      /// Test neural network output.
+      for ( size_t i = 0; i < testInputData.size(); ++i )
+      {
+         xData.push_back( testInputData[ i ][ 0 ] );
+         yData.push_back( testInputData[ i ][ 1 ] );
+         RealVector output = network.evaluate( testInputData[ i ] );
+         zData.push_back( output[ 0 ] );
+      }
+
+      std::ostringstream title;
+      title << "testMultiLayerPerceptron/testSet" << iIter;
+
+      gPlotFactory().createPlot( title.str() );
+      gPlotFactory().createZScatter( xData, yData, zData, Plotting::Palette::heatPalette(), Plotting::MarkerDrawAttr( Qt::red, Plotting::MarkerPlus ) );
+   }
 
    return;
 }

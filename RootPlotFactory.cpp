@@ -142,8 +142,7 @@ int RootPlotFactory::rootColorFromQColor( const QColor& colour )
 
 void RootPlotFactory::createStftGraph( const WaveAnalysis::StftData& stftData )
 {
-   Visualisation::StftGraph stftGraph( stftData );
-   m_currentCanvas = stftGraph.create();
+   assert( false );
 }
 
 void RootPlotFactory::createHistogram( const Math::IAccumArray& hist, const QColor& colour )
