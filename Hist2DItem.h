@@ -2,17 +2,13 @@
 #define HIST2DITEM_H
 
 #include "IPaintItem.h"
+#include "Palette.h"
 
 #include <QPixmap>
 
 namespace Math
 {
 class Regular2DHistogram;
-}
-
-namespace Plotting
-{
-class Palette;
 }
 
 namespace Plotting
@@ -38,11 +34,20 @@ class Hist2DItem : public IPaintItem
       void generatePlotCommands( PaintArea* paintArea ) const;
 
    private:
-      QPixmap     m_pixmap;
-      double      m_minX;
-      double      m_maxX;
-      double      m_minY;
-      double      m_maxY;
+      void createPixmaps( const Math::Regular2DHistogram& hist2D, const Palette& palette );
+      const QPixmap& getPixmap( double compressionX, double compressionY ) const;
+
+      void fillPixmap( QPixmap& pixmap, size_t xCompIndex, size_t yCompIndex ) const;
+      QColor getMaxColourInRect( const QPoint& pos, const QSize& rect ) const;
+
+   private:
+      std::vector< std::vector< double > >                    m_relPixmap;
+      double                                                  m_minX;
+      double                                                  m_maxX;
+      double                                                  m_minY;
+      double                                                  m_maxY;
+      mutable std::map< size_t, std::map< size_t, QPixmap > > m_cache;
+      Palette                                                 m_palette;
 };
 
 } /// namespace Plotting
