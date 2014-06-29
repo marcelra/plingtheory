@@ -25,7 +25,8 @@ Palette::Palette( const std::vector< QColor >& stops, const std::vector< double 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 QColor Palette::getColour( double z ) const
 {
-   assert( z >= 0 && z <= 1 );
+   // assert( z >= 0 && z <= 1 );
+   z = z > 1 ? 0.999 : z;
 
    size_t stopIndexLeft = 0;
    for ( size_t i = 0; i < m_stopPoints.size() - 1; ++i )
