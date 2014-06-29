@@ -24,6 +24,7 @@ class Palette
        * Obtain colour from value z. Z should be normalised between 0 and 1.
        */
       QColor getColour( double z ) const;
+      QRgb   getRgb( double z ) const;
 
       /**
        * Prefab palettes.
@@ -44,6 +45,8 @@ class Palette
    private:
       std::vector< QColor >      m_stops;
       std::vector< double >      m_stopPoints;
+      std::vector< QRgb >        m_colourCache;
+      static const size_t        s_numColoursInCache;
 };
 
 } /// namespace Plotting

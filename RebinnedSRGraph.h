@@ -21,7 +21,7 @@ namespace Visualisation
 class RebinnedSRGraph
 {
    public:
-      RebinnedSRGraph( const WaveAnalysis::StftData& stftData, size_t nBinsX = 0, size_t nBinsY = 0 );
+      RebinnedSRGraph( const WaveAnalysis::StftData& stftData );
       virtual ~RebinnedSRGraph();
 
       void create( const std::string& name );
@@ -31,8 +31,6 @@ class RebinnedSRGraph
 
    private:
       Math::Regular2DHistogram*     m_hist;
-      size_t                        m_nBinsX;
-      size_t                        m_nBinsY;
 
    private:
       RebinnedSRGraph( const RebinnedSRGraph& other );

@@ -6,6 +6,7 @@
 #include "Regular2DHistogram.h"
 
 #include <QColor>
+#include <QImage>
 #include <QPainter>
 #include <QDebug>
 
@@ -106,30 +107,32 @@ void Hist2DItem::fillPixmap( QPixmap& pixmap, size_t xCompIndex, size_t yCompInd
    newPixmapSize.setWidth( xSizeSource / xCompression );
    newPixmapSize.setHeight( ySizeSource / yCompression );
 
-   pixmap = QPixmap( newPixmapSize );
-
    double posX = 0;
    double posXStep = static_cast< double >( xSizeSource ) / newPixmapSize.width();
    double posY = 0;
    double posYStep = static_cast< double >( ySizeSource ) / newPixmapSize.height();
 
-   QPainter p;
-   p.begin( &pixmap );
-   for ( int iX = 0; iX < newPixmapSize.width(); ++iX, posX += posXStep )
+   QImage image( newPixmapSize, QImage::Format_ARGB32 );
+   QRgb* bits = reinterpret_cast< QRgb* >( image.bits() );
+
+   size_t iBit = 0;
+
+   for ( int iY = 0; iY < newPixmapSize.height(); ++iY, posY += posYStep )
    {
-      posY = 0;
-      for ( int iY = 0; iY < newPixmapSize.height(); ++iY, posY += posYStep )
+      posX = 0;
+      for ( int iX = 0; iX < newPixmapSize.width(); ++iX, posX += posXStep, ++iBit )
       {
-         p.setPen( getMaxColourInRect( QPoint( posX, posY ), QSize( xCompression, yCompression ) ) );
-         p.drawPoint( QPoint( iX, iY ) );
+         bits[ iBit ] = getMaxColourInRect( QPoint( posX, posY ), QSize( xCompression, yCompression ) );
       }
    }
+
+   pixmap = QPixmap::fromImage( image );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// getMaxColourInRect
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-QColor Hist2DItem::getMaxColourInRect( const QPoint& pos, const QSize& rect ) const
+QRgb Hist2DItem::getMaxColourInRect( const QPoint& pos, const QSize& rect ) const
 {
    double max = 0;
    for ( size_t iX = pos.x(); ( (int ) iX < pos.x() + rect.width() ) && iX < m_relPixmap.size(); ++iX )
@@ -143,7 +146,7 @@ QColor Hist2DItem::getMaxColourInRect( const QPoint& pos, const QSize& rect ) co
          }
       }
    }
-   return m_palette.getColour( max );
+   return m_palette.getRgb( max );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
