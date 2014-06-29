@@ -38,7 +38,7 @@ class Hist2DItem : public IPaintItem
       const QPixmap& getPixmap( double compressionX, double compressionY ) const;
 
       void fillPixmap( QPixmap& pixmap, size_t xCompIndex, size_t yCompIndex ) const;
-      QColor getMaxColourInRect( const QPoint& pos, const QSize& rect ) const;
+      QRgb getMaxColourInRect( const QPoint& pos, const QSize& rect ) const;
 
    private:
       std::vector< std::vector< double > >                    m_relPixmap;
