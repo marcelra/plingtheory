@@ -85,7 +85,6 @@ const QPixmap& Hist2DItem::getPixmap( double compressionX, double compressionY )
    QPixmap& pixmap = m_cache[ xCompIndex ][ yCompIndex ];
    if ( pixmap.size() == QSize( 0, 0 ) )
    {
-      qDebug() << "Creating cached pixmap.";
       fillPixmap( pixmap, xCompIndex, yCompIndex );
    }
 
