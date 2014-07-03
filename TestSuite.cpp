@@ -14,7 +14,7 @@ bool checkTodos = false;
 void TestSuite::execute()
 {
    /// Test math algorithms.
-   runTestMath();
+   // runTestMath();
 
    /// Test Utilities.
    testFindMinima();
@@ -63,7 +63,8 @@ void TestSuite::execute()
 
 void TestSuite::singleTest()
 {
-   testSpectralReassignment();
+   // testSpectralReassignment();
+   testMultiLayerPerceptron();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -947,7 +948,7 @@ void TestSuite::testSpectralReassignment()
    MultiChannelRawPcmData* waveFile = WaveFile::read( GlobalParameters::getTestDataDir() + "atc_intro.wav" );
    RawPcmData* data = &waveFile->getChannel( 0 );
 
-   WaveAnalysis::SpectralReassignmentTransform specTrans( samplingInfo, fourierSize, fourierSize*8, 4 );
+   WaveAnalysis::SpectralReassignmentTransform specTrans( samplingInfo, fourierSize, fourierSize*7, 4 );
    WaveAnalysis::StftData::Ptr trans = specTrans.execute( *data );
 
    const WaveAnalysis::SrSpectrum& specReass = dynamic_cast< const WaveAnalysis::SrSpectrum& >( trans->getSpectrum( 0 ) );
@@ -1261,6 +1262,8 @@ void TestSuite::testMultiLayerPerceptron()
 
    /// Create neural network.
    std::vector< size_t > hiddenLayers;
+   hiddenLayers.push_back( 32 );
+   hiddenLayers.push_back( 24 );
    hiddenLayers.push_back( 16 );
    hiddenLayers.push_back( 8 );
    Mva::MultiLayerPerceptron network( 2, 1, hiddenLayers, true );
@@ -1273,10 +1276,10 @@ void TestSuite::testMultiLayerPerceptron()
       Mva::StochasticGradDescMlpTrainer mlpTrainer( network );
       mlpTrainer.setInputData( trainInputData, trainOutputData );
       mlpTrainer.setTestData( testInputData, testOutputData );
-      mlpTrainer.setEta( 0.1 );
-      mlpTrainer.setBatchSize( 100, 50 );
-      mlpTrainer.setErrorTolerance( 0.05 );
-      mlpTrainer.setNumIterations( 10 );
+      mlpTrainer.setEta( 0.10 );
+      mlpTrainer.setBatchSize( 50, 1000 );
+      mlpTrainer.setErrorTolerance( 0.01 );
+      mlpTrainer.setNumIterations( 20 );
       mlpTrainer.train();
 
       RealVector xData;
