@@ -296,7 +296,7 @@ linux: INCLUDEPATH += /usr/local/include/root
 macx: LIBS += -L/usr/local/lib -lfftw3
 linux: LIBS += -L/usr/local/lib -lfftw3
 
-macx: QMAKE_CXXFLAGS += -g -ffast-math
+macx: QMAKE_CXXFLAGS += -g -ffast-math -O3
 linux: QMAKE_CXXFLAGS += -g -ffast-math -mfpmath=387 -O3
 # QMAKE_CXXFLAGS_RELEASE -= -O2
 
