@@ -29,6 +29,7 @@ PaintArea::PaintArea( QWidget* parent ) :
    m_dataRange = QRectF( QPointF( -1, 1 ), QPointF( 1, -1 ) );
    QRectF initialViewport( QPointF( -1, 1 ), QPointF( 1, -1 ) );
    setViewport( initialViewport );
+   setFocusPolicy( Qt::ClickFocus );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -99,6 +100,15 @@ void PaintArea::paintEventImpl( QPaintEvent* event )
       {
          QColor color;
          QBrush brush;
+
+         if ( m_zoomAreaStart->x() == m_zoomAreaEnd->x() )
+         {
+            m_zoomAreaEnd->setX( m_zoomAreaStart->x() + 1 );
+         }
+         if ( m_zoomAreaStart->y() == m_zoomAreaEnd->y() )
+         {
+            m_zoomAreaEnd->setY( m_zoomAreaStart->y() + 1 );
+         }
 
          QRect zoomArea;
          zoomArea.setLeft( std::min( m_zoomAreaStart->x(), m_zoomAreaEnd->x() ) );
@@ -186,6 +196,8 @@ void PaintArea::autoScale()
    m_viewport.setBottom( m_dataRange.bottom() - yBorder );
    m_viewport.setLeft( m_dataRange.left() - xBorder );
    m_viewport.setRight( m_dataRange.right() + xBorder );
+
+   m_storedViews[ '0' ] = m_viewport;
 
    emit viewportChanged( m_viewport );
 }
@@ -424,7 +436,7 @@ void PaintArea::mousePressEvent( QMouseEvent* event )
 
       event->accept();
    }
-   if ( event->button() == Qt::LeftButton && m_zoomAreaStart.get() )
+   else if ( event->button() == Qt::LeftButton && m_zoomAreaStart.get() )
    {
       m_zoomAreaStart.reset( 0 );
       m_zoomAreaEnd.reset( 0 );
@@ -433,11 +445,71 @@ void PaintArea::mousePressEvent( QMouseEvent* event )
 
       update();
    }
+   else
+   {
+      PaintAreaBase::mousePressEvent( event );
+   }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// keyPressEvent
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void PaintArea::keyPressEvent( QKeyEvent* event )
+{
+   if ( event->key() == '-' || event->key() == '=' || event->key() == '_' || event->key() == '+' )
+   {
+      double zoomFactor;
+      if ( event->key() == '-' )
+      {
+         zoomFactor = 1.1;
+      }
+      else if ( event->key() == '_' )
+      {
+         zoomFactor = 1.5;
+      }
+      else if ( event->key() == '=' )
+      {
+         zoomFactor = 0.90;
+      }
+      else if ( event->key() == '+' )
+      {
+         zoomFactor = 0.5;
+      }
+      else
+      {
+         assert( false );
+      }
+
+      const QRectF& viewport = getViewport();
+
+      QPointF zoomPointCentre = m_clickedMousePos.get() ? transformToWorldCoordinates( *m_clickedMousePos ) : viewport.center();
+      QRectF newViewport = getZoomViewportHorizontal( zoomFactor, viewport, zoomPointCentre.x() );
+      newViewport = getZoomViewportVertical( zoomFactor, newViewport, zoomPointCentre.y() );
+      setViewport( newViewport );
+      update();
+      event->accept();
+   }
+
+   if ( event->key() >= '0' && event->key() <= '9' )
+   {
+      if ( event->modifiers() & Qt::ControlModifier && event->key() != '0' )
+      {
+         m_storedViews[ event->key() ] = getViewport();
+      }
+      else
+      {
+         if ( m_storedViews[ event->key() ].size() != QSize( 0, 0 ) )
+         {
+            setViewport( m_storedViews[ event->key() ] );
+         }
+      }
+      event->accept();
+   }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Static members
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-double PaintArea::s_minSizeAutoScale = 1e-16;
+double PaintArea::s_minSizeAutoScale = 1e-32;
 
 } /// namespace Plotting

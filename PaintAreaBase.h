@@ -90,9 +90,14 @@ class PaintAreaBase : public QWidget
       virtual void paintEvent( QPaintEvent* event );
 
       /**
-       * Remove the old mouse pos.
+       * Remove the old mouse position.
        */
       void mouseReleaseEvent( QMouseEvent* event );
+
+      /**
+       * Store the clicked mouse position.
+       */
+      void mousePressEvent( QMouseEvent* event );
 
       /**
        * The actual painting should be done in this method by the derived classes.
@@ -103,12 +108,13 @@ class PaintAreaBase : public QWidget
       void updateViewportWithConstraint( const QRectF& viewport );
 
    protected:
-      QString                    m_name;
-      QRectF                     m_viewport;
-      QRect                      m_canvas;
-      QPainter*                  m_painter;
+      QString                      m_name;
+      QRectF                       m_viewport;
+      QRect                        m_canvas;
+      QPainter*                    m_painter;
       std::unique_ptr< QPoint >    m_oldMousePos;
       std::unique_ptr< QRectF >    m_viewportConstraints;
+      std::unique_ptr< QPoint >    m_clickedMousePos;
 };
 
 
