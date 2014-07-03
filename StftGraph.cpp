@@ -62,7 +62,7 @@ void StftGraph::create( const std::string& name )
    }
 
    gPlotFactory().createPlot( name );
-   gPlotFactory().create2DHist( *m_hist );
+   gPlotFactory().create2DHist( *m_hist, Plotting::Palette::heatPalette() );
 
 }
 
