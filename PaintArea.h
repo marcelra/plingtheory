@@ -33,6 +33,7 @@ class PaintArea : public PaintAreaBase
       void mouseMoveEvent( QMouseEvent* event );
       void mousePressEvent( QMouseEvent* event );
       void mouseReleaseEvent( QMouseEvent* event );
+      void keyPressEvent( QKeyEvent* event );
 
    public:
       void removePaintItem( const IPaintItem* paintItem );
@@ -71,9 +72,10 @@ class PaintArea : public PaintAreaBase
 
       std::unique_ptr< QPoint >  m_zoomAreaStart;
       std::unique_ptr< QPoint >  m_zoomAreaEnd;
-      QPixmap                  m_grabbedWidget;
+      QPixmap                    m_grabbedWidget;
+      std::map< int, QRectF >    m_storedViews;
 
-      static double            s_minSizeAutoScale;
+      static double              s_minSizeAutoScale;
 };
 
 } /// namespace Plotting
