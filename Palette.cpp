@@ -3,6 +3,7 @@
 #include <QDebug>
 
 #include <cassert>
+#include <cmath>
 
 namespace Plotting
 {
@@ -54,12 +55,12 @@ QColor Palette::getColour( double z ) const
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 QRgb Palette::getRgb( double z ) const
 {
-   z = z > 1 ? 0.999 : z;
    z = z < 0 ? 0 : z;
-
    size_t index = z * s_numColoursInCache;
 
-   return m_colourCache[ index];
+   index = index >= s_numColoursInCache ? s_numColoursInCache - 1 : index;
+
+   return m_colourCache[ index ];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -69,19 +70,19 @@ QColor Palette::interpolate( const QColor& c1, const QColor& c2, double x ) cons
 {
    assert( x >= 0 && x <= 1 );
 
-   double r1 = c1.red();
-   double r2 = c2.red();
-   double g1 = c1.green();
-   double g2 = c2.green();
-   double b1 = c1.blue();
-   double b2 = c2.blue();
+   double r1 = c1.redF();
+   double r2 = c2.redF();
+   double g1 = c1.greenF();
+   double g2 = c2.greenF();
+   double b1 = c1.blueF();
+   double b2 = c2.blueF();
 
    double r = r1 + ( r2 - r1 ) * x;
    double g = g1 + ( g2 - g1 ) * x;
    double b = b1 + ( b2 - b1 ) * x;
 
    QColor result;
-   result.setRgb( r, g, b );
+   result.setRgbF( r, g, b );
    return result;
 }
 
