@@ -51,6 +51,8 @@ std::vector< size_t > StochasticGradDescMlpTrainer::makeBatch()
       for ( size_t i = 0; i < m_batchSize; ++i )
       {
          size_t proposedIndex = 0;
+         double largestError = 0;
+         size_t largestErrorIndex = 0;
          bool accepted = false;
 
          for ( size_t iTry = 0; iTry < s_numTriesAddSampleToBatch; ++iTry )
@@ -62,15 +64,23 @@ std::vector< size_t > StochasticGradDescMlpTrainer::makeBatch()
                accepted = true;
                break;
             }
+            else if ( m_sampleErrors[ proposedIndex ] > largestError )
+            {
+               largestError = m_sampleErrors[ proposedIndex ];
+               largestErrorIndex = proposedIndex;
+            }
+
          }
+
+         result[ i ] = proposedIndex;
 
          ++m_numSampleProposals;
          if ( !accepted )
          {
+            result[ i ] = largestErrorIndex;
             ++m_numFailedSampleProposals;
          }
 
-         result[ i ] = proposedIndex;
 
       }
    }
@@ -175,6 +185,6 @@ void StochasticGradDescMlpTrainer::updateSampleError( size_t sampleIndex, double
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Static members
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-const size_t StochasticGradDescMlpTrainer::s_numTriesAddSampleToBatch = 1000;
+const size_t StochasticGradDescMlpTrainer::s_numTriesAddSampleToBatch = 10;
 
 } /// namespace Mva
