@@ -16,21 +16,21 @@ class TestMath
    /**
     * Gradient-based optimisation algorithms.
     */
-   private:
+   public:
       static void testTwoDimExampleObjective();
       static void testGradDescOptimiser();
 
    /**
     * Stochastic optimisation algorithms.
     */
-   private:
+   public:
       static void testParticleSwarm();
       static void testMcmc();
 
    /**
     * Math containers.
     */
-   private:
+   public:
       static void testSampledMovingAverage();
       static void testTwoTuple();
       static void testRegularAccumArray();
@@ -38,7 +38,7 @@ class TestMath
    /**
     * Other/uncategorized.
     */
-   private:
+   public:
       static void testNewtonSolver1D();
       static void testPdf();
 

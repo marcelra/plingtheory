@@ -32,22 +32,26 @@ RealVector SampledMovingAverage::calculate( const RealVector& dataSet ) const
 {
    RealVector result( dataSet.size() );
 
-   size_t nSamplesOneSide = ( m_weights.size() - 1 ) / 2;
+   int nSamplesOneSide = ( m_weights.size() - 1 ) / 2;
 
-   for ( size_t iSample = nSamplesOneSide; iSample < dataSet.size() - nSamplesOneSide; ++iSample )
+   for ( size_t iSample = 0; iSample < dataSet.size(); ++iSample )
    {
+      double sumWeights = 0;
       double avg = 0;
-      for ( size_t iMovAvg = 0; iMovAvg < m_weights.size(); ++iMovAvg )
+      for ( int iMovAvg = -nSamplesOneSide; iMovAvg < nSamplesOneSide; ++iMovAvg )
       {
-         avg += dataSet[ iMovAvg + iSample - nSamplesOneSide ] * m_weights[ iMovAvg ];
+         int weightIndex = iMovAvg + nSamplesOneSide;
+         int sampleIndex = iSample - iMovAvg;
+         if ( sampleIndex >= 0 && sampleIndex < static_cast< int >( dataSet.size() ) )
+         {
+            sumWeights += m_weights[ weightIndex ];
+            avg += dataSet[ sampleIndex ] * m_weights[ weightIndex ];
+         }
       }
-      result[ iSample ] = avg;
-   }
+      assert( sumWeights > 0 );
+      avg /= sumWeights;
 
-   for ( size_t iSample = 0; iSample < nSamplesOneSide; ++iSample )
-   {
-      result[ iSample ] = result[ nSamplesOneSide ];
-      result[ result.size() - 1 - iSample ] = result[ result.size() - 1 - nSamplesOneSide ];
+      result[ iSample ] = avg;
    }
 
    return result;

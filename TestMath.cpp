@@ -100,6 +100,25 @@ void TestMath::testSampledMovingAverage()
    Logger msg( "testSampledMovingAverage" );
    msg << Msg::Info << "In testSampledMovingAverage..." << Msg::EndReq;
 
+   Math::SampledMovingAverage movAvgCalc( Math::SampledMovingAverage::createGaussianFilter( 41, 20 ) );
+
+   RealVector constDataSet( 100, 1 );
+
+   gPlotFactory().createPlot( "testSampledMovingAverage/const" );
+   gPlotFactory().createGraph( constDataSet );
+   gPlotFactory().createGraph( movAvgCalc.calculate( constDataSet ), Qt::blue );
+
+   RealVector linearDataSet = Utils::createRangeReal( 4, 1, 100 );
+   gPlotFactory().createPlot( "testSampledMovingAverage/linear" );
+   gPlotFactory().createGraph( linearDataSet );
+   gPlotFactory().createGraph( movAvgCalc.calculate( linearDataSet ), Qt::blue );
+
+   RealVector linearPerturbDataSet = Utils::createRangeReal( 4, 1, 101 );
+   linearPerturbDataSet[ 50 ] = 10;
+   gPlotFactory().createPlot( "testSampledMovingAverage/linearPerturb" );
+   gPlotFactory().createGraph( linearPerturbDataSet );
+   gPlotFactory().createGraph( movAvgCalc.calculate( linearPerturbDataSet ), Qt::blue );
+
    const RealVector& dataSet = TestDataSupply::createNoiseAndPeaks();
 
    std::vector< double > movAvgWeights;
@@ -108,7 +127,6 @@ void TestMath::testSampledMovingAverage()
    {
       movAvgWeights.push_back( 1 / lambda * exp( - i*i / lambda ) );
    }
-   Math::SampledMovingAverage movAvgCalc( Math::SampledMovingAverage::createGaussianFilter( 41, 20 ) );
    const RealVector& movAvg = movAvgCalc.calculate( dataSet );
 
    gPlotFactory().createPlot( "testSampledMovingAverage/graph" );

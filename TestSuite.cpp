@@ -4,6 +4,7 @@
 #include "GlobalParameters.h"
 #include "IPlotFactory.h"
 #include "RootUtilities.h"
+#include "TestMath.h"
 
 /// TODO: handle these items.
 bool checkTodos = false;
@@ -14,7 +15,7 @@ bool checkTodos = false;
 void TestSuite::execute()
 {
    /// Test math algorithms.
-   // runTestMath();
+   runTestMath();
 
    /// Test Utilities.
    testFindMinima();
@@ -63,8 +64,7 @@ void TestSuite::execute()
 
 void TestSuite::singleTest()
 {
-   // testSpectralReassignment();
-   testMultiLayerPerceptron();
+   TestMath::testSampledMovingAverage();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -89,7 +89,6 @@ void TestSuite::singleTest()
 #include "ObjectPool.h"
 #include "Peak.h"
 #include "Tone.h"
-#include "TestMath.h"
 #include "NaivePeaks.h"
 #include "StochasticGradDescMlpTrainer.h"
 #include "StftGraph.h"
