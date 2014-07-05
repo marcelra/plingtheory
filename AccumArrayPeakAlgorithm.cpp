@@ -116,6 +116,7 @@ RealVector AccumArrayPeakAlgorithm::subtractBaseline( const RealVector& smoothed
       gPlotFactory().createPlot( "AAPA/DataSubtraction" );
       gPlotFactory().createGraph( originalData, Qt::gray );
       gPlotFactory().createGraph( subtractedData, Qt::black );
+      gPlotFactory().createGraph( smoothedData, Qt::green );
       gPlotFactory().createGraph( minPosReal, minima, Qt::red );
    }
 
@@ -174,6 +175,8 @@ std::vector< Feature::Peak > AccumArrayPeakAlgorithm::findPeaks( const RealVecto
    {
       return peaks;
    }
+
+   return peaks;
 
    /// First find the position of peaks in indices.
    for ( size_t iPeak = 0; iPeak < minPositionVec.size() - 1; ++iPeak )
@@ -349,11 +352,11 @@ void AccumArrayPeakAlgorithm::dressPeaks( const Math::RegularAccumArray& data, c
 
          assert( peakData.size() == peakEntries.size() );
 
-         gPlotFactory().createScatter( peak.getPeakEntries()->getX(), peak.getPeakEntries()->getY() );
 
          std::ostringstream peakName;
          peakName << "Peak_" << iPeak;
          gPlotFactory().createPlot( peakName.str() );
+         gPlotFactory().createScatter( peak.getPeakEntries()->getX(), peak.getPeakEntries()->getY() );
          gPlotFactory().createGraph( peakEntries * data.getBinWidth(), peakData, Qt::black );
 
          RealVector xCentre( 2, peak.getPosition() );
