@@ -10,8 +10,7 @@ void DevSuite::execute()
    Logger msg( "DevSuite" );
    msg << Msg::Info << "Running development code..." << Msg::EndReq;
 
-   // devRebinSRSpec();
-   // devPeakFinder2();
+   devPeakFinder();
 
    return;
 }
@@ -33,60 +32,12 @@ void DevSuite::execute()
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// devRebinSRSpec
+/// devPeakFinder
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void DevSuite::devRebinSRSpec()
+void DevSuite::devPeakFinder()
 {
-   Logger msg( "devRebinSRSpec" );
-   msg << Msg::Info << "In devRebinSRSpec..." << Msg::EndReq;
-
-   RawPcmData::Ptr data = TestDataSupply::getCurrentTestSample();
-
-   size_t monitorIndex = 5;
-
-   size_t fourierSize = 4096;
-   WaveAnalysis::SpectralReassignmentTransform transform( data->getSamplingInfo(), fourierSize, fourierSize*7, 4 );
-   WaveAnalysis::StftData::Ptr stftData = transform.execute( *data );
-
-   WaveAnalysis::SrSpectrum& spec = static_cast< WaveAnalysis::SrSpectrum& >( stftData->getSpectrum( monitorIndex ) );
-
-   const Math::RegularAccumArray& accArr = spec.rebinToFourierLattice();
-
-   SortCache sortX( spec.getFrequencies() );
-
-   gPlotFactory().createPlot( "devRebinSRSpec/Rebinned" );
-   gPlotFactory().createHistogram( accArr );
-
-   // TGraph* grUnbinned = RootUtilities::createGraph( sortX.applyTo( spec.getFrequencies() ), sortX.applyTo( spec.getMagnitude() ) );
-   // grUnbinned->SetLineColor( kRed + 2 );
-   // grUnbinned->SetMarkerColor( kRed + 2 );
-   // grUnbinned->Draw( "PSAME" );
-
-   WaveAnalysis::StftAlgorithm normalTransAlg( data->getSamplingInfo(), fourierSize, WaveAnalysis::HanningWindowFuncDef(), 0, 2 );
-   WaveAnalysis::StftData::Ptr normalTrans = normalTransAlg.execute( *data );
-   // const WaveAnalysis::FourierSpectrum& normalSpec = normalTrans->getSpectrum( 5 );
-   // TGraph* grNormal = RootUtilities::createGraph( normalSpec.getFrequencies(), normalSpec.getMagnitude() );
-   // grNormal->Draw( "LSAME" );
-   // grNormal->SetLineColor( kBlue );
-
-   // Visualisation::RebinnedSRGraph rebinnedGraph( *stftData, stftData->getNumSpectra(), 0 );
-   // rebinnedGraph.create();
-
-   const WaveAnalysis::SrSpectrum& testSpec = dynamic_cast< WaveAnalysis::SrSpectrum& >( stftData->getSpectrum( monitorIndex ) );
-
-   FeatureAlgorithm::GroundtoneHypothesisBuilder gtSeed( testSpec );
-   const RealVector& vec = gtSeed.execute( 20 );
-   msg << Msg::Info << vec << Msg::EndReq;
-
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// devPeakFinder2
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void DevSuite::devPeakFinder2()
-{
-   Logger msg( "devPeakFinder2" );
-   msg << Msg::Info << "Running devPeakFinder2..." << Msg::EndReq;
+   Logger msg( "devPeakFinder" );
+   msg << Msg::Info << "Running devPeakFinder..." << Msg::EndReq;
 
    // const Math::RegularAccumArray& data = TestDataSupply::drawNoiseAndPeaks();
    size_t specIndex = 5;

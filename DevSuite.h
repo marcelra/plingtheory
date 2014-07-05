@@ -6,19 +6,8 @@ class DevSuite
    public:
       static void execute();
 
-   /**
-    * Plotting
-    */
    public:
-      static void devHistogram();
-
-   public:
-      static void devPeakFinder2();
-      static void devRebinSRSpec();
-
-   /// Parked and interesting.
-   public:
-      static void devFourierPeakFinder1();
+      static void devPeakFinder();
 };
 
 #endif // DEVSUITE_H
