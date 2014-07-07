@@ -24,6 +24,7 @@ void DevSuite::execute()
 #include "IPlotFactory.h"
 #include "NoteList.h"
 #include "RootUtilities.h"
+#include "SineGenerator.h"
 #include "SortCache.h"
 #include "SpectralReassignmentTransform.h"
 
@@ -40,57 +41,27 @@ void DevSuite::devPeakFinder()
    msg << Msg::Info << "Running devPeakFinder..." << Msg::EndReq;
 
    // const Math::RegularAccumArray& data = TestDataSupply::drawNoiseAndPeaks();
-   size_t specIndex = 5;
-   WaveAnalysis::StftData::Ptr stftData = TestDataSupply::getSrFtData();
-   const WaveAnalysis::SrSpectrum& spec = dynamic_cast< WaveAnalysis::SrSpectrum& >( stftData->getSpectrum( specIndex ) );
-   const Math::RegularAccumArray& data = spec.rebinToFourierLattice();
+   // size_t specIndex = 5;
+   // WaveAnalysis::StftData::Ptr stftData = TestDataSupply::getSrFtData();
+   // const WaveAnalysis::SrSpectrum& spec = dynamic_cast< WaveAnalysis::SrSpectrum& >( stftData->getSpectrum( specIndex ) );
+   // const Math::RegularAccumArray& data = spec.rebinToFourierLattice();
 
-   // TH1F* hist = data.createHistogram();
-   // hist->Draw();
+   SamplingInfo samplingInfo;
+   Synthesizer::SineGenerator sineGen( samplingInfo );
+   sineGen.setFrequency( 440 );
+   RawPcmData::Ptr data = sineGen.generate( 44100 );
+
+   size_t fourierSize = 2048;
+   WaveAnalysis::SpectralReassignmentTransform trans( samplingInfo, fourierSize, fourierSize, 2 );
+   WaveAnalysis::StftData::Ptr stftData = trans.execute( *data );
 
    FeatureAlgorithm::AccumArrayPeakAlgorithm peakAlg( 0 );
    peakAlg.setDoMonitor( true );
-   const std::vector< Feature::Peak>& peaks = peakAlg.execute( data );
-   return;
+   const Math::RegularAccumArray& accArr = dynamic_cast< WaveAnalysis::SrSpectrum& >( stftData->getSpectrum( 0 ) ).rebinToFourierLattice();
+   const std::vector< Feature::Peak>& peaks = peakAlg.execute( accArr );
 
-   RealVector prominence( peaks.size() );
-   RealVector frequencyBin( peaks.size() );
-   RealVector width( peaks.size() );
-   for ( size_t i = 0; i < peaks.size(); ++i )
-   {
-      prominence[ i ] = peaks[ i ].getProminence();
-      frequencyBin[ i ] = peaks[ i ].getPosition();
-      width[ i ] = peaks[ i ].getWidth();
-      msg << Msg::Verbose << "i = " << i << Msg::EndReq;
-      msg << Msg::Verbose << "Prominence = " << peaks[ i ].getProminence() << Msg::EndReq;
-   }
-
-   new TCanvas();
-   TGraph* grPromVsFreq = RootUtilities::createGraph( frequencyBin, prominence );
-   grPromVsFreq->Draw( "AP" );
-   new TCanvas();
-   TGraph* grWidthVsFreq = RootUtilities::createGraph( width, frequencyBin );
-   grWidthVsFreq->Draw( "AP" );
-
-   SortCache sortProminence( prominence );
-   const RealVector& sortedPeaks = sortProminence.applyReverseTo( frequencyBin );
-   const RealVector& sortedProminence = sortProminence.applyReverseTo( prominence );
-
-   for ( size_t i = 0; i < 100; ++i )
-   {
-      msg << Msg::Info << "Peak at " << sortedPeaks[i] << " with prominence: " << sortedProminence[i] << Msg::EndReq;
-   }
-
-   const Music::NoteList& notes = Music::createDiatonicScale( Music::Note( Music::Note::B, 1 ) );
-   for ( size_t iNote = 0; iNote < notes.size(); ++iNote )
-   {
-      msg << Msg::Info << "Note " << notes[ iNote ] << " has frequency " << notes[ iNote ].getFrequency() << Msg::EndReq;
-   }
-
-
-   // new TCanvas();
-   // Visualisation::RebinnedSRGraph stftGraph( *stftData );
-   // stftGraph.create();
+   std::vector< RealVector > inputDataSet;
+   std::vector< RealVector > outputDataSet;
 
    return;
 }

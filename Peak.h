@@ -31,7 +31,6 @@ class Peak
        * @param pedestal: offset.
        */
       Peak( size_t positionIndex );
-      // Peak( double position, double prominence, double width, double pedestal );
       virtual ~Peak();
 
       /**
