@@ -7,6 +7,7 @@
 #include "KernelPdf.h"
 #include "Logger.h"
 #include "NewtonSolver1D.h"
+#include "PredefinedRealFunctions.h"
 #include "RealMemFunction.h"
 #include "RootUtilities.h"
 #include "SampledMovingAverage.h"
@@ -113,11 +114,12 @@ RealVector AccumArrayPeakAlgorithm::subtractBaseline( const RealVector& smoothed
 
       RealVector minPosReal( allMinPos.begin(), allMinPos.end() );
 
+      Math::Log10Function logFunc( 1e-3 );
       gPlotFactory().createPlot( "AAPA/DataSubtraction" );
-      gPlotFactory().createGraph( originalData, Qt::gray );
-      gPlotFactory().createGraph( subtractedData, Qt::black );
-      gPlotFactory().createGraph( smoothedData, Qt::green );
-      gPlotFactory().createGraph( minPosReal, minima, Qt::red );
+      gPlotFactory().createGraph( logFunc.evalMany( originalData ), Qt::gray );
+      gPlotFactory().createGraph( logFunc.evalMany( subtractedData ), Qt::black );
+      gPlotFactory().createGraph( logFunc.evalMany( smoothedData ), Qt::green );
+      gPlotFactory().createGraph( minPosReal, logFunc.evalMany( minima ), Qt::red );
    }
 
    /// Return result.
@@ -176,8 +178,6 @@ std::vector< Feature::Peak > AccumArrayPeakAlgorithm::findPeaks( const RealVecto
       return peaks;
    }
 
-   return peaks;
-
    /// First find the position of peaks in indices.
    for ( size_t iPeak = 0; iPeak < minPositionVec.size() - 1; ++iPeak )
    {
@@ -222,7 +222,8 @@ std::vector< Feature::Peak > AccumArrayPeakAlgorithm::findPeaks( const RealVecto
          peakPositions[ iPeak] = thisPeakPos;
          peakHeights[ iPeak ] = peaks[ iPeak ].getProminence();
       }
-      gPlotFactory().createScatter( peakPositions, peakHeights, Plotting::MarkerDrawAttr( Qt::red ) );
+      Math::Log10Function logFunc( 1e-3 );
+      gPlotFactory().createScatter( peakPositions, logFunc.evalMany( peakHeights ), Plotting::MarkerDrawAttr( Qt::red ) );
    }
 
    dressPeaks( data, baselineSubtractedData, peaks );
@@ -236,6 +237,8 @@ void AccumArrayPeakAlgorithm::dressPeaks( const Math::RegularAccumArray& data, c
 {
    Logger msg( "AccumArrayPeakAlgorithm" );
    // msg.setThreshold( Msg::Always );
+
+   std::vector< Math::IPdf* > kernPdfs;
 
    /// Peak entries
    /// Total weight (corrected, uncorrected)
@@ -320,8 +323,9 @@ void AccumArrayPeakAlgorithm::dressPeaks( const Math::RegularAccumArray& data, c
       }
       peak.setPeakEntries( allPeakEntries );
 
-      Math::KernelPdf kernPdf( Math::IPdf::CPtr( new Math::GaussPdf( 0, 1 ) ), allPeakEntries.getX(), allPeakEntries.getY() );
-      Math::RealMemFunction< Math::KernelPdf > memFunc( &Math::KernelPdf::getIntegral, &kernPdf );
+      Math::KernelPdf* kernPdf = new Math::KernelPdf( Math::IPdf::CPtr( new Math::GaussPdf( 0, 1 ) ), allPeakEntries.getX(), allPeakEntries.getY() );
+      kernPdfs.push_back( kernPdf );
+      Math::RealMemFunction< Math::KernelPdf > memFunc( &Math::KernelPdf::getIntegral, kernPdf );
       Math::IRealFunction& func = memFunc;
 
       Interval solutionInterval( peak.getLeftBound(), peak.getRightBound() );
@@ -359,6 +363,11 @@ void AccumArrayPeakAlgorithm::dressPeaks( const Math::RegularAccumArray& data, c
          gPlotFactory().createScatter( peak.getPeakEntries()->getX(), peak.getPeakEntries()->getY() );
          gPlotFactory().createGraph( peakEntries * data.getBinWidth(), peakData, Qt::black );
 
+         const RealVector& xEvalPdf = Utils::createRangeReal( peak.getLeftBound(), peak.getRightBound(), 200 );
+         const RealVector& yEvalPdf = kernPdfs[ iPeak ]->getDensityAsFunc()->evalMany( xEvalPdf );
+         gPlotFactory().createGraph( xEvalPdf, yEvalPdf, Qt::blue );
+
+
          RealVector xCentre( 2, peak.getPosition() );
          RealVector yCentre( 1, peak.getProminence() );
          yCentre.push_back( 0 );
@@ -372,6 +381,11 @@ void AccumArrayPeakAlgorithm::dressPeaks( const Math::RegularAccumArray& data, c
 
          gPlotFactory().createGraph( xWidth, yWidth, Qt::red );
       }
+   }
+
+   for ( size_t iKernPdf = 0; iKernPdf < kernPdfs.size(); ++iKernPdf )
+   {
+      delete kernPdfs[ iKernPdf ];
    }
 }
 

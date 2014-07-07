@@ -137,7 +137,8 @@ SOURCES += main.cpp \
     MultiLayerPerceptron.cpp \
     ZScatterItem.cpp \
     MlpErrorObjective.cpp \
-    StochasticGradDescMlpTrainer.cpp
+    StochasticGradDescMlpTrainer.cpp \
+    PredefinedRealFunctions.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -271,7 +272,8 @@ HEADERS += \
     ZScatterItem.h \
     MlpErrorObjective.h \
     GradDescOptimiser.h \
-    StochasticGradDescMlpTrainer.h
+    StochasticGradDescMlpTrainer.h \
+    PredefinedRealFunctions.h
 
 OTHER_FILES += \
     Todos.txt
