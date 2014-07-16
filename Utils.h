@@ -69,6 +69,9 @@ class Utils
        */
       template< class T >
       static RealVector convertToRealVec( const std::vector< T >& vec );
+
+      template< class T >
+      static std::vector< std::vector< T > > transpose( const std::vector< std::vector< T > >& matrix );
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -138,6 +141,41 @@ RealVector Utils::convertToRealVec( const std::vector< T >& vec )
    {
       result[ i ] = static_cast< double >( vec[ i ] );
    }
+   return result;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// transpose
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+template< class T >
+std::vector< std::vector< T > > Utils::transpose( const std::vector< std::vector< T > >& matrix )
+{
+   std::vector< std::vector< T > > result;
+
+   if ( matrix.size() == 0 )
+   {
+      return result;
+   }
+
+   const size_t nRows = matrix.size();
+   const size_t nCols = matrix[ 0 ].size();
+
+   result.resize( nCols );
+   for ( size_t iCol = 0; iCol < nCols; ++iCol )
+   {
+      result[ iCol ].resize( nRows );
+   }
+
+   for ( size_t iRow = 0; iRow < nRows; ++iRow )
+   {
+      assert( nCols == matrix[ iRow ].size() );
+
+      for ( size_t iCol = 0; iCol < matrix[ iRow ].size(); ++iCol )
+      {
+         result[ iCol ][ iRow ] = matrix[ iRow ][ iCol ];
+      }
+   }
+
    return result;
 }
 
