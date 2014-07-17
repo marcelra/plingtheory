@@ -1,9 +1,28 @@
 #include "ScrollPaintArea.h"
 
 #include <QBrush>
+#include <QDebug>
+#include <QMenu>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPen>
+#include <QPolygonF>
+
+namespace
+{
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// pointWiseMultiply
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+QPointF pointWiseMultiply( const QPointF& p1, const QPointF& p2 )
+{
+   QPointF result;
+   result.setX( p1.x() * p2.x() );
+   result.setY( p1.y() * p2.y() );
+   return result;
+}
+
+} /// anonymous namespace
 
 namespace Plotting
 {
@@ -16,7 +35,55 @@ ScrollPaintArea::ScrollPaintArea( QWidget* parent ) :
    m_dataMin( 0 ),
    m_dataMax( 0 ),
    m_isScrolling( false )
-{}
+{
+   setContextMenuPolicy( Qt::CustomContextMenu );
+   connect( this, SIGNAL( customContextMenuRequested( const QPoint& ) ), this, SLOT( showContextMenu( const QPoint& ) ) );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// showContextMenu
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void ScrollPaintArea::showContextMenu( const QPoint& pos )
+{
+   QPoint globalPos = mapToGlobal( pos );
+
+   QMenu contextMenu;
+   QAction* setMarkerAction = contextMenu.addAction(  "Set marker" );
+   QAction* deleteMarkersAction = contextMenu.addAction( "Delete markers" );
+
+   if ( m_marker0.get() && m_marker1.get() )
+   {
+      setMarkerAction->setEnabled( false );
+   }
+
+   QAction* action = contextMenu.exec( globalPos );
+   if ( action == setMarkerAction )
+   {
+      double posProjected = project( transformToWorldCoordinates( pos ) );
+      if ( !m_marker0.get() )
+      {
+         m_marker0.reset( new double( posProjected ) );
+      }
+      else
+      {
+         m_marker1.reset( new double( posProjected ) );
+         m_dataMinOld = m_dataMin;
+         m_dataMaxOld = m_dataMax;
+         double markerMin = std::min( *m_marker0, *m_marker1 );
+         double markerMax = std::max( *m_marker0, *m_marker1 );
+         setDataRange( markerMin, markerMax );
+      }
+      update();
+   }
+   else if ( action == deleteMarkersAction )
+   {
+      m_marker0.reset( 0 );
+      m_marker1.reset( 0 );
+      m_dataMin = m_dataMinOld;
+      m_dataMax = m_dataMaxOld;
+      update();
+   }
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// destructor
@@ -64,6 +131,52 @@ void ScrollPaintArea::paintEventImpl( QPaintEvent* paintEvent )
    getPainter().setPen( QPen( brush, 2 ) );
    getPainter().drawRect( getViewRangeRect() );
 
+   if ( m_marker0.get() )
+   {
+      drawMarker( *m_marker0 );
+   }
+   if ( m_marker1.get() )
+   {
+      drawMarker( *m_marker1 );
+   }
+
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// drawMarker
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void ScrollPaintArea::drawMarker( double markerPosition )
+{
+   QBrush brush( Qt::darkBlue, Qt::SolidPattern );
+   QPointF markerProjected = markerPosition * getCanVecAlong();
+   QPointF pMinMarker = transformToCanvasCoordinates( markerProjected );
+   pMinMarker = pointWiseMultiply( pMinMarker, getCanVecAlong() );
+   QPointF pMaxMarker = pMinMarker + getCanVecOrthogonal();
+
+   if ( pMinMarker.manhattanLength() == 0 )
+   {
+      pMinMarker += getCanVecAlong();
+   }
+
+   getPainter().setPen( QPen( brush, 2 ) );
+   getPainter().drawLine( pMinMarker.toPoint(), pMaxMarker.toPoint() );
+
+   double triangleSize = 4;
+   QPointF triangleOrthogonal = triangleSize * getCanVecOrthogonal() / getCanVecOrthogonal().manhattanLength();
+
+   QPolygonF triangleUp;
+   triangleUp.append( pMinMarker + triangleSize * getCanVecAlong() );
+   triangleUp.append( pMinMarker + triangleOrthogonal );
+   triangleUp.append( pMinMarker - triangleSize * getCanVecAlong() );
+
+   QPolygonF triangleDown;
+   triangleDown.append( pMaxMarker + triangleSize * getCanVecAlong() );
+   triangleDown.append( pMaxMarker - triangleOrthogonal );
+   triangleDown.append( pMaxMarker - triangleSize * getCanVecAlong() );
+
+   getPainter().setPen( QPen( brush, 2 ) );
+   getPainter().drawPolygon( triangleUp.toPolygon() );
+   getPainter().drawPolygon( triangleDown.toPolygon() );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

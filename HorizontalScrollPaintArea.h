@@ -27,6 +27,9 @@ class HorizontalScrollPaintArea : public ScrollPaintArea
       QRectF getDataRangeRect() const;
       QRectF getViewRangeRect() const;
       void updateViewportGraphFromShift( const QPointF& shift );
+      double project( const QPointF& p ) const;
+      QPointF getCanVecAlong() const;
+      QPointF getCanVecOrthogonal() const;
 
    /**
     * @see ScrollPaintArea interface for docuemtation.

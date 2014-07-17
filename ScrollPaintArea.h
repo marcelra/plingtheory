@@ -51,6 +51,24 @@ class ScrollPaintArea : public PaintAreaBase
       void mouseMoveEvent( QMouseEvent* event );
 
    private:
+
+      /**
+       * Project point @param p horizontally or vertically.
+       */
+      virtual double project( const QPointF& p ) const = 0;
+      /**
+       * Get a unit vector in canvas coordinates along the direction of scroll-bar.
+       */
+      virtual QPointF getCanVecAlong() const = 0;
+      /**
+       * Get a vector orthogonal to scroll-direction in canvas coordinates. Length of the vector is equal to canvas size.
+       */
+      virtual QPointF getCanVecOrthogonal() const = 0;
+
+      /**
+       * Draw a marker set by the user.
+       */
+      void drawMarker( double markerPosition );
       /**
        * Calculate the canvas rectangle displaying the range of the data.
        */
@@ -85,12 +103,22 @@ class ScrollPaintArea : public PaintAreaBase
        * Handle a view port change of the graph.
        */
       virtual void viewportGraphChanged( const QRectF& newViewportOfGraph ) = 0;
+      /**
+       * Show the context menu.
+       */
+      void showContextMenu( const QPoint& pos );
 
    protected:
       double   m_dataMin;                 //! Min of the data.
       double   m_dataMax;                 //! Max of the data.
       QRectF   m_viewportGraph;           //! Viewport of the graph.
       bool     m_isScrolling;             //! True iff user is scrolling.
+
+      double   m_dataMinOld;
+      double   m_dataMaxOld;
+
+      std::unique_ptr< double >  m_marker0;
+      std::unique_ptr< double >  m_marker1;
 
 };
 
