@@ -149,18 +149,24 @@ void ScrollPaintArea::paintEventImpl( QPaintEvent* paintEvent )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void ScrollPaintArea::drawMarker( double markerPosition )
 {
+   const QPen& prevPen = getPainter().pen();
+   QPainter::RenderHints prevRenderHints = getPainter().renderHints();
+
+   getPainter().setRenderHint( QPainter::Antialiasing, false );
+
    QBrush brush( Qt::darkBlue, Qt::SolidPattern );
    QPointF markerProjected = markerPosition * getCanVecAlong();
    QPointF pMinMarker = transformToCanvasCoordinates( markerProjected );
    pMinMarker = pointWiseMultiply( pMinMarker, getCanVecAlong() );
    QPointF pMaxMarker = pMinMarker + getCanVecOrthogonal();
 
-   if ( pMinMarker.manhattanLength() == 0 )
+   if ( pMinMarker.manhattanLength() < 1 )
    {
       pMinMarker += getCanVecAlong();
+      pMaxMarker += getCanVecAlong();
    }
 
-   getPainter().setPen( QPen( brush, 2 ) );
+   getPainter().setPen( QPen( brush, 2, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin ) );
    getPainter().drawLine( pMinMarker.toPoint(), pMaxMarker.toPoint() );
 
    double triangleSize = 4;
@@ -176,9 +182,12 @@ void ScrollPaintArea::drawMarker( double markerPosition )
    triangleDown.append( pMaxMarker - triangleOrthogonal );
    triangleDown.append( pMaxMarker - triangleSize * getCanVecAlong() );
 
-   getPainter().setPen( QPen( brush, 2 ) );
+   getPainter().setPen( QPen( brush, 2, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin ) );
    getPainter().drawPolygon( triangleUp.toPolygon() );
    getPainter().drawPolygon( triangleDown.toPolygon() );
+
+   getPainter().setPen( prevPen );
+   getPainter().setRenderHints( prevRenderHints );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

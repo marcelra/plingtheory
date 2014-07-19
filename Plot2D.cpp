@@ -35,8 +35,8 @@ Plot2D::Plot2D( QWidget* parent ) :
    m_yScroll = new VerticalScrollPaintArea( this );
 
    /// Set Layout.
-   m_xScroll->setFixedHeight( 20 );
-   m_yScroll->setFixedWidth( 20 );
+   m_xScroll->setFixedHeight( 21 );
+   m_yScroll->setFixedWidth( 21 );
 
    m_empty->setFixedHeight( 100 );
    m_empty->setFixedWidth( 100 );
