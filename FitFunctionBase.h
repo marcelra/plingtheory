@@ -13,20 +13,41 @@ namespace Math
 class FitFunctionBase : public IRealFunction
 {
    public:
+      /**
+       * Create a fit function with @param numParameters parameters.
+       */
       FitFunctionBase( size_t numParameters = 2 );
+      /**
+       * Destructor
+       */
       virtual ~FitFunctionBase();
 
-      size_t getNumParameters() const;
-      void setParameters( const RealVector& parameters );
-
+   public:
+      /**
+       * Evaluate the function at point @param x (@see IRealFunction).
+       */
       double operator()( double x ) const;
+      /**
+       * @see IRealFunction.
+       */
       IRealFunction* clone() const;
 
-   protected:
+   public:
+      /**
+       * Get the number of parameters.
+       */
+      size_t getNumParameters() const;
+      /**
+       * Set parameters.
+       */
+      void setParameters( const RealVector& parameters );
+      /**
+       * Get parameter @param parIndex.
+       */
       double par( size_t parIndex ) const;
 
    private:
-      RealVector     m_parameters;
+      RealVector     m_parameters;     //! The parameters of the fit function.
 };
 
 } /// namespace Math
