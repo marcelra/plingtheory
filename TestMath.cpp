@@ -118,7 +118,7 @@ void TestMath::testSimpleFit()
    }
 
    /// Define the fit objective.
-   Math::IFitFunction* fitFunction = new Math::IFitFunction();
+   Math::FitFunctionBase* fitFunction = new Math::FitFunctionBase();
    Math::Chi2FitObjective fitObj( xData, yData, ySigma2, fitFunction );
 
    /// Optimise the fit error.
