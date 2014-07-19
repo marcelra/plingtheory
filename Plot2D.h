@@ -36,6 +36,7 @@ class Plot2D : public QWidget
 
    private slots:
       void synchroniseViewports( const QRectF& viewport );
+      void synchroniseWithGraphViewport();
 
    private:
       QGridLayout*       m_gridLayout;

@@ -71,6 +71,10 @@ Plot2D::Plot2D( QWidget* parent ) :
    assert( isConnected );
    isConnected = connect( m_yScroll, SIGNAL( viewportFromScroll( QRectF ) ), this, SLOT( setViewport( QRectF ) ) );
    assert( isConnected );
+   isConnected = connect( m_xScroll, SIGNAL( updateViewportFromMarkers() ), this, SLOT( synchroniseWithGraphViewport() ) );
+   assert( isConnected );
+   isConnected = connect( m_yScroll, SIGNAL( updateViewportFromMarkers() ), this, SLOT( synchroniseWithGraphViewport() ) );
+   assert( isConnected );
 
    /// Enable grid by default.
    setEnableGrid( true );
@@ -150,6 +154,14 @@ void Plot2D::synchroniseViewports( const QRectF& viewport )
    m_yScroll->setViewport( viewport );
    m_xAxisPaintArea->setViewport( viewport );
    m_yAxisPaintArea->setViewport( viewport );
+}
+
+void Plot2D::synchroniseWithGraphViewport()
+{
+   m_xScroll->setViewport( m_graph->getViewport() );
+   m_yScroll->setViewport( m_graph->getViewport() );
+   m_xAxisPaintArea->setViewport( m_graph->getViewport() );
+   m_yAxisPaintArea->setViewport( m_graph->getViewport() );
 }
 
 } /// namespace Plotting

@@ -63,6 +63,7 @@ void ScrollPaintArea::showContextMenu( const QPoint& pos )
       if ( !m_marker0.get() )
       {
          m_marker0.reset( new double( posProjected ) );
+         update();
       }
       else
       {
@@ -72,8 +73,8 @@ void ScrollPaintArea::showContextMenu( const QPoint& pos )
          double markerMin = std::min( *m_marker0, *m_marker1 );
          double markerMax = std::max( *m_marker0, *m_marker1 );
          setDataRange( markerMin, markerMax );
+         emit updateViewportFromMarkers();
       }
-      update();
    }
    else if ( action == deleteMarkersAction )
    {
@@ -82,6 +83,7 @@ void ScrollPaintArea::showContextMenu( const QPoint& pos )
       m_dataMin = m_dataMinOld;
       m_dataMax = m_dataMaxOld;
       update();
+      emit updateViewportFromMarkers();
    }
 }
 
