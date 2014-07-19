@@ -16,21 +16,24 @@ class FitFunctionBase : public IRealFunction
       /**
        * Create a fit function with @param numParameters parameters.
        */
-      FitFunctionBase( size_t numParameters = 2 );
+      FitFunctionBase( size_t numParameters );
       /**
        * Destructor
        */
       virtual ~FitFunctionBase();
 
+   /**
+    * Restating necessary overloads from IRealFunction (@see IRealFunction).
+    */
    public:
       /**
        * Evaluate the function at point @param x (@see IRealFunction).
        */
-      double operator()( double x ) const;
+      virtual double operator()( double x ) const = 0;
       /**
        * @see IRealFunction.
        */
-      IRealFunction* clone() const;
+      virtual IRealFunction* clone() const = 0;
 
    public:
       /**
