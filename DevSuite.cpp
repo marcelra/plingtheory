@@ -55,7 +55,7 @@ void DevSuite::devPeakFinder()
    WaveAnalysis::SpectralReassignmentTransform trans( samplingInfo, fourierSize, fourierSize, 2 );
    WaveAnalysis::StftData::Ptr stftData = trans.execute( *data );
 
-   FeatureAlgorithm::AccumArrayPeakAlgorithm peakAlg( 0 );
+   FeatureAlgorithm::AccumArrayPeakAlgorithm peakAlg;
    peakAlg.setDoMonitor( true );
    const Math::RegularAccumArray& accArr = dynamic_cast< WaveAnalysis::SrSpectrum& >( stftData->getSpectrum( 0 ) ).rebinToFourierLattice();
    const std::vector< Feature::Peak>& peaks = peakAlg.execute( accArr );

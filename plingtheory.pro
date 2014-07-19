@@ -140,7 +140,8 @@ SOURCES += main.cpp \
     StochasticGradDescMlpTrainer.cpp \
     PredefinedRealFunctions.cpp \
     Chi2FitObjective.cpp \
-    FitFunctionBase.cpp
+    FitFunctionBase.cpp \
+    PolynomialFitFunction.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -277,7 +278,8 @@ HEADERS += \
     StochasticGradDescMlpTrainer.h \
     PredefinedRealFunctions.h \
     Chi2FitObjective.h \
-    FitFunctionBase.h
+    FitFunctionBase.h \
+    PolynomialFitFunction.h
 
 OTHER_FILES += \
     Todos.txt

@@ -16,6 +16,7 @@
 #include "McmcOptimiser.h"
 #include "NewtonSolver1D.h"
 #include "ParticleSwarmOptimiser.h"
+#include "PolynomialFitFunction.h"
 #include "RealMemFunction.h"
 #include "SampledMovingAverage.h"
 #include "TwoDimExampleObjective.h"
@@ -104,7 +105,7 @@ void TestMath::testSimpleFit()
    Logger msg( "testSimpleFit" );
    msg << Msg::Info << "Running testSimpleFit..." << Msg::EndReq;
 
-   /// Create f(x) = x with added noise sampled from Uniform(-1,1).
+   /// Create f(x) = x - x^2 with added noise sampled from Uniform(-1,1).
    RandomNumberGenerator rng( 1 );
    size_t numSamples = 100;
 
@@ -113,16 +114,17 @@ void TestMath::testSimpleFit()
    RealVector ySigma2( numSamples, 1 );
    for ( size_t i = 0; i < numSamples; ++i )
    {
-      xData[ i ] = i;
-      yData[ i ] = i + 1 * rng.uniform( -1, 1 );
+      double x = ( i - 0.5 * numSamples ) / 10.0;
+      xData[ i ] = x;
+      yData[ i ] = x - x * x + 1 * rng.uniform( -1, 1 );
    }
 
    /// Define the fit objective.
-   Math::FitFunctionBase* fitFunction = new Math::FitFunctionBase();
+   Math::FitFunctionBase* fitFunction = new Math::PolynomialFitFunction( 2 );
    Math::Chi2FitObjective fitObj( xData, yData, ySigma2, fitFunction );
 
    /// Optimise the fit error.
-   Math::GradDescOptimiser optimiser( fitObj, realVector( 10, 10 ) );
+   Math::GradDescOptimiser optimiser( fitObj, realVector( 10, 10, 2 ) );
    optimiser.setLoggerThreshold( Msg::Debug );
    optimiser.setMaxIterations( 100000 );
    optimiser.setGamma( 1e-6 );
@@ -134,45 +136,13 @@ void TestMath::testSimpleFit()
    gPlotFactory().createScatter( xData, yData );
 
    /// Draw the real solution.
-   const RealVector& solution = realVector( 0, 1 );
+   const RealVector& solution = realVector( 0, 1, -1 );
    fitFunction->setParameters( solution );
    gPlotFactory().createGraph( xData, fitFunction->evalMany( xData ), Qt::red );
 
    /// Draw the fitted solution.
    fitFunction->setParameters( optSolution );
    gPlotFactory().createGraph( xData, fitFunction->evalMany( xData ), Qt::blue );
-
-   /// Find solution by brute-force search in box.
-   RealVector xEval;
-   RealVector yEval;
-   RealVector obj;
-   double minObj = std::numeric_limits< double >::max();
-   double xEvalMin;
-   double yEvalMin;
-   for ( size_t iX = 0; iX < 100; ++iX )
-   {
-      for ( size_t iY = 0; iY < 100; ++iY )
-      {
-         double x = ( iX - 50. ) / 1.;
-         double y = ( iY - 50. ) / 100. + 1.;
-         xEval.push_back( x );
-         yEval.push_back( y );
-         double objVal = fitObj.evaluate( realVector( x, y ) );
-         obj.push_back( objVal );
-         if ( objVal < minObj )
-         {
-            minObj = objVal;
-            xEvalMin = x;
-            yEvalMin = y;
-         }
-      }
-   }
-
-   msg << Msg::Info << "Minimum objective value x* = (" << xEvalMin << ", " << yEvalMin << ")" << Msg::EndReq;
-
-   /// Plot the objective function values as function of (x, y).
-   gPlotFactory().createPlot( "testSimpleFit/ObjectiveFunction" );
-   gPlotFactory().createZScatter( xEval, yEval, obj, Plotting::Palette::heatPalette() );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
