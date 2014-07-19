@@ -108,6 +108,9 @@ void IThread::run()
 void IThread::kill()
 {
    getLogger() << Msg::Verbose << "Killing thread with id " << m_thread->get_id() << Msg::EndReq;
+   m_thread->interrupt();
+   m_thread->join();
+
    delete m_thread;
    m_thread = 0;
    m_isRunning = false;
