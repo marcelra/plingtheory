@@ -20,6 +20,9 @@ class TestMath
       static void testTwoDimExampleObjective();
       static void testGradDescOptimiser();
 
+   public:
+      static void testSimpleFit();
+
    /**
     * Stochastic optimisation algorithms.
     */
