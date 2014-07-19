@@ -25,8 +25,8 @@ namespace FeatureAlgorithm
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// constructor
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-AccumArrayPeakAlgorithm::AccumArrayPeakAlgorithm( const AlgorithmBase* parent ) :
-   AlgorithmBase( "AccumArrayPeakAlgorithm", parent )
+AccumArrayPeakAlgorithm::AccumArrayPeakAlgorithm( const std::string& algorithmName, const AlgorithmBase* parent ) :
+   AlgorithmBase( algorithmName, parent )
 {
    m_smoothFraction = 1 / 100.;
    m_sigmaFactor = 1;

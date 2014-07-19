@@ -17,7 +17,7 @@ class StochasticGradDescMlpTrainer : public Mva::MlpTrainer
       /**
        * Constructur. Train MLP @param mlp.
        */
-      StochasticGradDescMlpTrainer( MultiLayerPerceptron& mlp, const std::string& algName = "GradDescMlpTrainer", const AlgorithmBase* parent = 0 );
+      StochasticGradDescMlpTrainer( MultiLayerPerceptron& mlp, const std::string& algName = "StochasticGradDescMlpTrainer", const AlgorithmBase* parent = 0 );
 
       /**
        * Set the gradient descent eta: x(i+1) = x(i) + eta * df/dx(i).

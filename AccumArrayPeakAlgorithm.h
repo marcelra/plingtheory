@@ -13,7 +13,7 @@ namespace FeatureAlgorithm
 class AccumArrayPeakAlgorithm : public AlgorithmBase
 {
    public:
-      AccumArrayPeakAlgorithm( const AlgorithmBase* parent );
+      AccumArrayPeakAlgorithm( const std::string& algorithmName = "AccumArrayPeakAlgorithm", const AlgorithmBase* parent = 0 );
 
       std::vector< Feature::Peak > execute( const Math::RegularAccumArray& data ) const;
 
