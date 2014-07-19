@@ -141,7 +141,8 @@ SOURCES += main.cpp \
     PredefinedRealFunctions.cpp \
     Chi2FitObjective.cpp \
     FitFunctionBase.cpp \
-    PolynomialFitFunction.cpp
+    PolynomialFitFunction.cpp \
+    LineSearchGradDescOptimiser.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -279,7 +280,8 @@ HEADERS += \
     PredefinedRealFunctions.h \
     Chi2FitObjective.h \
     FitFunctionBase.h \
-    PolynomialFitFunction.h
+    PolynomialFitFunction.h \
+    LineSearchGradDescOptimiser.h
 
 OTHER_FILES += \
     Todos.txt

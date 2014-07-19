@@ -13,6 +13,7 @@
 #include "GradDescOptimiser.h"
 #include "Hypercube.h"
 #include "KernelPdf.h"
+#include "LineSearchGradDescOptimiser.h"
 #include "McmcOptimiser.h"
 #include "NewtonSolver1D.h"
 #include "ParticleSwarmOptimiser.h"
@@ -105,7 +106,15 @@ void TestMath::testSimpleFit()
    Logger msg( "testSimpleFit" );
    msg << Msg::Info << "Running testSimpleFit..." << Msg::EndReq;
 
-   /// Create f(x) = x - x^2 with added noise sampled from Uniform(-1,1).
+
+   /// Define solution and startValues.
+   const RealVector& solution = realVector( 0, 1, -0.5, 1./6., -1/24. );
+   const RealVector& startValues = realVector( 0, 0, 0, 0, 0 );
+
+   Math::FitFunctionBase* fitFunction = new Math::PolynomialFitFunction( solution.size() - 1 );
+   fitFunction->setParameters( solution );
+
+   /// Create f(x) = x - 1/2 * x^2 + 1/6 * x^3 with added noise sampled from Uniform(-1,1).
    RandomNumberGenerator rng( 1 );
    size_t numSamples = 100;
 
@@ -116,33 +125,31 @@ void TestMath::testSimpleFit()
    {
       double x = ( i - 0.5 * numSamples ) / 10.0;
       xData[ i ] = x;
-      yData[ i ] = x - x * x + 1 * rng.uniform( -1, 1 );
+      yData[ i ] = (*fitFunction)( x ) + 1 * rng.uniform( -1, 1 );
    }
 
    /// Define the fit objective.
-   Math::FitFunctionBase* fitFunction = new Math::PolynomialFitFunction( 2 );
    Math::Chi2FitObjective fitObj( xData, yData, ySigma2, fitFunction );
 
-   /// Optimise the fit error.
-   Math::GradDescOptimiser optimiser( fitObj, realVector( 10, 10, 2 ) );
-   optimiser.setLoggerThreshold( Msg::Debug );
-   optimiser.setMaxIterations( 100000 );
-   optimiser.setGamma( 1e-6 );
-   const RealVector& optSolution = optimiser.solve();
-   msg << Msg::Info << "Solution found by GradDescOptimiser = " << optSolution << Msg::EndReq;
+   Math::LineSearchGradDescOptimiser lineSearchOptimiser( fitObj );
+   lineSearchOptimiser.setMaxIterations( 100000 );
+   lineSearchOptimiser.setMinGradLength( 1 );
+   lineSearchOptimiser.setMinObjFuncValChange( 1e-8 );
+   lineSearchOptimiser.setLoggerThreshold( Msg::Info );
+   const RealVector& lsOptSolution = lineSearchOptimiser.solve( startValues );
+   msg << Msg::Info << "Solution found by LineSearchGradDescOptimiser = " << lsOptSolution << Msg::EndReq;
 
    /// Draw the data set.
    gPlotFactory().createPlot( "testSimpleFit/FitResult" );
    gPlotFactory().createScatter( xData, yData );
 
    /// Draw the real solution.
-   const RealVector& solution = realVector( 0, 1, -1 );
    fitFunction->setParameters( solution );
    gPlotFactory().createGraph( xData, fitFunction->evalMany( xData ), Qt::red );
 
-   /// Draw the fitted solution.
-   fitFunction->setParameters( optSolution );
-   gPlotFactory().createGraph( xData, fitFunction->evalMany( xData ), Qt::blue );
+   /// Draw the solution fitted by the line-search optimiser.
+   fitFunction->setParameters( lsOptSolution );
+   gPlotFactory().createGraph( xData, fitFunction->evalMany( xData ), Qt::green );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
