@@ -88,9 +88,13 @@ class ScrollPaintArea : public PaintAreaBase
 
    signals:
       /**
-       * Signals that the viewport has been changed by a scroll action.
+       * Signals that the viewport has been changed by a scroll action on this widget.
        */
       void viewportFromScroll( const QRectF& viewport );
+      /**
+       * Signals that both markers have been set.
+       */
+      void updateViewportFromMarkers();
 
    public:
       /**
@@ -100,7 +104,7 @@ class ScrollPaintArea : public PaintAreaBase
 
    private slots:
       /**
-       * Handle a view port change of the graph.
+       * Handle a viewport change of the graph.
        */
       virtual void viewportGraphChanged( const QRectF& newViewportOfGraph ) = 0;
       /**

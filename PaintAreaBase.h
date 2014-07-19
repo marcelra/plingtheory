@@ -113,7 +113,7 @@ class PaintAreaBase : public QWidget
       QRect                        m_canvas;
       QPainter*                    m_painter;
       std::unique_ptr< QPoint >    m_oldMousePos;
-      std::unique_ptr< QRectF >    m_viewportConstraints;
+      std::unique_ptr< QRectF >    m_viewportConstraints;      //! Viewport constraints. Cannot pan or zoom outside this area. Used for 2D histograms.
       std::unique_ptr< QPoint >    m_clickedMousePos;
 };
 
