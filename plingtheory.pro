@@ -138,7 +138,8 @@ SOURCES += main.cpp \
     ZScatterItem.cpp \
     MlpErrorObjective.cpp \
     StochasticGradDescMlpTrainer.cpp \
-    PredefinedRealFunctions.cpp
+    PredefinedRealFunctions.cpp \
+    Chi2FitObjective.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -273,7 +274,8 @@ HEADERS += \
     MlpErrorObjective.h \
     GradDescOptimiser.h \
     StochasticGradDescMlpTrainer.h \
-    PredefinedRealFunctions.h
+    PredefinedRealFunctions.h \
+    Chi2FitObjective.h
 
 OTHER_FILES += \
     Todos.txt

@@ -24,8 +24,8 @@ class LoggerClient
 
    private:
       std::unique_ptr< Logger >    m_logger;
-      LoggerClientId             m_loggerClientId;
-      static LoggerClientId      s_loggerClientId;
+      LoggerClientId               m_loggerClientId;
+      static LoggerClientId        s_loggerClientId;
 };
 
 

@@ -12,12 +12,13 @@ namespace Math
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// constructor
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-GradDescOptimiser::GradDescOptimiser( const IObjectiveFunction& func, const RealVector& startValues ) :
+GradDescOptimiser::GradDescOptimiser( const IObjectiveFunction& func, const RealVector& startValues, const std::string& algorithmName, const AlgorithmBase* parent ) :
+   AlgorithmBase( algorithmName, parent ),
    m_func( func ),
+   m_gamma( 0.1 ),
    m_input( startValues ),
    m_maxIterations( 20 ),
-   m_objValChangeConvergence( 1e-6 ),
-   m_useLineSearch( true )
+   m_objValChangeConvergence( 1e-6 )
 {
    assert( m_func.getNumParameters() > 0 && m_func.getNumParameters() == startValues.size() );
 }
@@ -35,34 +36,20 @@ RealVector GradDescOptimiser::solve()
 {
    double currentObjective = m_func.evaluate( m_input );
 
-   Logger msg( "GradDescOptimiser" );
-   msg << Msg::Info << "Optimising Objective function with " << m_func.getNumParameters() << " parameters..." << Msg::EndReq;
+   getLogger() << Msg::Debug << "Optimising Objective function with " << m_func.getNumParameters() << " parameters..." << Msg::EndReq;
 
    size_t iter = 0;
-   double gamma = 1e-6;
+   double gamma = m_gamma;
 
    RealVector bestParameter = m_input;
    double bestValue = currentObjective;
    double gradLength;
 
-   msg << Msg::Debug << "Starting iterations" << Msg::EndReq;
+   getLogger() << Msg::Debug << "Starting iterations" << Msg::EndReq;
    do
    {
       // double oldObjective = currentObjective;
       const RealVector& grad = m_func.calculateGradient( m_input );
-      if ( m_useLineSearch )
-      {
-         LineSearchObjective lineSearchObj( m_func, m_input, grad );
-         RealVector gammaVec( 1, gamma );
-         GradDescOptimiser lineSearch( lineSearchObj, gammaVec );
-
-         /// We do not want infinite recursion
-         lineSearch.setUseLineSearch( false );
-         lineSearch.setConvergenceCriterion( 1e-6 );
-         lineSearch.setMaxIterations( 10 );
-
-         gamma = fabs( lineSearch.solve()[0] );
-      }
 
       m_input = m_input - gamma*grad;
 
@@ -70,8 +57,8 @@ RealVector GradDescOptimiser::solve()
       // solutionChange = oldObjective - currentObjective;
       gradLength = grad*grad;
 
-      msg << Msg::Verbose << "Objective = " << currentObjective << Msg::EndReq;
-      msg << Msg::Verbose << "Grad = " << grad << Msg::EndReq;
+      getLogger() << Msg::Verbose << "Objective = " << currentObjective << Msg::EndReq;
+      getLogger() << Msg::Verbose << "Grad = " << grad << Msg::EndReq;
       ++iter;
 
       if ( currentObjective < bestValue )
@@ -82,8 +69,8 @@ RealVector GradDescOptimiser::solve()
    }
    while ( ( gradLength > m_objValChangeConvergence ) && iter < m_maxIterations );
 
-   msg << Msg::Debug << "Num iterations needed: " << iter << Msg::EndReq;
-   msg << Msg::Debug << "Solution = " << m_input << Msg::EndReq;
+   getLogger() << Msg::Debug << "Num iterations needed: " << iter << Msg::EndReq;
+   getLogger() << Msg::Debug << "Solution = " << m_input << Msg::EndReq;
 
    return m_input;
 }
@@ -105,11 +92,11 @@ void GradDescOptimiser::setConvergenceCriterion( double objValChange )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// setUseLineSearch
+/// setGamma
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void GradDescOptimiser::setUseLineSearch( bool useLineSearch )
+void GradDescOptimiser::setGamma( double gamma )
 {
-   m_useLineSearch = useLineSearch;
+   m_gamma = gamma;
 }
 
 } /// namespace Math
