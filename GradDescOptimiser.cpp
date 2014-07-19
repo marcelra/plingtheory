@@ -54,7 +54,6 @@ RealVector GradDescOptimiser::solve()
       m_input = m_input - gamma*grad;
 
       currentObjective = m_func.evaluate( m_input );
-      // solutionChange = oldObjective - currentObjective;
       gradLength = grad*grad;
 
       getLogger() << Msg::Verbose << "Objective = " << currentObjective << Msg::EndReq;
