@@ -39,14 +39,15 @@ QRectF HorizontalScrollPaintArea::getViewRangeRect() const
    viewRect.setLeft( viewMinCanvas.x() );
    viewRect.setRight( viewMaxCanvas.x() );
    viewRect.setTop( viewRect.top() + 1 );
+   viewRect.setBottom( viewRect.bottom() - 1 );
    viewRect.setBottom( viewRect.bottom() );
    if ( viewRect.left() == 0 )
    {
       viewRect.setLeft( 1 );
    }
-   if ( viewRect.right() == m_canvas.right() )
+   if ( viewRect.right() > m_canvas.right() )
    {
-      viewRect.setRight( m_canvas.right() - 1 );
+      viewRect.setRight( m_canvas.right() );
    }
 
    return viewRect;

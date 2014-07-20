@@ -72,7 +72,7 @@ void YAxisPaintArea::drawMinorTick( double tickValue )
    QPointF tickPosCanvas = transformToCanvasCoordinates( QPointF( 0, tickValue ) );
    int tickPosY = tickPosCanvas.y();
 
-   QLineF tickLine( QPointF( m_canvas.right() + 1, tickPosY ), QPointF( m_canvas.right() - tickLength + 1, tickPosY ) );
+   QLineF tickLine( QPointF( m_canvas.right(), tickPosY ), QPointF( m_canvas.right() - tickLength, tickPosY ) );
 
    p.setPen( QPen( QBrush( Qt::black ), 1 ) );
    p.drawLine( tickLine );
@@ -84,7 +84,7 @@ void YAxisPaintArea::drawMinorTick( double tickValue )
 void YAxisPaintArea::drawAxisLine()
 {
    QPainter& p = getPainter();
-   QLineF line( QPointF( m_canvas.right() + 1, m_canvas.top() ), QPointF( m_canvas.right() + 1, m_canvas.bottom() ) );
+   QLineF line( QPointF( m_canvas.right(), m_canvas.top() ), QPointF( m_canvas.right(), m_canvas.bottom() ) );
    p.setPen( QPen( QBrush( Qt::black ), 2 ) );
    p.drawLine( line );
 }

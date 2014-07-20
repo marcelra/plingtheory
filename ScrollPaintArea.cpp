@@ -68,8 +68,8 @@ void ScrollPaintArea::showContextMenu( const QPoint& pos )
       else
       {
          m_marker1.reset( new double( posProjected ) );
-         m_dataMinOld = m_dataMin;
-         m_dataMaxOld = m_dataMax;
+         m_oldDataMin = m_dataMin;
+         m_oldDataMax = m_dataMax;
          double markerMin = std::min( *m_marker0, *m_marker1 );
          double markerMax = std::max( *m_marker0, *m_marker1 );
          setDataRange( markerMin, markerMax );
@@ -80,8 +80,8 @@ void ScrollPaintArea::showContextMenu( const QPoint& pos )
    {
       m_marker0.reset( 0 );
       m_marker1.reset( 0 );
-      m_dataMin = m_dataMinOld;
-      m_dataMax = m_dataMaxOld;
+      m_dataMin = m_oldDataMin;
+      m_dataMax = m_oldDataMax;
       update();
       emit updateViewportFromMarkers();
    }
@@ -100,6 +100,8 @@ void ScrollPaintArea::setDataRange( double min, double max )
 {
    m_dataMin = min;
    m_dataMax = max;
+   m_oldDataMin = min;
+   m_oldDataMax = max;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -125,14 +127,6 @@ void ScrollPaintArea::paintEventImpl( QPaintEvent* paintEvent )
    getPainter().setBrush( brush );
    getPainter().drawRect( getDataRangeRect().toRect() );
 
-   /// Draw scroll handle.
-   QColor viewColor( Qt::blue );
-   viewColor.setAlpha( 64 );
-   brush.setColor( viewColor );
-   getPainter().setBrush( brush );
-   getPainter().setPen( QPen( brush, 2 ) );
-   getPainter().drawRect( getViewRangeRect() );
-
    if ( m_marker0.get() )
    {
       drawMarker( *m_marker0 );
@@ -141,6 +135,15 @@ void ScrollPaintArea::paintEventImpl( QPaintEvent* paintEvent )
    {
       drawMarker( *m_marker1 );
    }
+
+   /// Draw scroll handle.
+   QColor viewColor( Qt::blue );
+   viewColor.setAlpha( 64 );
+   brush.setColor( viewColor );
+   getPainter().setBrush( brush );
+   getPainter().setPen( QPen( brush, 2 ) );
+   getPainter().drawRect( getViewRangeRect() );
+
 
 }
 
@@ -151,25 +154,27 @@ void ScrollPaintArea::drawMarker( double markerPosition )
 {
    const QPen& prevPen = getPainter().pen();
    const QBrush& prevBrush = getPainter().brush();
-   QPainter::RenderHints prevRenderHints = getPainter().renderHints();
 
-   getPainter().setRenderHint( QPainter::Antialiasing, false );
+   QColor markerColour;
 
-   QBrush brush( Qt::darkBlue, Qt::SolidPattern );
+   if ( m_marker1.get() )
+   {
+      markerColour.setRgb( 80, 80, 80 );
+   }
+   else
+   {
+      markerColour.setRgb( 160, 0, 0 );
+   }
+
+   QBrush brush( markerColour, Qt::SolidPattern );
    QPointF markerProjected = markerPosition * getCanVecAlong();
    QPointF pMinMarker = transformToCanvasCoordinates( markerProjected );
    pMinMarker = pointWiseMultiply( pMinMarker, getCanVecAlong() );
    QPointF pMaxMarker = pMinMarker + getCanVecOrthogonal();
 
-   if ( pMinMarker.manhattanLength() < 1 )
-   {
-      pMinMarker += getCanVecAlong();
-      pMaxMarker += getCanVecAlong();
-   }
+   size_t penSize = 2;
 
-   pMinMarker += getCanVecOrthogonalUnitVector();
-
-   getPainter().setPen( QPen( brush, 2, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin ) );
+   getPainter().setPen( QPen( brush, penSize, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin ) );
    getPainter().drawLine( pMinMarker.toPoint(), pMaxMarker.toPoint() );
 
    double triangleSize = 4;
@@ -185,14 +190,13 @@ void ScrollPaintArea::drawMarker( double markerPosition )
    triangleDown.append( pMaxMarker - triangleOrthogonal );
    triangleDown.append( pMaxMarker - triangleSize * getCanVecAlong() );
 
-   getPainter().setPen( QPen( brush, 2, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin ) );
+   getPainter().setPen( QPen( brush, penSize, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin ) );
    getPainter().setBrush( brush );
    getPainter().drawPolygon( triangleUp.toPolygon(), Qt::OddEvenFill );
    getPainter().drawPolygon( triangleDown.toPolygon(), Qt::OddEvenFill );
 
    getPainter().setPen( prevPen );
    getPainter().setBrush( prevBrush );
-   getPainter().setRenderHints( prevRenderHints );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

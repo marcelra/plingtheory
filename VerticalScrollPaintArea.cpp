@@ -39,16 +39,16 @@ QRectF VerticalScrollPaintArea::getViewRangeRect() const
    viewRect.setTop( viewMinCanvas.y() );
    viewRect.setBottom( viewMaxCanvas.y() );
    viewRect.setLeft( viewRect.left() + 1 );
-   viewRect.setRight( viewRect.right() );
+   viewRect.setRight( viewRect.right() - 1 );
 
    /// Correct boundaries.
    if ( viewRect.top() == 0 )
    {
       viewRect.setTop( 1 );
    }
-   if ( viewRect.bottom() > m_canvas.bottom() )
+   if ( viewRect.bottom() >= m_canvas.bottom() )
    {
-      viewRect.setBottom( m_canvas.bottom() );
+      viewRect.setBottom( m_canvas.bottom() - 1 );
    }
 
    return viewRect;
