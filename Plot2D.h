@@ -4,6 +4,8 @@
 #include <QWidget>
 #include <QMetaType>
 
+#include "PaintArea.h"
+
 /// Forward declares
 class QGridLayout;
 
@@ -14,7 +16,6 @@ namespace Plotting
 class CurveItem;
 class GridItem;
 class IPaintItem;
-class PaintArea;
 class ScrollPaintArea;
 class AxisPaintArea;
 
@@ -37,6 +38,7 @@ class Plot2D : public QWidget
    private slots:
       void synchroniseViewports( const QRectF& viewport );
       void synchroniseWithGraphViewport();
+      void animateActiveScrollbar( PaintArea::ZoomMode zoomMode );
 
    private:
       QGridLayout*       m_gridLayout;

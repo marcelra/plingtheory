@@ -311,6 +311,9 @@ void PaintArea::mouseDoubleClickEvent( QMouseEvent* event )
    {
       m_zoomMode = ZoomBoth;
    }
+
+   emit zoomModeChanged( m_zoomMode );
+
    event->accept();
 }
 

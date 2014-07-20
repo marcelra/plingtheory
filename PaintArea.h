@@ -43,13 +43,16 @@ class PaintArea : public PaintAreaBase
 
       void autoScale();
 
-   private:
+   public:
       enum ZoomMode
       {
          ZoomBoth = 0,
          ZoomHorizontal,
          ZoomVertical
       };
+
+   signals:
+      void zoomModeChanged( PaintArea::ZoomMode zoomMode );
 
    private:
       void generatePaintCommands();

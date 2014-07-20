@@ -105,6 +105,10 @@ class ScrollPaintArea : public PaintAreaBase
        * Sets viewport. Can be graph viewport only if user is scrolling.
        */
       void setViewport( const QRectF& viewport );
+      /**
+       * Animates that this zoom direction is activated.
+       */
+      void animateActive();
 
    private slots:
       /**
@@ -115,6 +119,10 @@ class ScrollPaintArea : public PaintAreaBase
        * Show the context menu.
        */
       void showContextMenu( const QPoint& pos );
+      /**
+       * animateTimerSlot
+       */
+      void animateTimerSlot();
 
    protected:
       double   m_dataMin;                 //! Min of the data.
@@ -124,6 +132,12 @@ class ScrollPaintArea : public PaintAreaBase
 
       double   m_oldDataMin;
       double   m_oldDataMax;
+
+      /// TODO: wrap in private namespace class. Do not rebuild animation palette every time.
+      QTimer*         m_animationTimer;
+      size_t          m_animationFrameCounter;
+      double          m_animationProgess;
+      static size_t   s_numTotalAnimations;
 
       std::unique_ptr< double >  m_marker0;
       std::unique_ptr< double >  m_marker1;
