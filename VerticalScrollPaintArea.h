@@ -28,7 +28,9 @@ class VerticalScrollPaintArea : public ScrollPaintArea
       QRectF getViewRangeRect() const;
       void updateViewportGraphFromShift( const QPointF& shift );
       double project( const QPointF& p ) const;
+
       QPointF getCanVecAlong() const;
+      QPointF getCanVecAlongUnitVector() const;
       QPointF getCanVecOrthogonal() const;
       QPointF getCanVecOrthogonalUnitVector() const;
 

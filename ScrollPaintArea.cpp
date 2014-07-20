@@ -97,7 +97,9 @@ void ScrollPaintArea::showContextMenu( const QPoint& pos )
 /// destructor
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ScrollPaintArea::~ScrollPaintArea()
-{}
+{
+   delete m_animationTimer;
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// setDataRange
@@ -116,7 +118,7 @@ void ScrollPaintArea::paintEventImpl( QPaintEvent* paintEvent )
    assert( paintEvent );
 
    /// Draw background color.
-   QColor bkgColor( Qt::lightGray );
+   QColor bkgColor;
    bkgColor.setRgb( 220, 220, 220 );
    QBrush brush( bkgColor, Qt::SolidPattern );
    getPainter().setBrush( brush );
@@ -126,6 +128,7 @@ void ScrollPaintArea::paintEventImpl( QPaintEvent* paintEvent )
    /// Draw data range.
    QColor dataRangeColor( bkgColor );
    dataRangeColor.setRgb( 180, 180, 180 );
+   dataRangeColor.setAlpha( m_animationProgess * 255 );
    brush.setColor( dataRangeColor );
    getPainter().setPen( QPen( brush, 0 ) );
    getPainter().setBrush( brush );
@@ -144,7 +147,7 @@ void ScrollPaintArea::paintEventImpl( QPaintEvent* paintEvent )
    std::vector< QColor > paletteStops;
    std::vector< double > stopPoints;
    stopPoints.push_back( 0 ); paletteStops.push_back( QColor( Qt::blue ) );
-   stopPoints.push_back( 0.25 ); paletteStops.push_back( QColor( Qt::white ) );
+   stopPoints.push_back( 0.1 ); paletteStops.push_back( QColor( Qt::white ) );
    stopPoints.push_back( 1 ); paletteStops.push_back( QColor( Qt::blue ) );
    Plotting::Palette scrollPalette( paletteStops, stopPoints );
 
@@ -155,7 +158,41 @@ void ScrollPaintArea::paintEventImpl( QPaintEvent* paintEvent )
    getPainter().setPen( QPen( brush, 2 ) );
    getPainter().drawRect( getViewRangeRect() );
 
+   // if ( m_animationTimer )
+   // {
+   //    QColor triangleColour( m_animationProgess < 0.5 ? Qt::gray : Qt::white );
+   //    triangleColour.setAlpha( m_animationProgess < 0.5 ? ( 0.5 - m_animationProgess ) * 255 : ( m_animationProgess - 0.5 ) * 255 );
+   //    QBrush triangleBrush( triangleColour );
+   //    getPainter().setPen( QPen( triangleBrush, 0 ) );
+   //    getPainter().setBrush( triangleBrush );
 
+   //    QPointF topLeft( 0, 0 );
+   //    QPointF bottomLeft = getCanVecOrthogonal();
+
+   //    QPointF topRight = getCanVecAlong();
+
+   //    QPointF t0 = topLeft + m_animationProgess * topRight;
+   //    QPointF t1 = bottomLeft + m_animationProgess * topRight;
+   //    QPointF t2 = ( t0 + t1 ) / 2.0 + 10 * getCanVecAlongUnitVector();
+
+   //    QPolygonF triangle1;
+   //    triangle1.append( t0 );
+   //    triangle1.append( t1 );
+   //    triangle1.append( t2 );
+
+   //    getPainter().drawPolygon( triangle1 );
+
+   //    t0 = ( 1 - m_animationProgess ) * topRight;
+   //    t1 = bottomLeft + ( 1 - m_animationProgess ) * topRight;
+   //    t2 = ( t0 + t1 ) / 2.0 - 10 * getCanVecAlongUnitVector();
+
+   //    QPolygonF triangle2;
+   //    triangle2.append( t0 );
+   //    triangle2.append( t1 );
+   //    triangle2.append( t2 );
+
+   //    getPainter().drawPolygon( triangle2 );
+   // }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -178,9 +215,9 @@ void ScrollPaintArea::drawMarker( double markerPosition )
    }
 
    QBrush brush( markerColour, Qt::SolidPattern );
-   QPointF markerProjected = markerPosition * getCanVecAlong();
+   QPointF markerProjected = markerPosition * getCanVecAlongUnitVector();
    QPointF pMinMarker = transformToCanvasCoordinates( markerProjected );
-   pMinMarker = pointWiseMultiply( pMinMarker, getCanVecAlong() );
+   pMinMarker = pointWiseMultiply( pMinMarker, getCanVecAlongUnitVector() );
    QPointF pMaxMarker = pMinMarker + getCanVecOrthogonal();
 
    size_t penSize = 2;
@@ -192,14 +229,14 @@ void ScrollPaintArea::drawMarker( double markerPosition )
    QPointF triangleOrthogonal = triangleSize * getCanVecOrthogonalUnitVector();
 
    QPolygonF triangleUp;
-   triangleUp.append( pMinMarker + triangleSize * getCanVecAlong() );
+   triangleUp.append( pMinMarker + triangleSize * getCanVecAlongUnitVector() );
    triangleUp.append( pMinMarker + triangleOrthogonal );
-   triangleUp.append( pMinMarker - triangleSize * getCanVecAlong() );
+   triangleUp.append( pMinMarker - triangleSize * getCanVecAlongUnitVector() );
 
    QPolygonF triangleDown;
-   triangleDown.append( pMaxMarker + triangleSize * getCanVecAlong() );
+   triangleDown.append( pMaxMarker + triangleSize * getCanVecAlongUnitVector() );
    triangleDown.append( pMaxMarker - triangleOrthogonal );
-   triangleDown.append( pMaxMarker - triangleSize * getCanVecAlong() );
+   triangleDown.append( pMaxMarker - triangleSize * getCanVecAlongUnitVector() );
 
    getPainter().setPen( QPen( brush, penSize, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin ) );
    getPainter().setBrush( brush );
@@ -293,7 +330,7 @@ void ScrollPaintArea::animateActive()
    }
 
    m_animationTimer = new QTimer();
-   m_animationTimer->setInterval( 5 );
+   m_animationTimer->setInterval( 10 );
    m_animationFrameCounter = 0;
    connect( m_animationTimer, SIGNAL( timeout() ), this, SLOT( animateTimerSlot() ) );
    m_animationTimer->start();
