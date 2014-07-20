@@ -33,6 +33,7 @@ void TestSuite::execute()
    /// Test generators.
    testEnvelope();
    testSineGenerator();
+   testSquareGenerator();
    testNoiseGenerator();
    testTriangleGenerator();
    testSawtoothGenerator();
@@ -441,7 +442,7 @@ void TestSuite::testRandomMusic()
    msg << Msg::Info << "Running testRandomMusic..." << Msg::EndReq;
 
    SamplingInfo samplingInfo( 44100 );
-   size_t numNotesToGenerate = 400;
+   size_t numNotesToGenerate = 40;
 
    Music::Note rootAccomp( Music::Note::C, 4, Music::Duration(1) );
    Music::Note rootBass( Music::Note::C, 3, Music::Duration(4) );
@@ -478,7 +479,7 @@ void TestSuite::testRandomMusic()
    generatedDataRight->mixAdd( *generatedBassData );
 
    MultiChannelRawPcmData waveData( generatedDataLeft.release(), generatedDataRight.release() );
-   WaveFile::write( GlobalParameters::getRunDir() + "testResults/randomMonoMusic.wav", waveData );
+   // WaveFile::write( GlobalParameters::getRunDir() + "testResults/randomMonoMusic.wav", waveData );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1311,7 +1312,7 @@ void TestSuite::testMultiLayerPerceptron()
    network.randomiseWeights( Interval( -1, 1 ), 3 );
 
    /// Train network.
-   for ( size_t iIter = 0; iIter < 10; ++iIter )
+   for ( size_t iIter = 0; iIter < 3; ++iIter )
    {
       Mva::StochasticGradDescMlpTrainer mlpTrainer( network );
       mlpTrainer.setInputData( trainInputData, trainOutputData );

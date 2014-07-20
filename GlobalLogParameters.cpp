@@ -114,6 +114,7 @@ void GlobalLogParameters::setThreshold( Msg::LogLevel threshold )
 void GlobalLogParameters::setRegressionConfig()
 {
    m_threshold = Msg::Never;
+   m_useColors = false;
    m_overrideLocalThresholds = true;
    m_displayLoggerId = false;
 }
