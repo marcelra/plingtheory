@@ -62,14 +62,14 @@ void ScrollPaintArea::showContextMenu( const QPoint& pos )
       double posProjected = project( transformToWorldCoordinates( pos ) );
       if ( !m_marker0.get() )
       {
+         m_oldDataMin = m_dataMin;
+         m_oldDataMax = m_dataMax;
          m_marker0.reset( new double( posProjected ) );
          update();
       }
       else
       {
          m_marker1.reset( new double( posProjected ) );
-         m_oldDataMin = m_dataMin;
-         m_oldDataMax = m_dataMax;
          double markerMin = std::min( *m_marker0, *m_marker1 );
          double markerMax = std::max( *m_marker0, *m_marker1 );
          setDataRange( markerMin, markerMax );
@@ -100,8 +100,6 @@ void ScrollPaintArea::setDataRange( double min, double max )
 {
    m_dataMin = min;
    m_dataMax = max;
-   m_oldDataMin = min;
-   m_oldDataMax = max;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
