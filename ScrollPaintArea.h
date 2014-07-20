@@ -122,8 +122,8 @@ class ScrollPaintArea : public PaintAreaBase
       QRectF   m_viewportGraph;           //! Viewport of the graph.
       bool     m_isScrolling;             //! True iff user is scrolling.
 
-      double   m_dataMinOld;
-      double   m_dataMaxOld;
+      double   m_oldDataMin;
+      double   m_oldDataMax;
 
       std::unique_ptr< double >  m_marker0;
       std::unique_ptr< double >  m_marker1;

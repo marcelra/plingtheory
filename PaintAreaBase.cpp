@@ -69,7 +69,7 @@ QPointF PaintAreaBase::transformToWorldCoordinates( const QPoint& point ) const
 void PaintAreaBase::paintEvent( QPaintEvent* paintEvent )
 {
    /// Synchronise canvas size.
-   m_canvas = QRect( 0, 0, width() - 1, height() - 1 );
+   m_canvas = QRect( 0, 0, width(), height() );
 
    /// Contruct painter.
    m_painter = new QPainter( this );
