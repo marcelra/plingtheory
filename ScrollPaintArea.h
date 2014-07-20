@@ -61,9 +61,13 @@ class ScrollPaintArea : public PaintAreaBase
        */
       virtual QPointF getCanVecAlong() const = 0;
       /**
-       * Get a vector orthogonal to scroll-direction in canvas coordinates. Length of the vector is equal to canvas size.
+       * Get the vector orthogonal to scroll-direction in canvas coordinates. Length of the vector is equal to canvas size.
        */
       virtual QPointF getCanVecOrthogonal() const = 0;
+      /**
+       * Get the vector orthogonal to scroll-direction in canvas coordinates. Length of the vector is normalised to unity.
+       */
+      virtual QPointF getCanVecOrthogonalUnitVector() const = 0;
 
       /**
        * Draw a marker set by the user.

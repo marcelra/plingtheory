@@ -30,6 +30,7 @@ class HorizontalScrollPaintArea : public ScrollPaintArea
       double project( const QPointF& p ) const;
       QPointF getCanVecAlong() const;
       QPointF getCanVecOrthogonal() const;
+      QPointF getCanVecOrthogonalUnitVector() const;
 
    /**
     * @see ScrollPaintArea interface for docuemtation.
