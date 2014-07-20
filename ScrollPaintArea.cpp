@@ -123,7 +123,7 @@ void ScrollPaintArea::paintEventImpl( QPaintEvent* paintEvent )
    brush.setColor( dataRangeColor );
    getPainter().setPen( QPen( brush, 0 ) );
    getPainter().setBrush( brush );
-   getPainter().drawRect( getDataRangeRect() );
+   getPainter().drawRect( getDataRangeRect().toRect() );
 
    /// Draw scroll handle.
    QColor viewColor( Qt::blue );
@@ -150,6 +150,7 @@ void ScrollPaintArea::paintEventImpl( QPaintEvent* paintEvent )
 void ScrollPaintArea::drawMarker( double markerPosition )
 {
    const QPen& prevPen = getPainter().pen();
+   const QBrush& prevBrush = getPainter().brush();
    QPainter::RenderHints prevRenderHints = getPainter().renderHints();
 
    getPainter().setRenderHint( QPainter::Antialiasing, false );
@@ -166,11 +167,13 @@ void ScrollPaintArea::drawMarker( double markerPosition )
       pMaxMarker += getCanVecAlong();
    }
 
+   pMinMarker += getCanVecOrthogonalUnitVector();
+
    getPainter().setPen( QPen( brush, 2, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin ) );
    getPainter().drawLine( pMinMarker.toPoint(), pMaxMarker.toPoint() );
 
    double triangleSize = 4;
-   QPointF triangleOrthogonal = triangleSize * getCanVecOrthogonal() / getCanVecOrthogonal().manhattanLength();
+   QPointF triangleOrthogonal = triangleSize * getCanVecOrthogonalUnitVector();
 
    QPolygonF triangleUp;
    triangleUp.append( pMinMarker + triangleSize * getCanVecAlong() );
@@ -183,10 +186,12 @@ void ScrollPaintArea::drawMarker( double markerPosition )
    triangleDown.append( pMaxMarker - triangleSize * getCanVecAlong() );
 
    getPainter().setPen( QPen( brush, 2, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin ) );
-   getPainter().drawPolygon( triangleUp.toPolygon() );
-   getPainter().drawPolygon( triangleDown.toPolygon() );
+   getPainter().setBrush( brush );
+   getPainter().drawPolygon( triangleUp.toPolygon(), Qt::OddEvenFill );
+   getPainter().drawPolygon( triangleDown.toPolygon(), Qt::OddEvenFill );
 
    getPainter().setPen( prevPen );
+   getPainter().setBrush( prevBrush );
    getPainter().setRenderHints( prevRenderHints );
 }
 
