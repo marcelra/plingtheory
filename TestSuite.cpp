@@ -64,7 +64,7 @@ void TestSuite::execute()
 
 void TestSuite::singleTest()
 {
-   TestMath::testSimpleFit();
+   TestSuite::testSquareGenerator();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -389,6 +389,47 @@ void TestSuite::testSineGenerator()
    /// Write to wave file
    MultiChannelRawPcmData data( channel );
    WaveFile::write( "testSineGen.wav", data );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// testSquareGenerator
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void TestSuite::testSquareGenerator()
+{
+   Logger msg( "testSquareGenerator" );
+   msg << Msg::Info << "Running testSquareGenerator..." << Msg::EndReq;
+
+   /// Define output format
+   SamplingInfo samplingInfo;
+   RawPcmData* channel = new RawPcmData( samplingInfo );
+
+   /// Setup synthesizer and notes to play
+   Synthesizer::SquareGenerator square( samplingInfo );
+   square.setAmplitude( 0.1 );
+
+   Music::Note c( Music::Note::C, 4 );
+   Music::Note es( Music::Note::Es, 4 );
+
+   size_t oneSec = 44100;
+   RawPcmData::Ptr noteData;
+
+   /// Generate 'c'-note
+   square.setFrequency( c.getFrequency() );
+   noteData = square.generate( 2 * oneSec );
+   channel->pasteAtEnd( *noteData );
+
+   /// Generate 'es'-note
+   square.setFrequency( es.getFrequency() );
+   noteData = square.generate( 2 * oneSec );
+   channel->pasteAtEnd( *noteData );
+
+   gPlotFactory().createPlot( "testSquareGenerator/Square" );
+   gPlotFactory().drawPcmData( *channel );
+
+   /// Write to wave file
+   MultiChannelRawPcmData data( channel );
+   WaveFile::write( "testSquareGen.wav", data );
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
