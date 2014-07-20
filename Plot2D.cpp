@@ -4,7 +4,6 @@
 #include "CurveItem.h"
 #include "GridItem.h"
 #include "HorizontalScrollPaintArea.h"
-#include "PaintArea.h"
 #include "VerticalScrollPaintArea.h"
 #include "XAxisPaintArea.h"
 #include "YAxisPaintArea.h"
@@ -74,6 +73,8 @@ Plot2D::Plot2D( QWidget* parent ) :
    isConnected = connect( m_xScroll, SIGNAL( updateViewportFromMarkers() ), this, SLOT( synchroniseWithGraphViewport() ) );
    assert( isConnected );
    isConnected = connect( m_yScroll, SIGNAL( updateViewportFromMarkers() ), this, SLOT( synchroniseWithGraphViewport() ) );
+   assert( isConnected );
+   isConnected = connect( m_graph, SIGNAL( zoomModeChanged( PaintArea::ZoomMode ) ), this, SLOT( animateActiveScrollbar( PaintArea::ZoomMode ) ) );
    assert( isConnected );
 
    /// Enable grid by default.
@@ -156,12 +157,35 @@ void Plot2D::synchroniseViewports( const QRectF& viewport )
    m_yAxisPaintArea->setViewport( viewport );
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// synchroniseWithGraphViewport
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void Plot2D::synchroniseWithGraphViewport()
 {
    m_xScroll->setViewport( m_graph->getViewport() );
    m_yScroll->setViewport( m_graph->getViewport() );
    m_xAxisPaintArea->setViewport( m_graph->getViewport() );
    m_yAxisPaintArea->setViewport( m_graph->getViewport() );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// animateActiveScrollbar
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void Plot2D::animateActiveScrollbar( PaintArea::ZoomMode zoomMode )
+{
+   if ( zoomMode == PaintArea::ZoomHorizontal )
+   {
+      m_xScroll->animateActive();
+   }
+   else if ( zoomMode == PaintArea::ZoomVertical )
+   {
+      m_yScroll->animateActive();
+   }
+   else if ( zoomMode == PaintArea::ZoomBoth )
+   {
+      m_xScroll->animateActive();
+      m_yScroll->animateActive();
+   }
 }
 
 } /// namespace Plotting

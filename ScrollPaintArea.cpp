@@ -1,5 +1,7 @@
 #include "ScrollPaintArea.h"
 
+#include "Palette.h"
+
 #include <QBrush>
 #include <QDebug>
 #include <QMenu>
@@ -7,6 +9,7 @@
 #include <QPainter>
 #include <QPen>
 #include <QPolygonF>
+#include <QTimer>
 
 namespace
 {
@@ -34,7 +37,10 @@ ScrollPaintArea::ScrollPaintArea( QWidget* parent ) :
    PaintAreaBase( parent ),
    m_dataMin( 0 ),
    m_dataMax( 0 ),
-   m_isScrolling( false )
+   m_isScrolling( false ),
+   m_animationTimer( 0 ),
+   m_animationFrameCounter( 0 ),
+   m_animationProgess( 1 )
 {
    setContextMenuPolicy( Qt::CustomContextMenu );
    connect( this, SIGNAL( customContextMenuRequested( const QPoint& ) ), this, SLOT( showContextMenu( const QPoint& ) ) );
@@ -135,7 +141,14 @@ void ScrollPaintArea::paintEventImpl( QPaintEvent* paintEvent )
    }
 
    /// Draw scroll handle.
-   QColor viewColor( Qt::blue );
+   std::vector< QColor > paletteStops;
+   std::vector< double > stopPoints;
+   stopPoints.push_back( 0 ); paletteStops.push_back( QColor( Qt::blue ) );
+   stopPoints.push_back( 0.25 ); paletteStops.push_back( QColor( Qt::white ) );
+   stopPoints.push_back( 1 ); paletteStops.push_back( QColor( Qt::blue ) );
+   Plotting::Palette scrollPalette( paletteStops, stopPoints );
+
+   QColor viewColor = scrollPalette.getColour( m_animationProgess );
    viewColor.setAlpha( 64 );
    brush.setColor( viewColor );
    getPainter().setBrush( brush );
@@ -268,5 +281,45 @@ void ScrollPaintArea::setViewport( const QRectF& viewport )
    }
    update();
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// animateActive
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void ScrollPaintArea::animateActive()
+{
+   if ( m_animationTimer )
+   {
+      delete m_animationTimer;
+   }
+
+   m_animationTimer = new QTimer();
+   m_animationTimer->setInterval( 5 );
+   m_animationFrameCounter = 0;
+   connect( m_animationTimer, SIGNAL( timeout() ), this, SLOT( animateTimerSlot() ) );
+   m_animationTimer->start();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// animateTimerSlot
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void ScrollPaintArea::animateTimerSlot()
+{
+   if ( m_animationFrameCounter == s_numTotalAnimations )
+   {
+      delete m_animationTimer;
+      m_animationTimer = 0;
+      m_animationProgess = 1;
+   }
+
+   m_animationProgess = static_cast< double >( m_animationFrameCounter ) / s_numTotalAnimations;
+   update();
+
+   ++m_animationFrameCounter;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// Static members ScrollPaintArea
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+size_t ScrollPaintArea::s_numTotalAnimations = 100;
 
 } /// namespace Plotting
