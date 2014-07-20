@@ -21,14 +21,24 @@ RawPcmData::Ptr SquareGenerator::generate( size_t length )
    double phaseStep = getSamplingInfo().getPhaseStepPerSample( getFrequency() );
    double phase = getPhase();
 
+   size_t highestHarmonic = getSamplingInfo().getNyquistFrequency() / getFrequency();
+
    for ( size_t iSample = 0; iSample < length; ++iSample )
    {
-      phase += phaseStep;
+      double osc = 0;
+      for ( size_t iHarmonic = 1; iHarmonic < highestHarmonic; iHarmonic += 2 )
+      {
+         /// TODO: phase information ignored.
+         osc += 1. / iHarmonic * sin( phaseStep * iSample * iHarmonic );
+      }
       double currentAmp = getCurrentSampleAmplitude();
-      (*data)[iSample] = sin( phase ) > 0? currentAmp : -currentAmp;
+      osc *= 4 / M_PI * currentAmp;
+      (*data)[iSample] = osc;
+
       nextSample();
    }
 
+   phase += phaseStep * length;
    setPhase( phase );
    return RawPcmData::Ptr( data );
 }

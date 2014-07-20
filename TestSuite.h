@@ -46,6 +46,7 @@ class TestSuite
        * Music generation tests
        */
       static void testSineGenerator();
+      static void testSquareGenerator();
       static void testNoiseGenerator();
       static void testTriangleGenerator();
       static void testSawtoothGenerator();
