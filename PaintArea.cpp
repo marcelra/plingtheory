@@ -228,7 +228,7 @@ void PaintArea::wheelEvent( QWheelEvent* event )
    const QRectF& viewport = getViewport();
 
    QRectF newViewport;
-   double zoomFactor = 1 - event->delta() / 10.0;
+   double zoomFactor = 1 - event->delta() / 40.0;
    zoomFactor = zoomFactor < 0.75 ? 0.75 : zoomFactor;
    zoomFactor = zoomFactor > 1.25 ? 1.25 : zoomFactor;
    if ( fabs( zoomFactor - 1 ) < 0.01 )

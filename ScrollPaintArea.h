@@ -57,9 +57,13 @@ class ScrollPaintArea : public PaintAreaBase
        */
       virtual double project( const QPointF& p ) const = 0;
       /**
-       * Get a unit vector in canvas coordinates along the direction of scroll-bar.
+       * Get the vector along the scroll-direction in canvas coordinates. Length of the vector is equal to canvas size.
        */
       virtual QPointF getCanVecAlong() const = 0;
+      /**
+       * Get a unit vector in canvas coordinates along the direction of scroll-bar.
+       */
+      virtual QPointF getCanVecAlongUnitVector() const = 0;
       /**
        * Get the vector orthogonal to scroll-direction in canvas coordinates. Length of the vector is equal to canvas size.
        */
