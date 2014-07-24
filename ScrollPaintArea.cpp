@@ -55,6 +55,7 @@ void ScrollPaintArea::showContextMenu( const QPoint& pos )
 
    QMenu contextMenu;
    QAction* setMarkerAction = contextMenu.addAction(  "Set marker" );
+   QAction* setMarkersAroundViewportAction = contextMenu.addAction( "Set markers around view" );
    QAction* deleteMarkersAction = contextMenu.addAction( "Delete markers" );
 
    if ( m_marker0.get() && m_marker1.get() )
@@ -68,27 +69,41 @@ void ScrollPaintArea::showContextMenu( const QPoint& pos )
       double posProjected = project( transformToWorldCoordinates( pos ) );
       if ( !m_marker0.get() )
       {
-         m_oldDataMin = m_dataMin;
-         m_oldDataMax = m_dataMax;
+         m_originalDataMin = m_dataMin;
+         m_originalDataMax = m_dataMax;
          m_marker0.reset( new double( posProjected ) );
          update();
       }
       else
       {
          m_marker1.reset( new double( posProjected ) );
+
          double markerMin = std::min( *m_marker0, *m_marker1 );
          double markerMax = std::max( *m_marker0, *m_marker1 );
-         setDataRange( markerMin, markerMax );
+         updateDataRange( markerMin, markerMax );
+
          emit updateViewportFromMarkers();
       }
+   }
+   else if ( action == setMarkersAroundViewportAction )
+   {
+      const std::pair< double, double >& boundingValues = getBoundingValuesViewportGraph();
+
+      m_marker0.reset( new double ( boundingValues.first ) );
+      m_marker1.reset( new double ( boundingValues.second ) );
+
+      double markerMin = std::min( *m_marker0, *m_marker1 );
+      double markerMax = std::max( *m_marker0, *m_marker1 );
+      updateDataRange( markerMin, markerMax );
+
+      emit updateViewportFromMarkers();
    }
    else if ( action == deleteMarkersAction )
    {
       m_marker0.reset( 0 );
       m_marker1.reset( 0 );
-      m_dataMin = m_oldDataMin;
-      m_dataMax = m_oldDataMax;
-      update();
+      m_dataMin = m_originalDataMin;
+      m_dataMax = m_originalDataMax;
       emit updateViewportFromMarkers();
    }
 }
@@ -106,6 +121,8 @@ ScrollPaintArea::~ScrollPaintArea()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void ScrollPaintArea::setDataRange( double min, double max )
 {
+   m_originalDataMin = min;
+   m_originalDataMax = max;
    m_dataMin = min;
    m_dataMax = max;
 }
@@ -298,6 +315,15 @@ void ScrollPaintArea::setIsScrolling( bool isScrolling )
 bool ScrollPaintArea::isScrolling() const
 {
    return m_isScrolling;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// updateDataRange
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void ScrollPaintArea::updateDataRange( double min, double max )
+{
+   m_dataMin = min;
+   m_dataMax = max;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
