@@ -205,30 +205,37 @@ class MainWorkerThread : public IThread
          m_programOptions( programOptions )
       {}
 
-      void run()
+      ReturnStatus run()
       {
-         std::cout << "Running the main worker thread..." << std::endl;
-         if ( m_programOptions->doRunTests() )
+         try
          {
-            runTests( m_programOptions );
+            if ( m_programOptions->doRunTests() )
+            {
+               runTests( m_programOptions );
+            }
+            if ( m_programOptions->doRunSingleTest() )
+            {
+               runTests( m_programOptions );
+            }
+            if ( m_programOptions->doRunDevelopmentCode() )
+            {
+               runDevelopmentCode( m_programOptions );
+            }
+            if ( m_programOptions->getRootFileOutput() != "" )
+            {
+               saveRootFileOutput( m_programOptions );
+            }
+            if ( m_programOptions->doCompareRootFiles() )
+            {
+               compareRootFiles( m_programOptions );
+            }
+            std::cout << "Main worker thread done." << std::endl;
          }
-         if ( m_programOptions->doRunSingleTest() )
+         catch ( StopExecutionException& exc )
          {
-            runTests( m_programOptions );
+            return Failed;
          }
-         if ( m_programOptions->doRunDevelopmentCode() )
-         {
-            runDevelopmentCode( m_programOptions );
-         }
-         if ( m_programOptions->getRootFileOutput() != "" )
-         {
-            saveRootFileOutput( m_programOptions );
-         }
-         if ( m_programOptions->doCompareRootFiles() )
-         {
-            compareRootFiles( m_programOptions );
-         }
-         std::cout << "Main worker thread done." << std::endl;
+         return Finished;
       }
 
    private:

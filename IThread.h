@@ -32,6 +32,17 @@ class IThread
 {
    public:
       /**
+       * Status enum.
+       */
+      enum ReturnStatus
+      {
+         Pending = 0,
+         Finished,
+         Failed
+      };
+
+   public:
+      /**
        * Create thread with name @param threadName.
        */
       IThread( const std::string& threadName );
@@ -77,11 +88,16 @@ class IThread
        */
       bool isKilled() const;
 
+      /**
+       * Retrieve the thread status.
+       */
+      ReturnStatus getReturnStatus() const;
+
    private:
       /**
        * Worker method. Derived class should override this method.
        */
-      virtual void run();
+      virtual ReturnStatus run();
 
    private:
       /**
@@ -97,10 +113,11 @@ class IThread
     * State administration members.
     */
    private:
-      bool     m_isFinished;
-      bool     m_isKilled;
-      bool     m_isRunning;
-      size_t   m_pollTimeMilliSeconds;
+      bool          m_isFinished;
+      bool          m_isKilled;
+      bool          m_isRunning;
+      ReturnStatus  m_returnStatus;
+      size_t        m_pollTimeMilliSeconds;
 
    /**
     * The boost worker thread.
