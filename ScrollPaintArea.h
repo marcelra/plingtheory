@@ -6,6 +6,8 @@
 namespace Plotting
 {
 
+struct ScrollBarAnimator;
+
 /**
  * @class ScrollPaintArea
  * @brief Base class for scroll bars that visually indicate the range of the data and the viewport.
@@ -82,10 +84,6 @@ class ScrollPaintArea : public PaintAreaBase
       virtual std::pair< double, double > getBoundingValuesViewportGraph() const = 0;
 
       /**
-       * Draw a marker set by the user.
-       */
-      void drawMarker( double markerPosition );
-      /**
        * Calculate the canvas rectangle displaying the range of the data.
        */
       virtual QRectF getDataRangeRect() const = 0;
@@ -97,10 +95,16 @@ class ScrollPaintArea : public PaintAreaBase
        * Given a shift of the viewport from e.g. a mouse move event, update the graph view port.
        */
       virtual void updateViewportGraphFromShift( const QPointF& shift ) = 0;
+
+   public:
       /**
        * Block updating the viewport.
        */
       void setIsScrolling( bool isScrolling );
+      /**
+       * Draw a marker set by the user.
+       */
+      void drawMarker( double markerPosition );
 
    signals:
       /**
@@ -145,11 +149,7 @@ class ScrollPaintArea : public PaintAreaBase
       double   m_originalDataMin;
       double   m_originalDataMax;
 
-      /// TODO: wrap in private namespace class. Do not rebuild animation palette every time.
-      QTimer*         m_animationTimer;
-      size_t          m_animationFrameCounter;
-      double          m_animationProgess;
-      static size_t   s_numTotalAnimations;
+      ScrollBarAnimator*         m_scrollBarAnimator;
 
       std::unique_ptr< double >  m_marker0;
       std::unique_ptr< double >  m_marker1;
