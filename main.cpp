@@ -207,6 +207,7 @@ class MainWorkerThread : public IThread
 
       void run()
       {
+         std::cout << "Running the main worker thread..." << std::endl;
          if ( m_programOptions->doRunTests() )
          {
             runTests( m_programOptions );
@@ -227,6 +228,7 @@ class MainWorkerThread : public IThread
          {
             compareRootFiles( m_programOptions );
          }
+         std::cout << "Main worker thread done." << std::endl;
       }
 
    private:
