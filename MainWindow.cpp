@@ -7,12 +7,14 @@
 #include <QDebug>
 #include <QHBoxLayout>
 #include <QListWidget>
+#include <QMessageBox>
 #include <QPushButton>
 #include <QStandardItemModel>
 #include <QTimer>
 #include <QVBoxLayout>
 
 #include <cassert>
+#include <sstream>
 
 namespace Gui
 {
@@ -151,8 +153,20 @@ void MainWindow::lowFreqUpdate()
    {
       if ( !(*it)->isRunning() )
       {
-         delete *it;
-         it = m_runningThreads.erase( it );
+         if ( (*it)->getReturnStatus() == IThread::Finished )
+         {
+            delete *it;
+            it = m_runningThreads.erase( it );
+         }
+         else
+         {
+            std::ostringstream msg;
+            msg << "Operation " << *it << " failed.";
+            QMessageBox::warning( this, "Error", msg.str().c_str() );
+
+            delete *it;
+            it = m_runningThreads.erase( it );
+         }
       }
       else
       {
