@@ -31,6 +31,64 @@ namespace Plotting
 {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// ScrollBarAnimator private class
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+struct ScrollBarAnimator
+{
+   ScrollBarAnimator();
+
+   void start();
+   void nextFrame();
+
+   std::unique_ptr< QTimer >   animationTimer;
+   size_t                      animationFrameCounter;
+   double                      animationProgess;
+   static size_t               numTotalAnimations;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// constructor
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ScrollBarAnimator::ScrollBarAnimator() :
+   animationTimer(),
+   animationFrameCounter( 0 ),
+   animationProgess( 1 )
+{}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// start
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void ScrollBarAnimator::start()
+{
+   animationTimer.reset( new QTimer() );
+   animationTimer->setInterval( 10 );
+   animationFrameCounter = 0;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// nextFrame
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void ScrollBarAnimator::nextFrame()
+{
+   if ( animationFrameCounter == numTotalAnimations )
+   {
+      animationTimer.reset( 0 );
+      animationTimer = 0;
+      animationProgess = 1;
+   }
+
+   animationProgess = static_cast< double >( animationFrameCounter ) / numTotalAnimations;
+   ++animationFrameCounter;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// Static members ScrollBarAnimation
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+size_t ScrollBarAnimator::numTotalAnimations = 100;
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// constructor
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ScrollPaintArea::ScrollPaintArea( QWidget* parent ) :
@@ -38,9 +96,7 @@ ScrollPaintArea::ScrollPaintArea( QWidget* parent ) :
    m_dataMin( 0 ),
    m_dataMax( 0 ),
    m_isScrolling( false ),
-   m_animationTimer( 0 ),
-   m_animationFrameCounter( 0 ),
-   m_animationProgess( 1 )
+   m_scrollBarAnimator( new ScrollBarAnimator() )
 {
    setContextMenuPolicy( Qt::CustomContextMenu );
    connect( this, SIGNAL( customContextMenuRequested( const QPoint& ) ), this, SLOT( showContextMenu( const QPoint& ) ) );
@@ -113,7 +169,7 @@ void ScrollPaintArea::showContextMenu( const QPoint& pos )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ScrollPaintArea::~ScrollPaintArea()
 {
-   delete m_animationTimer;
+   delete m_scrollBarAnimator;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -142,10 +198,12 @@ void ScrollPaintArea::paintEventImpl( QPaintEvent* paintEvent )
    getPainter().setPen( QPen( brush, 0 ) );
    getPainter().drawRect( m_canvas );
 
+   double animationProgress = m_scrollBarAnimator->animationProgess;
+
    /// Draw data range.
    QColor dataRangeColor( bkgColor );
    dataRangeColor.setRgb( 180, 180, 180 );
-   dataRangeColor.setAlpha( m_animationProgess * 255 );
+   dataRangeColor.setAlpha( animationProgress * 255 );
    brush.setColor( dataRangeColor );
    getPainter().setPen( QPen( brush, 0 ) );
    getPainter().setBrush( brush );
@@ -168,48 +226,12 @@ void ScrollPaintArea::paintEventImpl( QPaintEvent* paintEvent )
    stopPoints.push_back( 1 ); paletteStops.push_back( QColor( Qt::blue ) );
    Plotting::Palette scrollPalette( paletteStops, stopPoints );
 
-   QColor viewColor = scrollPalette.getColour( m_animationProgess );
+   QColor viewColor = scrollPalette.getColour( animationProgress );
    viewColor.setAlpha( 64 );
    brush.setColor( viewColor );
    getPainter().setBrush( brush );
    getPainter().setPen( QPen( brush, 2 ) );
    getPainter().drawRect( getViewRangeRect() );
-
-   // if ( m_animationTimer )
-   // {
-   //    QColor triangleColour( m_animationProgess < 0.5 ? Qt::gray : Qt::white );
-   //    triangleColour.setAlpha( m_animationProgess < 0.5 ? ( 0.5 - m_animationProgess ) * 255 : ( m_animationProgess - 0.5 ) * 255 );
-   //    QBrush triangleBrush( triangleColour );
-   //    getPainter().setPen( QPen( triangleBrush, 0 ) );
-   //    getPainter().setBrush( triangleBrush );
-
-   //    QPointF topLeft( 0, 0 );
-   //    QPointF bottomLeft = getCanVecOrthogonal();
-
-   //    QPointF topRight = getCanVecAlong();
-
-   //    QPointF t0 = topLeft + m_animationProgess * topRight;
-   //    QPointF t1 = bottomLeft + m_animationProgess * topRight;
-   //    QPointF t2 = ( t0 + t1 ) / 2.0 + 10 * getCanVecAlongUnitVector();
-
-   //    QPolygonF triangle1;
-   //    triangle1.append( t0 );
-   //    triangle1.append( t1 );
-   //    triangle1.append( t2 );
-
-   //    getPainter().drawPolygon( triangle1 );
-
-   //    t0 = ( 1 - m_animationProgess ) * topRight;
-   //    t1 = bottomLeft + ( 1 - m_animationProgess ) * topRight;
-   //    t2 = ( t0 + t1 ) / 2.0 - 10 * getCanVecAlongUnitVector();
-
-   //    QPolygonF triangle2;
-   //    triangle2.append( t0 );
-   //    triangle2.append( t1 );
-   //    triangle2.append( t2 );
-
-   //    getPainter().drawPolygon( triangle2 );
-   // }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -350,16 +372,9 @@ void ScrollPaintArea::setViewport( const QRectF& viewport )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void ScrollPaintArea::animateActive()
 {
-   if ( m_animationTimer )
-   {
-      delete m_animationTimer;
-   }
-
-   m_animationTimer = new QTimer();
-   m_animationTimer->setInterval( 10 );
-   m_animationFrameCounter = 0;
-   connect( m_animationTimer, SIGNAL( timeout() ), this, SLOT( animateTimerSlot() ) );
-   m_animationTimer->start();
+   m_scrollBarAnimator->start();
+   connect( m_scrollBarAnimator->animationTimer.get(), SIGNAL( timeout() ), this, SLOT( animateTimerSlot() ) );
+   m_scrollBarAnimator->animationTimer->start();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -367,22 +382,8 @@ void ScrollPaintArea::animateActive()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void ScrollPaintArea::animateTimerSlot()
 {
-   if ( m_animationFrameCounter == s_numTotalAnimations )
-   {
-      delete m_animationTimer;
-      m_animationTimer = 0;
-      m_animationProgess = 1;
-   }
-
-   m_animationProgess = static_cast< double >( m_animationFrameCounter ) / s_numTotalAnimations;
+   m_scrollBarAnimator->nextFrame();
    update();
-
-   ++m_animationFrameCounter;
 }
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// Static members ScrollPaintArea
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-size_t ScrollPaintArea::s_numTotalAnimations = 100;
 
 } /// namespace Plotting
