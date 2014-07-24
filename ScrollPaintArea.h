@@ -39,6 +39,10 @@ class ScrollPaintArea : public PaintAreaBase
        * True if updates from viewport are blocked.
        */
       bool isScrolling() const;
+      /**
+       * Updates the data range.
+       */
+      void updateDataRange( double min, double max );
 
    private:
       /**
@@ -72,6 +76,10 @@ class ScrollPaintArea : public PaintAreaBase
        * Get the vector orthogonal to scroll-direction in canvas coordinates. Length of the vector is normalised to unity.
        */
       virtual QPointF getCanVecOrthogonalUnitVector() const = 0;
+      /**
+       * Get the bounding values of the viewport of the graph (left or bottom, depending of horizontal/vertical scrollbar).
+       */
+      virtual std::pair< double, double > getBoundingValuesViewportGraph() const = 0;
 
       /**
        * Draw a marker set by the user.
@@ -134,8 +142,8 @@ class ScrollPaintArea : public PaintAreaBase
       QRectF   m_viewportGraph;           //! Viewport of the graph.
       bool     m_isScrolling;             //! True iff user is scrolling.
 
-      double   m_oldDataMin;
-      double   m_oldDataMax;
+      double   m_originalDataMin;
+      double   m_originalDataMax;
 
       /// TODO: wrap in private namespace class. Do not rebuild animation palette every time.
       QTimer*         m_animationTimer;

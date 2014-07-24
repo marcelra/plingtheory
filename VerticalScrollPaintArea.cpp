@@ -134,4 +134,12 @@ QPointF VerticalScrollPaintArea::getCanVecOrthogonalUnitVector() const
    return QPointF( 1, 0 );
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// getBoundingValuesViewportGraph
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+std::pair< double, double > VerticalScrollPaintArea::getBoundingValuesViewportGraph() const
+{
+   return std::pair< double, double >( m_viewportGraph.bottom(), m_viewportGraph.top() );
+}
+
 } /// namespace Plotting

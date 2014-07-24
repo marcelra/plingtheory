@@ -33,6 +33,7 @@ class VerticalScrollPaintArea : public ScrollPaintArea
       QPointF getCanVecAlongUnitVector() const;
       QPointF getCanVecOrthogonal() const;
       QPointF getCanVecOrthogonalUnitVector() const;
+      std::pair< double, double > getBoundingValuesViewportGraph() const;
 
    /**
     * @see ScrollPaintArea interface for docuemtation.

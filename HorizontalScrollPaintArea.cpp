@@ -130,4 +130,12 @@ QPointF HorizontalScrollPaintArea::getCanVecOrthogonalUnitVector() const
    return QPointF( 0, 1 );
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// getBoundingValuesViewportGraph
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+std::pair< double, double > HorizontalScrollPaintArea::getBoundingValuesViewportGraph() const
+{
+   return std::pair< double, double >( m_viewportGraph.left(), m_viewportGraph.right() );
+}
+
 } /// namespace Plotting
