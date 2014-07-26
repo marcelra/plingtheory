@@ -421,8 +421,12 @@ void TestSuite::testSquareGenerator()
 
    /// Generate 'es'-note
    square.setFrequency( es.getFrequency() );
-   noteData = square.generate( 2 * oneSec );
-   channel->pasteAtEnd( *noteData );
+   size_t nBuf = 100;
+   for ( size_t iBuf = 0; iBuf < 100; ++iBuf )
+   {
+      noteData = square.generate( 2 * oneSec / nBuf );
+      channel->pasteAtEnd( *noteData );
+   }
 
    gPlotFactory().createPlot( "testSquareGenerator/Square" );
    gPlotFactory().drawPcmData( *channel );
