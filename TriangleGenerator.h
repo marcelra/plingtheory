@@ -1,7 +1,7 @@
 #ifndef TRIANGLEGENERATOR_H
 #define TRIANGLEGENERATOR_H
 
-#include "IGenerator.h"
+#include "AdditiveSynthesizer.h"
 
 namespace Synthesizer
 {
@@ -10,17 +10,19 @@ namespace Synthesizer
  * @class TriangleGenerator
  * @brief Class that generates triangle waves
  */
-class TriangleGenerator : public IGenerator
+class TriangleGenerator : public AdditiveSynthesizer
 {
    public:
       /**
        * constructor (@see IGenerator)
        */
       TriangleGenerator( const SamplingInfo& samplingInfo );
+
+   private:
       /**
-       * generate (@see IGenerator)
+       * getHarmonicsInfo (@see AdditiveSynthesizer).
        */
-      RawPcmData::Ptr generate( size_t length );
+      std::vector< HarmonicInfo > getHarmonicsInfo() const;
 };
 
 } /// namespace Synthesizer
