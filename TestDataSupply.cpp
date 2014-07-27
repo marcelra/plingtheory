@@ -152,7 +152,7 @@ RawPcmData::Ptr TestDataSupply::generateChord( Synthesizer::IGenerator& generato
 RawPcmData::Ptr TestDataSupply::getCurrentTestSample()
 {
    // return generateSoundData();
-   // return readSoundData();
+   return readSoundData();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

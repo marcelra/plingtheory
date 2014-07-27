@@ -8,44 +8,28 @@ namespace Synthesizer {
 /// constructor
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 SquareGenerator::SquareGenerator( const SamplingInfo& samplingInfo ) :
-   IGenerator( samplingInfo )
+   AdditiveSynthesizer( samplingInfo )
 {}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// generate
+/// getHarmonicsInfo
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-RawPcmData::Ptr SquareGenerator::generate( size_t length )
+std::vector< AdditiveSynthesizer::HarmonicInfo > SquareGenerator::getHarmonicsInfo() const
 {
-   RawPcmData* data = new RawPcmData( getSamplingInfo(), length );
+   size_t nHarmonics = getSamplingInfo().getNyquistFrequency() / getFrequency();
 
-   double phaseStep = getSamplingInfo().getPhaseStepPerSample( getFrequency() );
-   double phase = getPhase();
+   std::vector< HarmonicInfo > result;
 
-   size_t highestHarmonic = getSamplingInfo().getNyquistFrequency() / getFrequency();
-
-   std::vector< double > phaseVec( highestHarmonic );
-   for ( size_t iHarmonic = 1; iHarmonic < highestHarmonic; iHarmonic += 2 )
+   for ( size_t iHarmonic = 1; iHarmonic < nHarmonics; iHarmonic += 2 )
    {
-      phaseVec[ iHarmonic ] = fmod( phase * iHarmonic, 2 * M_PI );
+      double relAmp = 4 / M_PI / iHarmonic;
+      double phase = fmod( getPhase() * iHarmonic, 2 * M_PI );
+      double phaseStep = getSamplingInfo().getPhaseStepPerSample( getFrequency() * iHarmonic );
+
+      result.push_back( HarmonicInfo( phaseStep, phase, relAmp ) );
    }
 
-   for ( size_t iSample = 0; iSample < length; ++iSample )
-   {
-      double osc = 0;
-      for ( size_t iHarmonic = 1; iHarmonic < highestHarmonic; iHarmonic += 2 )
-      {
-         osc += 1. / iHarmonic * sin( phaseVec[ iHarmonic ] + phaseStep * iSample * iHarmonic );
-      }
-      double currentAmp = getCurrentSampleAmplitude();
-      osc *= 4 / M_PI * currentAmp;
-      (*data)[iSample] = osc;
-
-      nextSample();
-   }
-
-   phase += phaseStep * length;
-   setPhase( fmod( phase, 2 * M_PI ) );
-   return RawPcmData::Ptr( data );
+   return result;
 }
 
 } /// namespace Synthesizer
