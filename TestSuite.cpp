@@ -65,7 +65,7 @@ void TestSuite::execute()
 
 void TestSuite::singleTest()
 {
-   TestSuite::testSawtoothGenerator();
+   TestSuite::testTriangleGenerator();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -462,7 +462,7 @@ void TestSuite::testRandomMusic()
    RawPcmData::Ptr generatedDataRight = msrmg.generateRandomMusic( numNotesToGenerate );
 
    /// Generate solo
-   Music::MonophonicSimpleRandomMusicGenerator soloGen( soloNoteArray, 3 );
+   Music::MonophonicSimpleRandomMusicGenerator soloGen( soloNoteArray, 4 );
    Synthesizer::SquareGenerator squareSynth( samplingInfo );
    soloGen.useSynthesizer( &squareSynth );
    squareSynth.setAmplitude( 0.05 );

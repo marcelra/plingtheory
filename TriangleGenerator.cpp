@@ -2,6 +2,16 @@
 
 #include <math.h>
 
+namespace
+{
+
+double sqr( double x )
+{
+   return x * x;
+}
+
+}
+
 namespace Synthesizer
 {
 
@@ -9,70 +19,30 @@ namespace Synthesizer
 /// constructor
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TriangleGenerator::TriangleGenerator( const SamplingInfo& samplingInfo ) :
-   IGenerator( samplingInfo )
+   AdditiveSynthesizer( samplingInfo )
 {}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// generate
+/// getHarmonicsInfo
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-RawPcmData::Ptr TriangleGenerator::generate( size_t length )
+std::vector< AdditiveSynthesizer::HarmonicInfo > TriangleGenerator::getHarmonicsInfo() const
 {
-   RawPcmData* data = new RawPcmData( getSamplingInfo(), length );
-   double valStep = 2*M_PI / getSamplingInfo().getPeriodInSamples( getFrequency() );
+   size_t iMaxHarmonic = getSamplingInfo().getNyquistFrequency() / getFrequency();
 
-   /// Calculate phase between (0, 2*pi)
-   double phase = getModPhase();
+   std::vector< HarmonicInfo > result;
+   double mult = 1;
+   for ( size_t iHarmonic = 1; iHarmonic < iMaxHarmonic; iHarmonic += 2 )
+   {
+      double phaseStep = getSamplingInfo().getPhaseStepPerSample( getFrequency() * iHarmonic );
+      double phase = getPhase() * iHarmonic;
+      double amplitude = 8 / sqr( M_PI ) / sqr( iHarmonic ) * mult;
+      mult *= -1;
 
-   /// Calculate val and valStep from the phase
-   double val;
-   if ( phase < 0.5*M_PI )
-   {
-      val = 0 + phase / ( 0.5*M_PI );
-   }
-   else if ( phase < 1.5*M_PI )
-   {
-      valStep = -valStep;
-      val = 1 - ( phase - 0.5*M_PI ) / ( 0.5*M_PI );
-   }
-   else
-   {
-      val = -1 + ( phase - 1.5*M_PI ) / ( 0.5*M_PI );
+      result.push_back( HarmonicInfo( phaseStep, phase, amplitude ) );
    }
 
-   /// Generate values
-   for ( size_t iSample = 0; iSample < length; ++iSample )
-   {
-      val += valStep;
-      if ( val > 1 )
-      {
-         val = 1 - ( val - 1 );
-         valStep = -valStep;
-      }
-      else if ( val < -1 )
-      {
-         val = -1 - ( val + 1 );
-         valStep = -valStep;
-      }
-      (*data)[iSample] = val * getCurrentSampleAmplitude();
-      nextSample();
-   }
-
-   /// Recalculate phase from valStep and value
-   if ( valStep > 0 && val > 0 )
-   {
-      phase = val * 0.5*M_PI;
-   }
-   else if ( valStep < 0 )
-   {
-      phase = -val * 0.5*M_PI + M_PI;
-   }
-   else
-   {
-      phase = val * 0.5*M_PI + 2*M_PI;
-   }
-
-   setPhase( phase );
-   return RawPcmData::Ptr( data );
+   return result;
 }
+
 
 } /// namespace Synthesizer
