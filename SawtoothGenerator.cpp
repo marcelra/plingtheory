@@ -9,35 +9,26 @@ namespace Synthesizer
 /// constructor
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 SawtoothGenerator::SawtoothGenerator( const SamplingInfo& samplingInfo ) :
-   IGenerator( samplingInfo )
+   AdditiveSynthesizer( samplingInfo )
 {}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// generate
+/// getHarmonicsInfo
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-RawPcmData::Ptr SawtoothGenerator::generate( size_t length )
+std::vector< AdditiveSynthesizer::HarmonicInfo > SawtoothGenerator::getHarmonicsInfo() const
 {
-   RawPcmData* result = new RawPcmData( getSamplingInfo(), length );
+   size_t iMaxHarmonic = getSamplingInfo().getNyquistFrequency() / getFrequency();
 
-   double phase = getModPhase();
-   double val = -1 + phase / M_PI;
-   double valStep = getSamplingInfo().getPhaseStepPerSample( getFrequency() ) / M_PI;
-
-   for ( size_t i = 0; i < length; ++i )
+   std::vector< HarmonicInfo > result;
+   for ( size_t iHarmonic = 1; iHarmonic < iMaxHarmonic; ++iHarmonic )
    {
-      if ( val > 1 )
-      {
-         val = -2 + val;
-      }
-      (*result)[i] = val * getCurrentSampleAmplitude();
-      val += valStep;
-      nextSample();
+      double phaseStep = getSamplingInfo().getPhaseStepPerSample( getFrequency() * iHarmonic );
+      double phase = getPhase() * iHarmonic;
+      double amplitude = 2 / M_PI / iHarmonic * ( ( iHarmonic % 2 == 0 ) ? -1 : 1 );
+      result.push_back( HarmonicInfo( phaseStep, phase, amplitude ) );
    }
 
-   phase = ( val + 1 ) * M_PI;
-   setPhase( phase );
-
-   return RawPcmData::Ptr( result );
+   return result;
 }
 
 } /// namespace WaveAnalysis
