@@ -65,7 +65,7 @@ void TestSuite::execute()
 
 void TestSuite::singleTest()
 {
-   TestSuite::testTriangleGenerator();
+   TestSuite::testRandomMusic();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -458,20 +458,24 @@ void TestSuite::testRandomMusic()
 
    /// Generate accomp
    Music::MonophonicSimpleRandomMusicGenerator msrmg( noteArray, 1 );
+   Synthesizer::SineGenerator sineGen( samplingInfo );
+   sineGen.setAmplitude( 0.1 );
+   msrmg.useSynthesizer( &sineGen );
    RawPcmData::Ptr generatedDataLeft = msrmg.generateRandomMusic( numNotesToGenerate );
    RawPcmData::Ptr generatedDataRight = msrmg.generateRandomMusic( numNotesToGenerate );
 
    /// Generate solo
    Music::MonophonicSimpleRandomMusicGenerator soloGen( soloNoteArray, 4 );
-   Synthesizer::SquareGenerator squareSynth( samplingInfo );
-   soloGen.useSynthesizer( &squareSynth );
-   squareSynth.setAmplitude( 0.05 );
+   Synthesizer::TriangleGenerator triangleSynth( samplingInfo );
+   triangleSynth.setAmplitude( 0.1 );
+   soloGen.useSynthesizer( &triangleSynth );
    RawPcmData::Ptr generatedSoloData = soloGen.generateRandomMusic( numNotesToGenerate*4 );
 
    /// Generate bass
    Music::MonophonicSimpleRandomMusicGenerator bassGen( bassNoteArray, 3 );
-   bassGen.useSynthesizer( &squareSynth );
-   squareSynth.setAmplitude( 0.03 );
+   Synthesizer::SawtoothGenerator sawtoothSynth( samplingInfo );
+   sawtoothSynth.setAmplitude( 0.003 );
+   bassGen.useSynthesizer( &sawtoothSynth );
    RawPcmData::Ptr generatedBassData = bassGen.generateRandomMusic( numNotesToGenerate/4 );
 
    /// Mix
@@ -482,8 +486,11 @@ void TestSuite::testRandomMusic()
    generatedDataLeft->mixAdd( *generatedBassData );
    generatedDataRight->mixAdd( *generatedBassData );
 
+   gPlotFactory().createPlot( "testRandomMusic/PCM" );
+   gPlotFactory().drawPcmData( *generatedDataLeft );
+
    MultiChannelRawPcmData waveData( generatedDataLeft.release(), generatedDataRight.release() );
-   // WaveFile::write( GlobalParameters::getRunDir() + "testResults/randomMonoMusic.wav", waveData );
+   WaveFile::write( GlobalParameters::getRunDir() + "testResults/randomMonoMusic.wav", waveData );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
