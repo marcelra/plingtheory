@@ -1,7 +1,7 @@
 #ifndef SQUAREGENERATOR_H
 #define SQUAREGENERATOR_H
 
-#include "IGenerator.h"
+#include "AdditiveSynthesizer.h"
 
 namespace Synthesizer {
 
@@ -9,17 +9,19 @@ namespace Synthesizer {
  * @class SquareGenerator
  * @brief Class that generates a square wave
  */
-class SquareGenerator : public IGenerator
+class SquareGenerator : public AdditiveSynthesizer
 {
    public:
       /**
        * constructor (@see IGenerator)
        */
       SquareGenerator( const SamplingInfo& samplingInfo );
+
+   private:
       /**
-       * generate (@see IGenerator)
+       * getHarmonicsInfo (@see AdditiveSynthesizer).
        */
-      RawPcmData::Ptr generate( size_t length );
+      std::vector< HarmonicInfo > getHarmonicsInfo() const;
 };
 
 } /// namespace Synthesizer

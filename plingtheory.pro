@@ -142,7 +142,8 @@ SOURCES += main.cpp \
     Chi2FitObjective.cpp \
     FitFunctionBase.cpp \
     PolynomialFitFunction.cpp \
-    LineSearchGradDescOptimiser.cpp
+    LineSearchGradDescOptimiser.cpp \
+    AdditiveSynthesizer.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -281,7 +282,8 @@ HEADERS += \
     Chi2FitObjective.h \
     FitFunctionBase.h \
     PolynomialFitFunction.h \
-    LineSearchGradDescOptimiser.h
+    LineSearchGradDescOptimiser.h \
+    AdditiveSynthesizer.h
 
 OTHER_FILES += \
     Todos.txt
