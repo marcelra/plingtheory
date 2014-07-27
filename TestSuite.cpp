@@ -990,7 +990,7 @@ void TestSuite::testSpectralReassignment()
    double freq = 2000;
 
    SamplingInfo samplingInfo( 44100 );
-   size_t fourierSize = 4096;
+   size_t fourierSize = 1024;
 
    Synthesizer::SquareGenerator sineGen( samplingInfo );
    sineGen.setAmplitude( 0.5 );
@@ -1000,10 +1000,10 @@ void TestSuite::testSpectralReassignment()
    MultiChannelRawPcmData* waveFile = WaveFile::read( GlobalParameters::getTestDataDir() + "atc_intro.wav" );
    RawPcmData* data = &waveFile->getChannel( 0 );
 
-   WaveAnalysis::SpectralReassignmentTransform specTrans( samplingInfo, fourierSize, fourierSize*7, 4 );
+   WaveAnalysis::SpectralReassignmentTransform specTrans( samplingInfo, fourierSize, fourierSize*0, 4 );
    WaveAnalysis::StftData::Ptr trans = specTrans.execute( *data );
 
-   const WaveAnalysis::SrSpectrum& specReass = dynamic_cast< const WaveAnalysis::SrSpectrum& >( trans->getSpectrum( 0 ) );
+   const WaveAnalysis::SrSpectrum& specReass = dynamic_cast< const WaveAnalysis::SrSpectrum& >( trans->getSpectrum( 10 ) );
    WaveAnalysis::FourierSpectrum spec( specReass );
 
    const RealVector& freqCorr = specReass.getFrequencyCorrections();
