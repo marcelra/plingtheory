@@ -13,6 +13,7 @@
 #include "GradDescOptimiser.h"
 #include "Hypercube.h"
 #include "KernelPdf.h"
+#include "LinearInterpolator.h"
 #include "LineSearchGradDescOptimiser.h"
 #include "McmcOptimiser.h"
 #include "NewtonSolver1D.h"
@@ -55,6 +56,7 @@ void TestMath::execute()
    /// Other/uncategorized.
    testNewtonSolver1D();
    testPdf();
+   testLinearInterpolator();
 
    msg << Msg::Info << "Math tests done." << Msg::EndReq;
 }
@@ -619,4 +621,28 @@ void TestMath::testPdf()
    gPlotFactory().createPlot( "testPdf/KernelPdf" );
    gPlotFactory().createGraph( xEvalKern, kernEval );
    gPlotFactory().createGraph( xEvalKern, uniformEval, Qt::red );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// devLinearInterpolator
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void TestMath::testLinearInterpolator()
+{
+   Logger msg( "testLinearInterpolator" );
+   msg << Msg::Info << "Running testLinearInterpolator..." << Msg::EndReq;
+
+   RealVector x = realVector( 0, 1, 2, 4, 5, 6, 8 );
+   RealVector y = realVector( 0, 1, 2, 4, 5, 6, 8 );
+
+   Math::LinearInterpolator interpolateY( x, y );
+
+   const RealVector xEval = Utils::createRangeReal( 0, 8, 10 );
+
+   for ( size_t i = 0; i < xEval.size(); ++i )
+   {
+      double diff = xEval[ i ] - interpolateY( xEval[ i ] );
+      msg << Msg::Info << "x = " << xEval[ i ] << ", f(x) = x => x - f(x) = " << diff << " = 0" << Msg::EndReq;
+   }
+
+   return;
 }
