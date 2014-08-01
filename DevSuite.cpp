@@ -12,6 +12,7 @@
 #include "SortCache.h"
 #include "SineGenerator.h"
 #include "SampledMovingAverage.h"
+#include "SawtoothGenerator.h"
 #include "LinearInterpolator.h"
 #include "Utils.h"
 
@@ -41,16 +42,21 @@ void DevSuite::devPeakFinder()
 
    SamplingInfo samplingInfo( 44100 );
 
-   RealVector inputFreqs = realVector( 100, 400, 800, 1000 );
+   RealVector inputFreqs = realVector( 100, 200, 400, 800, 1600 );
 
    for ( RealVector::iterator it = inputFreqs.begin(); it != inputFreqs.end(); ++it )
    {
-      Synthesizer::SineGenerator generator( samplingInfo );
+      Synthesizer::SawtoothGenerator generator( samplingInfo );
       generator.setAmplitude( 0.25 );
       generator.setFrequency( *it );
 
       RawPcmData::Ptr data = generator.generate( fourierSize );
       WaveAnalysis::SpectralReassignmentTransform transform( samplingInfo, fourierSize, 0, 1 );
+
+      std::ostringstream plotTitle;
+      plotTitle << "devPeakFinder/waveform" << *it;
+      gPlotFactory().createPlot( plotTitle.str() );
+      gPlotFactory().createGraph( Utils::createRangeReal( 0, data->size(), data->size() ), *(data->copyToVectorData()) );
 
       WaveAnalysis::StftData::Ptr stftData = transform.execute( *data );
       const WaveAnalysis::SrSpectrum& spectrum = stftData->getSrSpectrum( 0 );
@@ -165,45 +171,52 @@ void DevSuite::devPeakFinder()
 
       std::vector< std::vector< size_t > > peaks;
       peaks.push_back( std::vector< size_t >() );
+      peaks.back().push_back( 0 );
 
-      for ( size_t i = 0; i < freqAboveBaseline.size(); ++i )
+      for ( size_t i = 1; i < freqAboveBaseline.size(); ++i )
       {
-         double dist = fabs( freqAboveBaseline[ i ] - freqAboveBaseline[ i + 1 ] ) / fourierBinSize;
-         distVec[ i ] = dist;
+         double dist = fabs( freqAboveBaseline[ i ] - freqAboveBaseline[ i - 1 ] ) / fourierBinSize;
 
-         if ( dist < cutoff || prevDist < cutoff )
+         if ( dist < cutoff * 2 )
          {
             peaks.back().push_back( i );
+            msg << Msg::Verbose << "Adding point " << i << " with freq " << freqAboveBaseline[ i ] << " to peak " << peaks.size() - 1 << Msg::EndReq;
          }
          else
          {
+            msg << Msg::Verbose << "New peak" << Msg::EndReq;
             peaks.push_back( std::vector< size_t >() );
+            peaks.back().push_back( i );
          }
       }
 
-      RealVector peakHeights( peaks.size() );
-      RealVector peakFreqs( peaks.size() );
+      RealVector peakHeights;
+      RealVector peakFreqs;
       for ( size_t i = 0; i < peaks.size(); ++i )
       {
-         for ( size_t j = 0; j < peaks[ i ].size(); ++ j )
+         double maxHeight = -1;
+         double maxFreq = 0;
+         for ( size_t j = 0; j < peaks[ i ].size(); ++j )
          {
             size_t index = peaks[ i ][ j ];
-            peakHeights[ i ] += magAboveBaseline[ index ];
-            peakFreqs[ i ] += magAboveBaseline[ index ] * freqAboveBaseline[ index ];
+            if ( magAboveBaseline[ index ] > maxHeight )
+            {
+               maxHeight = magAboveBaseline[ index ];
+               maxFreq = freqAboveBaseline[ index ];
+            }
          }
-         if ( peakHeights[ i ] > 0 )
+         if ( maxHeight > 0 )
          {
-            peakFreqs[ i ] /= peakHeights[ i ];
-         }
-         else
-         {
-            peakFreqs[ i ] = -1;
+            peakHeights.push_back( maxHeight );
+            peakFreqs.push_back( maxFreq );
          }
       }
 
+      Math::IRealFunction& plotFct = logFct;
+
       gPlotFactory().createPlot( "devPeakFinder/selectedPeaks" );
-      gPlotFactory().createScatter( freqAboveBaseline, magAboveBaseline, Plotting::MarkerDrawAttr( Qt::red, Plotting::MarkerCross, 2 ) );
-      gPlotFactory().createScatter( peakFreqs, peakHeights, Plotting::MarkerDrawAttr( Qt::blue, Plotting::MarkerCircle ) );
+      gPlotFactory().createScatter( freqAboveBaseline, plotFct.evalMany( magAboveBaseline ), Plotting::MarkerDrawAttr( Qt::red, Plotting::MarkerCross, 2 ) );
+      gPlotFactory().createScatter( peakFreqs, plotFct.evalMany( peakHeights ), Plotting::MarkerDrawAttr( Qt::blue, Plotting::MarkerCircle ) );
    }
 }
 
