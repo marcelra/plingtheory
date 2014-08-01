@@ -9,7 +9,7 @@ namespace Math
 class Log10Function : public IRealFunction
 {
    public:
-      Log10Function( double min = 1e-12 );
+      Log10Function( double min = 1e-100 );
 
       double operator()( double x ) const;
       IRealFunction* clone() const;

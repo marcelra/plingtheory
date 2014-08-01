@@ -1,5 +1,7 @@
 #include "StftData.h"
 
+#include "SrSpectrum.h"
+
 namespace WaveAnalysis
 {
 
