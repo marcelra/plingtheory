@@ -143,7 +143,8 @@ SOURCES += main.cpp \
     FitFunctionBase.cpp \
     PolynomialFitFunction.cpp \
     LineSearchGradDescOptimiser.cpp \
-    AdditiveSynthesizer.cpp
+    AdditiveSynthesizer.cpp \
+    LinearInterpolator.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -283,7 +284,8 @@ HEADERS += \
     FitFunctionBase.h \
     PolynomialFitFunction.h \
     LineSearchGradDescOptimiser.h \
-    AdditiveSynthesizer.h
+    AdditiveSynthesizer.h \
+    LinearInterpolator.h
 
 OTHER_FILES += \
     Todos.txt
