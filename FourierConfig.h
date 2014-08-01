@@ -53,6 +53,10 @@ class FourierConfig
        */
       double getLowestFrequency() const;
       /**
+       * Get the width of a frequency bin.
+       */
+      double getFrequencyBinWidth() const;
+      /**
        * Returns a vector containing all the frequencies that are probed by the transform.
        */
       const RealVector& getSpectrumFrequencies() const;

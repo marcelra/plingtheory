@@ -2,10 +2,15 @@
 #define STFTDATA_H
 
 #include "FourierSpectrum.h"
-#include "SrSpectrum.h"
 
 #include <vector>
 #include <memory>
+
+/// Forward declarations
+namespace WaveAnalysis
+{
+class SrSpectrum;
+}
 
 namespace WaveAnalysis
 {
