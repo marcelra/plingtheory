@@ -61,17 +61,17 @@ Plotting::Plot2D* AvailablePlotsList::addPlot( const std::string& name )
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// updateModel
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool AvailablePlotsList::updateModel( QStandardItemModel* model )
+void AvailablePlotsList::updateModel( QStandardItemModel* model )
 {
    boost::mutex::scoped_try_lock lock( ::modelMutex );
    if ( !lock )
    {
-      return false;
+      return;
    }
 
    if ( model->rowCount() == static_cast< int >( m_plots.size() ) )
    {
-      return false;
+      return;
    }
 
    /// At this point only the addition of plots is supported. Plots cannot be removed.
@@ -86,9 +86,10 @@ bool AvailablePlotsList::updateModel( QStandardItemModel* model )
       item->setEditable( false );
 
       /// Insert the item in the model.
-      model->insertRow( iPlot, item );
+      model->appendRow( item );
    }
-   return true;
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

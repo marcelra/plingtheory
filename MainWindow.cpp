@@ -23,8 +23,7 @@ namespace Gui
 /// constructor
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 MainWindow::MainWindow( QWidget* parent ) :
-   QMainWindow( parent ),
-   m_plotsModel( new QStandardItemModel() )
+   QMainWindow( parent )
 {
    this->setGeometry( 0, 0, 1000, 700 );
 
@@ -32,6 +31,8 @@ MainWindow::MainWindow( QWidget* parent ) :
    m_quitButton = new QPushButton( "Quit" );
    m_plotsListView = new QListView();
    m_plotsListView->setSelectionMode( QListView::SingleSelection );
+   m_plotsListView->setAlternatingRowColors( true );
+   m_plotsListView->setModel( new QStandardItemModel( this ) );
 
    /// Initialise widgets.
    QStandardItemModel* model = new QStandardItemModel( m_plotsListView );
@@ -58,7 +59,8 @@ MainWindow::MainWindow( QWidget* parent ) :
 
    /// Make connections.
    connect( m_quitButton, SIGNAL( clicked() ), this, SLOT( quitClickedSlot() ) );
-   connect( m_plotsListView, SIGNAL( activated( QModelIndex ) ), this, SLOT( plotSelectedSlot( QModelIndex ) ) );
+   connect( m_plotsListView->selectionModel(), SIGNAL( currentChanged( QModelIndex, QModelIndex ) ), this, SLOT( plotSelectedSlot( QModelIndex, QModelIndex ) ) );
+
 
    m_lowFreqTimer  = new QTimer( this );
    m_lowFreqTimer->setInterval( 500 );
@@ -85,8 +87,6 @@ MainWindow::~MainWindow()
    {
       delete m_runningThreads[ i ];
    }
-
-   delete m_plotsModel;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -100,7 +100,7 @@ void MainWindow::quitClickedSlot()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// plotSelectedSlot
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void MainWindow::plotSelectedSlot( QModelIndex index )
+void MainWindow::plotSelectedSlot( const QModelIndex& index, const QModelIndex& /*previousIndex*/ )
 {
    QStandardItemModel* model = static_cast< QStandardItemModel* >( m_plotsListView->model() );
    QStandardItem* item = model->itemFromIndex( index );
@@ -123,14 +123,7 @@ void MainWindow::plotSelectedSlot( QModelIndex index )
 void MainWindow::refreshPlotsList()
 {
    AvailablePlotsList& plotsProvider = AvailablePlotsList::getInstance();
-   bool needsUpdate = plotsProvider.updateModel( m_plotsModel );
-
-   if ( needsUpdate )
-   {
-      QModelIndex currentIndex = m_plotsListView->currentIndex();
-      m_plotsListView->setModel( m_plotsModel );
-      m_plotsListView->setCurrentIndex( currentIndex );
-   }
+   plotsProvider.updateModel( dynamic_cast< QStandardItemModel* >( m_plotsListView->model() ) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

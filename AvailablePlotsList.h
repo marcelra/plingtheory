@@ -30,9 +30,8 @@ class AvailablePlotsList : public SingletonBase
       Plotting::Plot2D* addPlot( const std::string& name );
       /**
        * Will fill the model, @param[out] model, with plots. Returns immediately if a plot is being requested.
-       * Method return true if the model has been changed, false otherwise.
        */
-      bool updateModel( QStandardItemModel* model );
+      void updateModel( QStandardItemModel* model );
 
       /**
        * Creates new plots. This method is intended to be called regularly from the main (GUI) thread.
