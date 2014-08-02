@@ -9,6 +9,7 @@
 #include <QListWidget>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QSplitter>
 #include <QStandardItemModel>
 #include <QTimer>
 #include <QVBoxLayout>
@@ -37,25 +38,32 @@ MainWindow::MainWindow( QWidget* parent ) :
    /// Initialise widgets.
    QStandardItemModel* model = new QStandardItemModel( m_plotsListView );
    m_plotsListView->setModel( model );
-   m_plotsListView->setFixedWidth( 300 );
+   m_plotsListView->setMinimumWidth( 200 );
 
    m_plotWidget = new DummyPlotWidget( this );
    m_plotWidget->setMinimumWidth( 400 );
    m_plotWidget->setMinimumHeight( 400 );
 
    /// Set layout.
-   QWidget* centralWidget = new QWidget( this );
-   setCentralWidget( centralWidget );
+   QSplitter* splitter = new QSplitter( this );
+   setCentralWidget( splitter );
 
+   QWidget* leftWidget = new QWidget( this );
    QVBoxLayout* vLayout = new QVBoxLayout();
    vLayout->addWidget( m_plotsListView );
    vLayout->addWidget( m_quitButton );
+   leftWidget->setLayout( vLayout );
 
+   QWidget* rightWidget = new QWidget( this );
    QHBoxLayout* hLayout = new QHBoxLayout();
-   centralWidget->setLayout( hLayout );
+   hLayout->addWidget( m_plotWidget );
+   rightWidget->setLayout( hLayout );
 
-   hLayout->addLayout( vLayout );
-   hLayout->addWidget( m_plotWidget, 1 );
+   splitter->addWidget( leftWidget );
+   splitter->addWidget( rightWidget );
+   splitter->setStretchFactor( 1, 2 );
+   splitter->setCollapsible( 0, false );
+   splitter->setCollapsible( 1, false );
 
    /// Make connections.
    connect( m_quitButton, SIGNAL( clicked() ), this, SLOT( quitClickedSlot() ) );
@@ -105,13 +113,15 @@ void MainWindow::plotSelectedSlot( const QModelIndex& index, const QModelIndex& 
    QStandardItemModel* model = static_cast< QStandardItemModel* >( m_plotsListView->model() );
    QStandardItem* item = model->itemFromIndex( index );
 
-   QHBoxLayout* layout = dynamic_cast< QHBoxLayout* >( centralWidget()->layout() );
+   QSplitter* splitter = dynamic_cast< QSplitter* >( centralWidget() );
+   QHBoxLayout* layout = dynamic_cast< QHBoxLayout* >( splitter->widget( 1 )->layout() );
    assert( layout );
 
-   layout->removeWidget( m_plotWidget );
    m_plotWidget->hide();
+   // TODO: is this necessary?
+   // layout->removeWidget( m_plotWidget );
    m_plotWidget = item->data().value< Plotting::Plot2D* >();
-   layout->addWidget( m_plotWidget, 1 );
+   layout->addWidget( m_plotWidget );
    m_plotWidget->show();
    m_plotWidget->setMinimumWidth( 400 );
    m_plotWidget->setMinimumHeight( 400 );
