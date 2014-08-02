@@ -1,22 +1,26 @@
 #include "DevGui.h"
 
 #include "AvailablePlotsList.h"
+#include "IPlotFactory.h"
 #include "Logger.h"
+#include "RegLargeDataCurve.h"
 #include "StftAlgorithm.h"
 #include "TestDataSupply.h"
 
-#include "RegLargeDataCurve.h"
-#include "CurveItem.h"
-#include "ScatterItem.h"
-#include "Plot2D.h"
+#include <boost/thread.hpp>
 
-#include "IPlotFactory.h"
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// execute
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void DevGui::execute()
 {
-   devPlotFactory();
+   // devPlotFactory();
+   devMakeALotOfPlots();
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// devPlotFactory
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void DevGui::devPlotFactory()
 {
    RawPcmData::Ptr data = TestDataSupply::getCurrentTestSample();
@@ -25,4 +29,20 @@ void DevGui::devPlotFactory()
 
    gPlotFactory().createPlot( "STFT graph" );
    gPlotFactory().createStftGraph( *stft );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// makeALotOfPlots
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void DevGui::devMakeALotOfPlots()
+{
+   for ( size_t i = 0; i < 200; ++i )
+   {
+      std::ostringstream plotTitle;
+      plotTitle << "plot" << i;
+      gPlotFactory().createPlot( plotTitle.str() );
+      gPlotFactory().createGraph( realVector( 0, 1 ), realVector( i, i ) );
+
+      boost::this_thread::sleep_for( boost::chrono::milliseconds( 50 ) );
+   }
 }

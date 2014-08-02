@@ -29,9 +29,10 @@ class AvailablePlotsList : public SingletonBase
        */
       Plotting::Plot2D* addPlot( const std::string& name );
       /**
-       * Build the Qt model for the QListView.
+       * Will fill the model, @param[out] model, with plots. Returns immediately if a plot is being requested.
+       * Method return true if the model has been changed, false otherwise.
        */
-      QStandardItemModel* buildModel();
+      bool updateModel( QStandardItemModel* model );
 
       /**
        * Creates new plots. This method is intended to be called regularly from the main (GUI) thread.
@@ -62,9 +63,6 @@ class AvailablePlotsList : public SingletonBase
    private:
       std::vector< Plotting::Plot2D* > m_plots;             //! Store of plots.
       std::vector< std::string >       m_plotNames;         //! Names of plots.
-      QStandardItemModel*              m_model;             //! The StandardItemModel. This pointer is updated after every
-                                                            //! call to buildModel. The pointer is invalidated if a new plot
-                                                            //! is requested.
       bool                             m_newPlotRequested;  //! True iff a new plot is requested.
       bool                             m_newPlotReady;      //! True iff a new plot is created.
       Plotting::Plot2D*                m_newPlot;           //! Pointer to the new plot.

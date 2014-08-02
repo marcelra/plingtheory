@@ -8,6 +8,7 @@ class IThread;
 
 class QListView;
 class QPushButton;
+class QStandardItemModel;
 
 /// TODO: temporary includes for DummyPlotWidget
 #include <QHBoxLayout>
@@ -38,6 +39,7 @@ class DummyPlotWidget : public QWidget
       QLabel*     m_label;
 };
 
+/// TODO: doc
 class MainWindow : public QMainWindow
 {
    Q_OBJECT
@@ -46,7 +48,7 @@ class MainWindow : public QMainWindow
       explicit MainWindow( QWidget* parent = 0 );
       virtual ~MainWindow();
 
-      void buildPlotList();
+      void refreshPlotsList();
 
       void startWorkerThread( IThread* thread );
 
@@ -59,6 +61,7 @@ class MainWindow : public QMainWindow
    private:
       QPushButton*         	m_quitButton;
       QListView*           	m_plotsListView;
+      QStandardItemModel*     m_plotsModel;
       QWidget*             	m_plotWidget;
       QTimer*						m_lowFreqTimer;
       QTimer*						m_highFreqTimer;
