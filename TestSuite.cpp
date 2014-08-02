@@ -46,6 +46,7 @@ void TestSuite::execute()
 
    /// Test feature algorithms.
    testPeakDetection();
+   testSrSpecPeakAlgorithm();
 
    /// Test multivariate analysis algorithms.
    testMlpGradients();
@@ -65,7 +66,7 @@ void TestSuite::execute()
 
 void TestSuite::singleTest()
 {
-   TestMath::testLinearInterpolator();
+   TestSuite::testSrSpecPeakAlgorithm();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -91,6 +92,7 @@ void TestSuite::singleTest()
 #include "Peak.h"
 #include "Tone.h"
 #include "NaivePeaks.h"
+#include "SrSpecPeakAlgorithm.h"
 #include "StochasticGradDescMlpTrainer.h"
 #include "StftGraph.h"
 #include "DynamicFourier.h"
@@ -565,6 +567,51 @@ void TestSuite::testPeakDetection()
       msg << Msg::Info << "Peak[" << iPeak << "] : pos = " << peak.getPosition()
                        << ", height = " << peak.getProminence()
                        << ", width = " << peak.getWidth() << Msg::EndReq;
+   }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// testSrSpecPeakAlgorithm
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void TestSuite::testSrSpecPeakAlgorithm()
+{
+   Logger msg( "testSrSpecPeakAlgorithm" );
+   msg << Msg::Info << "Running testSrSpecPeakAlgorithm..." << Msg::EndReq;
+
+   size_t fourierSize = 1024;
+
+   SamplingInfo samplingInfo( 44100 );
+
+   RealVector inputFreqs = realVector( 100, 400, 1600, 6400 );
+
+   for ( RealVector::iterator it = inputFreqs.begin(); it != inputFreqs.end(); ++it )
+   {
+      Synthesizer::SawtoothGenerator generator( samplingInfo );
+      generator.setAmplitude( 0.5 );
+      generator.setFrequency( *it );
+
+      RawPcmData::Ptr data = generator.generate( fourierSize );
+      WaveAnalysis::SpectralReassignmentTransform transform( samplingInfo, fourierSize, 0 * fourierSize, 1 );
+
+      std::ostringstream plotTitle;
+      plotTitle << "testSrSpecPeakAlgorithm/waveform" << *it;
+      gPlotFactory().createPlot( plotTitle.str() );
+      gPlotFactory().createGraph( Utils::createRangeReal( 0, data->size(), data->size() ), *(data->copyToVectorData()) );
+
+      WaveAnalysis::StftData::Ptr stftData = transform.execute( *data );
+      const WaveAnalysis::SrSpectrum& spectrum = stftData->getSrSpectrum( 0 );
+
+      FeatureAlgorithm::SrSpecPeakAlgorithm peakAlg( 0.25 );
+      FeatureAlgorithm::SrSpecPeakAlgorithm::Monitor monitor;
+      std::vector< Feature::SrSpecPeak > peaks = peakAlg.execute( spectrum, &monitor );
+
+      monitor.createSpectrumPlot( "testSrSpecPeakAlgorithm/" );
+      monitor.createPeakPlot( "testSrSpecPeakAlgorithm/" );
+
+      for ( size_t i = 0; i < peaks.size(); ++i )
+      {
+         msg << Msg::Info << "Peak " << i << ": frequency = " << peaks[ i ].getFrequency() << ", height = " << peaks[ i ].getHeight() << Msg::EndReq;
+      }
    }
 }
 
@@ -1356,3 +1403,5 @@ void TestSuite::testMultiLayerPerceptron()
 
    return;
 }
+
+

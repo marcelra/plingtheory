@@ -70,6 +70,7 @@ class TestSuite
        * Feature algorithms
        */
       static void testPeakDetection();
+      static void testSrSpecPeakAlgorithm();
 
       /**
        * Multi Variate Analysis algorithms

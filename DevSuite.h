@@ -7,7 +7,6 @@ class DevSuite
       static void execute();
 
    public:
-      static void devPeakFinder();
 };
 
 #endif // DEVSUITE_H
