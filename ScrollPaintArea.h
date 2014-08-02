@@ -51,10 +51,21 @@ class ScrollPaintArea : public PaintAreaBase
        * @see PaintAreaBase::paintEventImpl.
        */
       void paintEventImpl( QPaintEvent* paintEvent );
+
       /**
        * Handle mouse event.
        */
       void mouseMoveEvent( QMouseEvent* event );
+
+      /**
+       * Sets cursor to closed hand and calls PaintArea mouseReleaseEvent.
+       */
+      void mousePressEvent( QMouseEvent* event );
+
+      /**
+       * Sets cursor to open hand and calls PaintArea mouseReleaseEvent.
+       */
+      void mouseReleaseEvent( QMouseEvent* event );
 
    private:
 

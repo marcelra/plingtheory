@@ -340,6 +340,8 @@ void PaintArea::mouseMoveEvent( QMouseEvent* event )
          return;
       }
 
+      setCursor( Qt::ClosedHandCursor );
+
       /// Calculate shift in world coordinates.
       const QPointF& shiftOfViewport = transformToWorldCoordinates( event->pos() ) - transformToWorldCoordinates( *m_oldMousePos );
 
@@ -421,6 +423,7 @@ void PaintArea::setGridItem( const GridItem* gridItem )
    }
    else
    {
+      setCursor( Qt::ArrowCursor );
       PaintAreaBase::mouseReleaseEvent( event );
    }
 }
