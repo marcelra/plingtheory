@@ -66,7 +66,7 @@ void TestSuite::execute()
 
 void TestSuite::singleTest()
 {
-   TestSuite::testSrSpecPeakAlgorithm();
+   TestMath::testPdf();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1065,7 +1065,7 @@ void TestSuite::testSpectralReassignment()
    msg << Msg::Info << "Correction given = " << freqCorr[ index ] << Msg::EndReq;
    msg << Msg::Info << "Correction factor on correction = " << ratio / freqCorr[index] << Msg::EndReq;
 
-   gPlotFactory().createPlot( "testSpectralReassignment/Comaprison with Fourier" );
+   gPlotFactory().createPlot( "testSpectralReassignment/Comparison with Fourier" );
    gPlotFactory().createGraph( spec.getFrequencies(), spec.getMagnitude(), Qt::red );
    gPlotFactory().createScatter( specReass.getFrequencies(), specReass.getMagnitude(), Plotting::MarkerDrawAttr() );
 

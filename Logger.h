@@ -121,7 +121,7 @@ Logger& Logger::operator<<( const Msg::LogCommand& logCommand );
 Logger& gLog();
 
 /// Initialise global logger (void ptr is used to keep include section clean)
-void initGlobalLogger( int threshold, const void* inspectMapPtr, bool doUseColors, const std::string& fileName );
+void initGlobalLogger( int threshold, const void* inspectMapPtr, bool doUseColors, bool doDisplayLoggerId, const std::string& fileName );
 void initRegressionLogger( const std::string& fileName );
 
 /// Close the global logger

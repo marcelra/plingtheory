@@ -108,6 +108,7 @@ const ProgramOptions* initialiseApplication( int argc, char* argv[] )
          initGlobalLogger( programOptions->getLogLevel(),
                            reinterpret_cast< const void* >( &programOptions->getLoggerInspectMap() ),
                            programOptions->doUseColorLogger(),
+                           programOptions->doShowLoggerIds(),
                            programOptions->getLogFileName() );
       }
       Msg::LogLevel threshold = GlobalLogParameters::getInstance().getThreshold( 0 );
