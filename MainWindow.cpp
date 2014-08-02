@@ -23,13 +23,15 @@ namespace Gui
 /// constructor
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 MainWindow::MainWindow( QWidget* parent ) :
-   QMainWindow( parent )
+   QMainWindow( parent ),
+   m_plotsModel( new QStandardItemModel() )
 {
    this->setGeometry( 0, 0, 1000, 700 );
 
    /// Build widgets.
    m_quitButton = new QPushButton( "Quit" );
    m_plotsListView = new QListView();
+   m_plotsListView->setSelectionMode( QListView::SingleSelection );
 
    /// Initialise widgets.
    QStandardItemModel* model = new QStandardItemModel( m_plotsListView );
@@ -57,8 +59,6 @@ MainWindow::MainWindow( QWidget* parent ) :
    /// Make connections.
    connect( m_quitButton, SIGNAL( clicked() ), this, SLOT( quitClickedSlot() ) );
    connect( m_plotsListView, SIGNAL( activated( QModelIndex ) ), this, SLOT( plotSelectedSlot( QModelIndex ) ) );
-   connect( m_plotsListView, SIGNAL( entered( QModelIndex ) ), this, SLOT( plotSelectedSlot( QModelIndex ) ) );
-   connect( m_plotsListView, SIGNAL( pressed( QModelIndex ) ), this, SLOT( plotSelectedSlot( QModelIndex ) ) );
 
    m_lowFreqTimer  = new QTimer( this );
    m_lowFreqTimer->setInterval( 500 );
@@ -85,6 +85,8 @@ MainWindow::~MainWindow()
    {
       delete m_runningThreads[ i ];
    }
+
+   delete m_plotsModel;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -102,13 +104,10 @@ void MainWindow::plotSelectedSlot( QModelIndex index )
 {
    QStandardItemModel* model = static_cast< QStandardItemModel* >( m_plotsListView->model() );
    QStandardItem* item = model->itemFromIndex( index );
-   // m_plotWidget->m_label->setText( QString( "%1" ).arg( (long) item->data().value< Plotting::Plot2D* >() ) );
 
    QHBoxLayout* layout = dynamic_cast< QHBoxLayout* >( centralWidget()->layout() );
    assert( layout );
-   // int plotLayoutIndex = layout->indexOf( m_plotWidget );
-   // QLayoutItem* layoutItem = layout->takeAt( plotLayoutIndex );
-   // layoutItem->
+
    layout->removeWidget( m_plotWidget );
    m_plotWidget->hide();
    m_plotWidget = item->data().value< Plotting::Plot2D* >();
@@ -119,18 +118,17 @@ void MainWindow::plotSelectedSlot( QModelIndex index )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// buildPlotLists
+/// refreshPlotsList
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void MainWindow::buildPlotList()
+void MainWindow::refreshPlotsList()
 {
    AvailablePlotsList& plotsProvider = AvailablePlotsList::getInstance();
-   QStandardItemModel* model = plotsProvider.buildModel();
+   bool needsUpdate = plotsProvider.updateModel( m_plotsModel );
 
-   if ( model )
+   if ( needsUpdate )
    {
       QModelIndex currentIndex = m_plotsListView->currentIndex();
-      delete m_plotsListView->model();
-      m_plotsListView->setModel( model );
+      m_plotsListView->setModel( m_plotsModel );
       m_plotsListView->setCurrentIndex( currentIndex );
    }
 }
@@ -180,7 +178,7 @@ void MainWindow::lowFreqUpdate()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void MainWindow::highFreqUpdate()
 {
-   buildPlotList();
+   refreshPlotsList();
    AvailablePlotsList::getInstance().handleNewPlotRequest();
 }
 

@@ -19,7 +19,6 @@ namespace Gui
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 AvailablePlotsList::AvailablePlotsList() :
    SingletonBase( "AvailablePlotsList" ),
-   m_model( 0 ),
    m_newPlotRequested( false ),
    m_newPlotReady( false ),
    m_newPlot( 0 )
@@ -52,7 +51,6 @@ AvailablePlotsList* AvailablePlotsList::s_instance = 0;
 Plotting::Plot2D* AvailablePlotsList::addPlot( const std::string& name )
 {
    boost::mutex::scoped_lock lock( ::modelMutex );
-   m_model = 0;
    Plotting::Plot2D* plot = requestNewPlot();
    m_newPlot = 0;
    m_plots.push_back( plot );
@@ -61,32 +59,36 @@ Plotting::Plot2D* AvailablePlotsList::addPlot( const std::string& name )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// buildModel
+/// updateModel
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-QStandardItemModel* AvailablePlotsList::buildModel()
+bool AvailablePlotsList::updateModel( QStandardItemModel* model )
 {
    boost::mutex::scoped_try_lock lock( ::modelMutex );
    if ( !lock )
    {
-      return 0;
+      return false;
    }
 
-   if ( m_model )
+   if ( model->rowCount() == static_cast< int >( m_plots.size() ) )
    {
-      return 0;
+      return false;
    }
 
-   m_model = new QStandardItemModel();
+   /// At this point only the addition of plots is supported. Plots cannot be removed.
+   assert( model->rowCount() < static_cast< int >( m_plots.size() ) );
 
-   for ( size_t iPlot = 0; iPlot < m_plots.size(); ++iPlot )
+   for ( size_t iPlot = model->rowCount(); iPlot < m_plots.size(); ++iPlot )
    {
+      /// Create new item.
       QStandardItem* item = new QStandardItem();
       item->setText( m_plotNames[ iPlot ].c_str() );
       item->setData( QVariant::fromValue< Plotting::Plot2D* >( m_plots[ iPlot ] ) );
       item->setEditable( false );
-      m_model->insertRow( iPlot, item );
+
+      /// Insert the item in the model.
+      model->insertRow( iPlot, item );
    }
-   return m_model;
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
