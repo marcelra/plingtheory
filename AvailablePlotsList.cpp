@@ -84,6 +84,7 @@ void AvailablePlotsList::updateModel( QStandardItemModel* model )
       item->setText( m_plotNames[ iPlot ].c_str() );
       item->setData( QVariant::fromValue< Plotting::Plot2D* >( m_plots[ iPlot ] ) );
       item->setEditable( false );
+      item->setToolTip( item->text() );
 
       /// Insert the item in the model.
       model->appendRow( item );
