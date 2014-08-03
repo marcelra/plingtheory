@@ -145,7 +145,8 @@ SOURCES += main.cpp \
     LineSearchGradDescOptimiser.cpp \
     AdditiveSynthesizer.cpp \
     LinearInterpolator.cpp \
-    SrSpecPeakAlgorithm.cpp
+    SrSpecPeakAlgorithm.cpp \
+    AnalysisSrpa.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -287,7 +288,8 @@ HEADERS += \
     LineSearchGradDescOptimiser.h \
     AdditiveSynthesizer.h \
     LinearInterpolator.h \
-    SrSpecPeakAlgorithm.h
+    SrSpecPeakAlgorithm.h \
+    AnalysisSrpa.h
 
 OTHER_FILES += \
     Todos.txt

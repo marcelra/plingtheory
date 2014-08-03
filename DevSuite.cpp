@@ -1,7 +1,8 @@
+#include "DevGui.h"
 #include "DevSuite.h"
 #include "Logger.h"
 #include "TestDataSupply.h"
-#include "DevGui.h"
+#include "Utils.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// execute
@@ -11,7 +12,25 @@ void DevSuite::execute()
    Logger msg( "DevSuite" );
    msg << Msg::Info << "Running development code..." << Msg::EndReq;
 
-   DevGui::devMakeALotOfPlots();
+   devAnalysisSrpa();
 
    return;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// Include section
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#include "AnalysisSrpa.h"
+
+void DevSuite::devAnalysisSrpa()
+{
+   Logger msg( "devAnalysisSrpa" );
+   msg << Msg::Info << "In devAnalysisSrpa..." << Msg::EndReq;
+
+   Analysis::AnalysisSrpa anaAlg;
+
+   const RealVector& frequencies = Utils::createRangeReal( 10, 10000, 5000 );
+   anaAlg.studyFrequencyPerformance( frequencies );
+
 }
