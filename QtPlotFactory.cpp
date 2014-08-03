@@ -74,7 +74,7 @@ void QtPlotFactory::drawPcmData( const RawPcmData& pcmData, const QColor& colour
 
    Plotting::RegLargeDataCurve* item = new Plotting::RegLargeDataCurve( xData, *yData );
    item->setLineColor( colour );
-   item->setAntialiasing( 0 );
+   item->setAntialiasing( true );
    item->setLineWidth( 2 );
    m_currentPlot->addItem( item );
    m_plotItems.push_back( item );

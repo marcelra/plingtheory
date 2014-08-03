@@ -66,7 +66,7 @@ void TestSuite::execute()
 
 void TestSuite::singleTest()
 {
-   TestSuite::testSrSpecPeakAlgorithm();
+   TestSuite::testWaveFile();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -307,18 +307,12 @@ void TestSuite::testWaveFile()
       MultiChannelRawPcmData* data = waveFile.read( GlobalParameters::getTestDataDir() + "anotherDay.wav" );
 
       /// Test writing
-      waveFile.write( GlobalParameters::getRunDir() + "testSoundData.wav", *data );
+      msg << Msg::Warning << "Disabled testing of wavefile write." << Msg::EndReq;
+      // waveFile.write( GlobalParameters::getRunDir() + "testSoundData.wav", *data );
 
       /// Make graph of read data
-      std::vector< double > pcmData;
-      size_t offset = 44100;
-      for ( size_t i = offset; i < offset + 10000; ++i )
-      {
-         pcmData.push_back( data->getChannel(0)[i] );
-      }
-
       gPlotFactory().createPlot( "testWaveFile/WaveFileView" );
-      gPlotFactory().createGraph( pcmData );
+      gPlotFactory().drawPcmData( data->getChannel( 0 ) );
 
       /// Clean up
       delete data;
@@ -1065,7 +1059,7 @@ void TestSuite::testSpectralReassignment()
    msg << Msg::Info << "Correction given = " << freqCorr[ index ] << Msg::EndReq;
    msg << Msg::Info << "Correction factor on correction = " << ratio / freqCorr[index] << Msg::EndReq;
 
-   gPlotFactory().createPlot( "testSpectralReassignment/Comaprison with Fourier" );
+   gPlotFactory().createPlot( "testSpectralReassignment/Comparison with Fourier" );
    gPlotFactory().createGraph( spec.getFrequencies(), spec.getMagnitude(), Qt::red );
    gPlotFactory().createScatter( specReass.getFrequencies(), specReass.getMagnitude(), Plotting::MarkerDrawAttr() );
 

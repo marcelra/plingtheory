@@ -9,6 +9,7 @@
 #include <QListWidget>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QSplitter>
 #include <QStandardItemModel>
 #include <QTimer>
 #include <QVBoxLayout>
@@ -23,8 +24,7 @@ namespace Gui
 /// constructor
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 MainWindow::MainWindow( QWidget* parent ) :
-   QMainWindow( parent ),
-   m_plotsModel( new QStandardItemModel() )
+   QMainWindow( parent )
 {
    this->setGeometry( 0, 0, 1000, 700 );
 
@@ -32,33 +32,43 @@ MainWindow::MainWindow( QWidget* parent ) :
    m_quitButton = new QPushButton( "Quit" );
    m_plotsListView = new QListView();
    m_plotsListView->setSelectionMode( QListView::SingleSelection );
+   m_plotsListView->setAlternatingRowColors( true );
+   m_plotsListView->setModel( new QStandardItemModel( this ) );
 
    /// Initialise widgets.
    QStandardItemModel* model = new QStandardItemModel( m_plotsListView );
    m_plotsListView->setModel( model );
-   m_plotsListView->setFixedWidth( 300 );
+   m_plotsListView->setMinimumWidth( 200 );
 
    m_plotWidget = new DummyPlotWidget( this );
    m_plotWidget->setMinimumWidth( 400 );
    m_plotWidget->setMinimumHeight( 400 );
 
    /// Set layout.
-   QWidget* centralWidget = new QWidget( this );
-   setCentralWidget( centralWidget );
+   QSplitter* splitter = new QSplitter( this );
+   setCentralWidget( splitter );
 
+   QWidget* leftWidget = new QWidget( this );
    QVBoxLayout* vLayout = new QVBoxLayout();
    vLayout->addWidget( m_plotsListView );
    vLayout->addWidget( m_quitButton );
+   leftWidget->setLayout( vLayout );
 
+   QWidget* rightWidget = new QWidget( this );
    QHBoxLayout* hLayout = new QHBoxLayout();
-   centralWidget->setLayout( hLayout );
+   hLayout->addWidget( m_plotWidget );
+   rightWidget->setLayout( hLayout );
 
-   hLayout->addLayout( vLayout );
-   hLayout->addWidget( m_plotWidget, 1 );
+   splitter->addWidget( leftWidget );
+   splitter->addWidget( rightWidget );
+   splitter->setStretchFactor( 1, 2 );
+   splitter->setCollapsible( 0, false );
+   splitter->setCollapsible( 1, false );
 
    /// Make connections.
    connect( m_quitButton, SIGNAL( clicked() ), this, SLOT( quitClickedSlot() ) );
-   connect( m_plotsListView, SIGNAL( activated( QModelIndex ) ), this, SLOT( plotSelectedSlot( QModelIndex ) ) );
+   connect( m_plotsListView->selectionModel(), SIGNAL( currentChanged( QModelIndex, QModelIndex ) ), this, SLOT( plotSelectedSlot( QModelIndex, QModelIndex ) ) );
+
 
    m_lowFreqTimer  = new QTimer( this );
    m_lowFreqTimer->setInterval( 500 );
@@ -85,8 +95,6 @@ MainWindow::~MainWindow()
    {
       delete m_runningThreads[ i ];
    }
-
-   delete m_plotsModel;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -100,18 +108,20 @@ void MainWindow::quitClickedSlot()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// plotSelectedSlot
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void MainWindow::plotSelectedSlot( QModelIndex index )
+void MainWindow::plotSelectedSlot( const QModelIndex& index, const QModelIndex& /*previousIndex*/ )
 {
    QStandardItemModel* model = static_cast< QStandardItemModel* >( m_plotsListView->model() );
    QStandardItem* item = model->itemFromIndex( index );
 
-   QHBoxLayout* layout = dynamic_cast< QHBoxLayout* >( centralWidget()->layout() );
+   QSplitter* splitter = dynamic_cast< QSplitter* >( centralWidget() );
+   QHBoxLayout* layout = dynamic_cast< QHBoxLayout* >( splitter->widget( 1 )->layout() );
    assert( layout );
 
-   layout->removeWidget( m_plotWidget );
    m_plotWidget->hide();
+   // TODO: is this necessary?
+   // layout->removeWidget( m_plotWidget );
    m_plotWidget = item->data().value< Plotting::Plot2D* >();
-   layout->addWidget( m_plotWidget, 1 );
+   layout->addWidget( m_plotWidget );
    m_plotWidget->show();
    m_plotWidget->setMinimumWidth( 400 );
    m_plotWidget->setMinimumHeight( 400 );
@@ -123,14 +133,7 @@ void MainWindow::plotSelectedSlot( QModelIndex index )
 void MainWindow::refreshPlotsList()
 {
    AvailablePlotsList& plotsProvider = AvailablePlotsList::getInstance();
-   bool needsUpdate = plotsProvider.updateModel( m_plotsModel );
-
-   if ( needsUpdate )
-   {
-      QModelIndex currentIndex = m_plotsListView->currentIndex();
-      m_plotsListView->setModel( m_plotsModel );
-      m_plotsListView->setCurrentIndex( currentIndex );
-   }
+   plotsProvider.updateModel( dynamic_cast< QStandardItemModel* >( m_plotsListView->model() ) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -213,7 +213,7 @@ Logger& gLog()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// initGlobalLogger
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void initGlobalLogger( int threshold, const void* inspectMap, bool doUseColors, const std::string& fileName )
+void initGlobalLogger( int threshold, const void* inspectMap, bool doUseColors, bool doDisplayLoggerIds, const std::string& fileName )
 {
    assert( !gp_gLog );
    GlobalLogParameters& globalLogPars = const_cast< GlobalLogParameters& >( GlobalLogParameters::getInstance() );
@@ -222,6 +222,7 @@ void initGlobalLogger( int threshold, const void* inspectMap, bool doUseColors, 
    globalLogPars.setThreshold( static_cast< Msg::LogLevel >( threshold ) );
 
    globalLogPars.setUseColors( doUseColors );
+   globalLogPars.setDoDisplayLoggerIds( doDisplayLoggerIds );
    if ( fileName != "" )
    {
       globalLogPars.openFileStream( fileName );

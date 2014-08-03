@@ -34,6 +34,10 @@ class GlobalLogParameters
        */
       void setUseColors( bool useColors );
       /**
+       * Set whether or not to display logger IDs.
+       */
+      void setDoDisplayLoggerIds( bool displayLoggerId );
+      /**
        * Open file stream.
        */
       void openFileStream( const std::string& fileName );

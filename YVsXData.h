@@ -4,6 +4,7 @@
 #include "ITwoDimPlotData.h"
 
 #include <vector>
+#include <cstddef>
 
 namespace Plotting
 {
@@ -32,6 +33,7 @@ class YVsXData : public ITwoDimPlotData
       double getMaxX() const;
       double getMinY() const;
       double getMaxY() const;
+      size_t getSize() const;
 
    /**
     * Access data.
@@ -102,6 +104,14 @@ inline const std::vector< double >& YVsXData::getX() const
 inline const std::vector< double >& YVsXData::getY() const
 {
    return m_yData;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// getSize
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+inline size_t YVsXData::getSize() const
+{
+   return m_xData.size();
 }
 
 } /// namespace Plotting

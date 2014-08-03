@@ -32,7 +32,7 @@ GlobalLogParameters::GlobalLogParameters() :
    m_spacerWidth( 2 ),
    m_threshold( Msg::Verbose ),
    m_useColors( true ),
-   m_displayLoggerId( true ),
+   m_displayLoggerId( false ),
    m_overrideLocalThresholds( false ),
    m_stream( &std::cout ),
    m_fstream( 0 )
@@ -125,6 +125,14 @@ void GlobalLogParameters::setRegressionConfig()
 void GlobalLogParameters::setUseColors( bool useColors )
 {
    m_useColors = useColors;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// setDoShowLoggerIds
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void GlobalLogParameters::setDoDisplayLoggerIds( bool displayLoggerId )
+{
+   m_displayLoggerId = displayLoggerId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

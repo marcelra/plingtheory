@@ -36,6 +36,7 @@ class ProgramOptions
       bool                 useRootInterface() const;
       bool                 useQtInterface() const;
       bool                 doUseColorLogger() const;
+      bool                 doShowLoggerIds() const;
       bool                 doUseRegressionLogConfig() const;
       const std::string&   getLogFileName() const;
       const std::string&   getDataDir() const;
@@ -65,6 +66,7 @@ class ProgramOptions
       bool                    m_useRootInterface;
       bool                    m_useQtInterface;
       bool                    m_doUseColorLogger;
+      bool                    m_doShowLoggerIds;
       bool                    m_useRegressionLogConfig;
       std::string             m_rootFileNameOld;
       std::string             m_rootFileNameNew;
