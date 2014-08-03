@@ -27,8 +27,8 @@ void RegLargeDataCurve::generatePlotCommands( PaintArea *paintArea ) const
 
    double xSpacing = ( getMaxX() - getMinX() ) / m_data.getSize();
 
-   size_t firstVisiblePoint = 0;
-   size_t lastVisiblePoint = m_data.getSize();
+   long firstVisiblePoint = 0;
+   long lastVisiblePoint = m_data.getSize();
 
    if ( viewport.left() > getMinX() )
    {
@@ -37,12 +37,12 @@ void RegLargeDataCurve::generatePlotCommands( PaintArea *paintArea ) const
    if ( viewport.right() < getMaxX() )
    {
       lastVisiblePoint = ( m_data.getSize() - ( getMaxX() - viewport.right() ) / xSpacing ) + 1;
-      lastVisiblePoint = lastVisiblePoint > m_data.getSize() ? m_data.getSize() : lastVisiblePoint;
    }
+   lastVisiblePoint = lastVisiblePoint > static_cast< long >( m_data.getSize() ) ? m_data.getSize() : lastVisiblePoint;
 
    size_t nPointsDraw = lastVisiblePoint - firstVisiblePoint;
 
-   int compressionFactor = log ( nPointsDraw / paintArea->getCanvas().width() ) / log( 2 );
+   int compressionFactor = log ( nPointsDraw / paintArea->getCanvas().width() ) / log( 2 ) - 1;
 
    const YVsXData& dataDraw = getData( compressionFactor );
    const std::vector< double >& xDataDraw = dataDraw.getX();
@@ -54,15 +54,16 @@ void RegLargeDataCurve::generatePlotCommands( PaintArea *paintArea ) const
    lastVisiblePoint = dataDraw.getSize();
    if ( viewport.left() > dataDraw.getMinX() )
    {
-      firstVisiblePoint = ( viewport.left() - dataDraw.getMinX() ) / xSpacing;
+      firstVisiblePoint = ( viewport.left() - dataDraw.getMinX() ) / xSpacing - 0.5;
    }
    if ( viewport.right() < getMaxX() )
    {
-      lastVisiblePoint = ( dataDraw.getSize() - ( dataDraw.getMaxX() - viewport.right() ) / xSpacing ) + 1;
+      lastVisiblePoint = ( dataDraw.getSize() - ( dataDraw.getMaxX() - viewport.right() ) / xSpacing ) + 1.5;
    }
-   lastVisiblePoint = lastVisiblePoint > dataDraw.getSize() ? dataDraw.getSize() : lastVisiblePoint;
+   firstVisiblePoint = firstVisiblePoint < 0 ? 0 : firstVisiblePoint;
+   lastVisiblePoint = lastVisiblePoint > static_cast< long >( dataDraw.getSize() ) ? dataDraw.getSize() : lastVisiblePoint;
 
-   for ( size_t i = firstVisiblePoint; i < lastVisiblePoint - 1; ++i )
+   for ( long i = firstVisiblePoint; i < lastVisiblePoint - 1; ++i )
    {
       PcLinePaint* linePaint = new PcLinePaint( QPointF( xDataDraw[ i ], yDataDraw[ i ] ), QPointF( xDataDraw[ i + 1], yDataDraw[ i + 1 ] ) );
       paintArea->addPaintCommand( linePaint );
