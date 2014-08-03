@@ -183,11 +183,11 @@ void PaintArea::autoScale()
    double xBorder = 0.1 * m_dataRange.width();
    double yBorder = -0.1 * m_dataRange.height();
 
-   if ( m_dataRange.width() < s_minSizeAutoScale )
+   if ( xBorder < s_minSizeAutoScale )
    {
       xBorder = 1;
    }
-   if ( m_dataRange.height() < s_minSizeAutoScale )
+   if ( yBorder < s_minSizeAutoScale )
    {
       yBorder = 1;
    }
