@@ -208,6 +208,7 @@ class MainWorkerThread : public IThread
 
       ReturnStatus run()
       {
+         gLog() << Msg::Always << "Running the main worker thread..." << Msg::EndReq;
          try
          {
             if ( m_programOptions->doRunTests() )
@@ -230,7 +231,7 @@ class MainWorkerThread : public IThread
             {
                compareRootFiles( m_programOptions );
             }
-            std::cout << "Main worker thread done." << std::endl;
+            gLog() << Msg::Always << "Main worker thread done." << Msg::EndReq;
          }
          catch ( StopExecutionException& exc )
          {

@@ -7,6 +7,7 @@ class DevSuite
       static void execute();
 
    public:
+      static void devAnalysisSrpa();
 };
 
 #endif // DEVSUITE_H
