@@ -118,6 +118,8 @@ SrSpecPeakAlgorithm::SrSpecPeakAlgorithm( double freqProximityCutoff, const std:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 std::vector< Feature::SrSpecPeak > SrSpecPeakAlgorithm::execute( const WaveAnalysis::SrSpectrum& spectrum, Monitor* monitor )
 {
+   const double ampCorrectionFactor = 3.95239;
+
    /// Get the reassigned frequencies and magnitudes (magnitude is identical to non-reassigned spectrum).
    const RealVector& frequencies = spectrum.getFrequencies();
    const RealVector& magnitudes = spectrum.getMagnitude();
@@ -203,6 +205,11 @@ std::vector< Feature::SrSpecPeak > SrSpecPeakAlgorithm::execute( const WaveAnaly
       }
    }
 
+   if ( magAboveBaseline.size() == 0 )
+   {
+      return std::vector< Feature::SrSpecPeak >();
+   }
+
    /// Create peaks from the points above baseline.
    std::vector< std::vector< size_t > > peaks;
    peaks.push_back( std::vector< size_t >() );
@@ -223,6 +230,7 @@ std::vector< Feature::SrSpecPeak > SrSpecPeakAlgorithm::execute( const WaveAnaly
       }
    }
 
+
    RealVector peakHeights;
    RealVector peakFreqs;
    for ( size_t i = 0; i < peaks.size(); ++i )
@@ -240,7 +248,7 @@ std::vector< Feature::SrSpecPeak > SrSpecPeakAlgorithm::execute( const WaveAnaly
       }
       if ( maxHeight > 0 )
       {
-         peakHeights.push_back( maxHeight );
+         peakHeights.push_back( maxHeight * ampCorrectionFactor );
          peakFreqs.push_back( maxFreq );
       }
    }

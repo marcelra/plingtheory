@@ -3,6 +3,7 @@
 #include "RegularAccumArray.h"
 #include "IPlotFactory.h"
 #include "Logger.h"
+#include "Regular2DHistogram.h"
 #include "SineGenerator.h"
 #include "SpectralReassignmentTransform.h"
 #include "SortCache.h"
@@ -14,16 +15,17 @@ namespace Analysis
 
 AnalysisSrpa::AnalysisSrpa( const std::string& name, const AlgorithmBase* parent ) :
    AlgorithmBase( name, parent ),
-   m_fourierSize( 1024 ),
+   m_fourierSize( 4096 ),
    m_zeroPadSize( 0 * m_fourierSize ),
    m_frequency( 440 ),
    m_phase( 0 ),
-   m_amplitude( 0.1 ),
+   m_amplitude( 1 ),
    m_samplingInfo( 44100 )
 {}
 
 
 /// Correction factor is dependent on number of zero padding samples.
+/// The correction factor for zeropadding = 0 has been added to the SrSpecPeakAlgorithm
 /// Zeropadding = 0: 3.95239, relative uncertainty on amp +- 0.058789
 /// Zeropadding = 1: 3.76495
 /// Zeropadding = 3: 3.71889
@@ -60,7 +62,7 @@ void AnalysisSrpa::studyFrequencyPerformance( const std::vector< double >& frequ
       getLogger() << Msg::Info << "Truth: frequency = " << frequency << ", amplitude = " << m_amplitude << Msg::EndReq;
       for ( size_t i = 0; i < peaks.size(); ++i )
       {
-         double recoAmp = peaks[ i ].getHeight() / m_fourierSize * 3.95239;
+         double recoAmp = peaks[ i ].getHeight() / m_fourierSize;
          getLogger() << Msg::Info << "Peak " << i << ": frequency = " << peaks[ i ].getFrequency() << ", amplitude " << recoAmp << Msg::EndReq;
          if ( recoAmp > 0.01 )
          {
@@ -106,6 +108,145 @@ void AnalysisSrpa::studyFrequencyPerformance( const std::vector< double >& frequ
 
    gPlotFactory().createPlot( "Delta frequency vs Frequency" );
    gPlotFactory().createGraph( frequencies, deltaFrequency );
+}
+
+enum HistStatus
+{
+   NotEnoughPeaks = 0,
+   PeaksIncorrect,
+   PeaksCorrect,
+   NumHistStatusItems
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// studyFrequencyProximity
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void AnalysisSrpa::studyFrequencyProximity( const std::vector< double >& frequencies, const std::vector< double >& frequencyDifference, double amp2 )
+{
+   Synthesizer::SineGenerator generator1( m_samplingInfo );
+   Synthesizer::SineGenerator generator2( m_samplingInfo );
+   FeatureAlgorithm::SrSpecPeakAlgorithm peakAlg( 0.25, "PeakAlg", this );
+   WaveAnalysis::SpectralReassignmentTransform transform( m_samplingInfo, m_fourierSize, m_zeroPadSize, 1 );
+
+   generator1.setAmplitude( m_amplitude );
+   generator1.setPhase( m_phase );
+   generator2.setAmplitude( amp2 );
+   generator2.setPhase( m_phase );
+
+   Math::RegularAccumArray statusHist( 3, -0.5, NumHistStatusItems - 0.5 );
+   Math::Regular2DHistogram statusHist2D( frequencies.size(), frequencies.front() - 0.5, frequencies.back() + 0.5, frequencyDifference.size(), frequencyDifference.front() - 0.5, frequencyDifference.back() + 0.5 );
+   for ( size_t iFreq = 0; iFreq < frequencies.size(); ++iFreq )
+   {
+      double frequency = frequencies[ iFreq ];
+      generator1.setFrequency( frequency );
+      RawPcmData::Ptr data1 = generator1.generate( m_fourierSize );
+
+      RealVector freqDiffX;
+      RealVector freqDiffYMin;
+      RealVector freqDiffYMax;
+
+      for ( size_t iFreqDiff = 0; iFreqDiff < frequencyDifference.size(); ++iFreqDiff )
+      {
+         double frequency2 = generator1.getFrequency() + frequencyDifference[ iFreqDiff ];
+         generator2.setFrequency( frequency2 );
+         RawPcmData::Ptr data2 = generator2.generate( m_fourierSize );
+
+         RawPcmData data( *data1 );
+         data.mixAdd( *data2 );
+
+         WaveAnalysis::StftData::Ptr stftData = transform.execute( data );
+         const WaveAnalysis::SrSpectrum& spectrum = stftData->getSrSpectrum( 0 );
+
+         FeatureAlgorithm::SrSpecPeakAlgorithm::Monitor* monitor = 0;
+         if ( iFreq == 0 && iFreqDiff == 2 )
+         {
+            monitor = new FeatureAlgorithm::SrSpecPeakAlgorithm::Monitor();
+         }
+
+         const std::vector< Feature::SrSpecPeak >& peaks = peakAlg.execute( spectrum, monitor );
+
+         if ( monitor )
+         {
+            monitor->createSpectrumPlot( "" );
+            delete monitor;
+         }
+
+         getLogger() << Msg::Info << "----------------------------------------" << Msg::EndReq;
+         getLogger() << Msg::Info << "iFreq = " << iFreq << ", iFreqDiff = " << iFreqDiff << Msg::EndReq;
+         getLogger() << Msg::Info << "Truth sinusoid 1: frequency = " << generator1.getFrequency() << ", amplitude = " << generator1.getAmplitude() << Msg::EndReq;
+         getLogger() << Msg::Info << "Truth sinusoid 2: frequency = " << generator2.getFrequency() << ", amplitude = " << generator2.getAmplitude() << Msg::EndReq;
+
+         RealVector peakAmps( peaks.size() );
+         for ( size_t iPeak = 0; iPeak < peaks.size(); ++iPeak )
+         {
+            peakAmps[ iPeak ] = peaks[ iPeak ].getHeight();
+         }
+
+         SortCache peakAmpsSc( peakAmps );
+         if ( peakAmpsSc.getSize() >= 2 )
+         {
+            double freqEstimate1 = peaks[ peakAmpsSc.getReverseSortedIndex( 0 ) ].getFrequency();
+            double freqEstimate2 = peaks[ peakAmpsSc.getReverseSortedIndex( 1 ) ].getFrequency();
+
+            double errDf1;
+            double errDf2;
+
+            int estimate1 = 2;
+            int estimate2 = 2;
+            if ( fabs( freqEstimate1 - frequency ) < fabs( freqEstimate1 - frequency2 ) )
+            {
+               estimate1 = 1;
+               errDf1 = freqEstimate1 - frequency;
+               errDf2 = freqEstimate2 - frequency2;
+            }
+            if ( fabs( freqEstimate2 - frequency ) < fabs( freqEstimate2 - frequency2 ) )
+            {
+               estimate2 = 1;
+               errDf1 = freqEstimate2 - frequency;
+               errDf2 = freqEstimate1 - frequency2;
+            }
+
+            if ( estimate1 != estimate2 )
+            {
+               statusHist.add( PeaksCorrect, 1 );
+               statusHist2D.add( frequency, frequencyDifference[ iFreqDiff ], PeaksCorrect );
+               freqDiffX.push_back( frequencyDifference[ iFreqDiff ] );
+               freqDiffYMin.push_back( std::min( errDf1, errDf2 ) );
+               freqDiffYMax.push_back( std::max( errDf1, errDf2 ) );
+            }
+            else
+            {
+               statusHist.add( PeaksIncorrect, 1 );
+               statusHist2D.add( frequency, frequencyDifference[ iFreqDiff ], PeaksIncorrect );
+            }
+         }
+         else
+         {
+            statusHist.add( NotEnoughPeaks, 1 );
+            statusHist2D.add( frequency, frequencyDifference[ iFreqDiff ], NotEnoughPeaks );
+         }
+
+         for ( size_t iPeak = 0; iPeak < peaks.size(); ++iPeak )
+         {
+            double recoAmp = peaks[ iPeak ].getHeight() / m_fourierSize;
+            getLogger() << Msg::Info << "Peak " << iPeak << ": frequency = " << peaks[ iPeak ].getFrequency() << ", amplitude " << recoAmp << Msg::EndReq;
+         }
+
+      } /// Loop over frequency differences.
+
+      std::ostringstream plotTitleFreqDifMin;
+      plotTitleFreqDifMin << "AnalysisSrpa/FreqErrorMin" << frequency;
+      gPlotFactory().createPlot( plotTitleFreqDifMin.str() );
+      gPlotFactory().createGraph( freqDiffX, freqDiffYMin, Qt::blue );
+      gPlotFactory().createGraph( freqDiffX, freqDiffYMax, Qt::red );
+
+   } /// Loop over frequencies.
+
+   gPlotFactory().createPlot( "AnalysisSrpa/CategorisedCounts" );
+   gPlotFactory().createHistogram( statusHist );
+
+   gPlotFactory().createPlot( "AnalysisSrpa/CategorisedCountsFreqDiffVsFreq" );
+   gPlotFactory().create2DHist( statusHist2D );
 }
 
 } /// namespace Analysis

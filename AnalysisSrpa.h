@@ -16,6 +16,7 @@ class AnalysisSrpa : public AlgorithmBase
 
    public:
       void studyFrequencyPerformance( const std::vector< double >& frequencies );
+      void studyFrequencyProximity( const std::vector< double >& frequencies, const std::vector< double >& frequencyDifference, double amp2 );
 
    private:
       size_t         m_fourierSize;

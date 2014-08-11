@@ -30,7 +30,11 @@ void DevSuite::devAnalysisSrpa()
 
    Analysis::AnalysisSrpa anaAlg;
 
-   const RealVector& frequencies = Utils::createRangeReal( 10, 10000, 5000 );
-   anaAlg.studyFrequencyPerformance( frequencies );
+   // const RealVector& frequencies = Utils::createRangeReal( 50, 10000, 500 );
+   const RealVector& frequencies = realVector( 100, 400, 1000, 10000 );
+   const RealVector& deltaFreq = Utils::createRangeReal( -500, 500, 4001 );
+   // anaAlg.studyFrequencyPerformance( frequencies );
+
+   anaAlg.studyFrequencyProximity( frequencies, deltaFreq, 1 );
 
 }
