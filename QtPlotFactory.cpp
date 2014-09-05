@@ -6,6 +6,7 @@
 #include "Hist2DItem.h"
 #include "HistogramItem.h"
 #include "IAccumArray.h"
+#include "Logger.h"
 #include "Palette.h"
 #include "Plot2D.h"
 #include "RawPcmData.h"
@@ -22,7 +23,9 @@ namespace PlotInterface
 
 QtPlotFactory::QtPlotFactory() :
    IPlotFactory( "QtPlotFactory" )
-{}
+{
+   m_logger = new Logger( "QtPlotFactory" );
+}
 
 QtPlotFactory::~QtPlotFactory()
 {
@@ -30,6 +33,12 @@ QtPlotFactory::~QtPlotFactory()
    {
       delete m_plotItems[ i ];
    }
+   delete m_logger;
+}
+
+Logger& QtPlotFactory::getLogger()
+{
+   return *m_logger;
 }
 
 void QtPlotFactory::initialise()
@@ -89,6 +98,12 @@ void QtPlotFactory::createScatter( const std::vector< double >& xData,
       throw ExceptionNoPlotAvailable();
    }
 
+   if ( xData.size() == 0 )
+   {
+      getLogger() << Msg::Warning << "Empty data for scatter item." << Msg::EndReq;
+      return;
+   }
+
    Plotting::ScatterItem * item = new Plotting::ScatterItem( xData, yData, markerDrawAttr );
    m_currentPlot->addItem( item );
    m_plotItems.push_back( item );
@@ -143,6 +158,12 @@ void QtPlotFactory::createZScatter( const std::vector< double >& xData,
    if ( !m_currentPlot )
    {
       throw ExceptionNoPlotAvailable();
+   }
+
+   if ( xData.size() == 0 )
+   {
+      getLogger() << Msg::Warning << "Empty data for z-scatter item." << Msg::EndReq;
+      return;
    }
 
    Plotting::ZScatterItem * item = new Plotting::ZScatterItem( xData, yData, zData, palette, markerDrawAttr );

@@ -5,9 +5,6 @@ class DevSuite
 {
    public:
       static void execute();
-
-   public:
-      static void devAnalysisSrpa();
 };
 
 #endif // DEVSUITE_H

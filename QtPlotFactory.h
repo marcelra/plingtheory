@@ -48,9 +48,12 @@ class QtPlotFactory : public IPlotFactory
       QtPlotFactory();
       virtual ~QtPlotFactory();
 
+      Logger& getLogger();
+
    private:
       Plotting::Plot2D*                     m_currentPlot;
       std::vector< Plotting::IPaintItem* >  m_plotItems;
+      Logger*                               m_logger;
 };
 
 } /// namespace PlotInterface

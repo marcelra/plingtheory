@@ -22,6 +22,8 @@ class LoggerClient
       void setLoggerThreshold( Msg::LogLevel logLevel, LoggerClientId id );
       LoggerClientId getLoggerClientId() const;
 
+      const std::string& getName() const;
+
    private:
       std::unique_ptr< Logger >    m_logger;
       LoggerClientId               m_loggerClientId;

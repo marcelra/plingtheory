@@ -13,6 +13,8 @@ ProgramOptions::ProgramOptions( int argc, char* argv[] ) :
    m_hasErrors( false ),
    m_doRunTests( false ),
    m_doRunSingleTest( false ),
+   m_doRunAnalyses( false ),
+   m_doRunSingleAnalysis( false ),
    m_doRunDevelopmentCode( false ),
    m_doCompareRootFiles( false ),
    m_useRootInterface( false ),
@@ -70,6 +72,14 @@ void ProgramOptions::parseArguments()
       else if ( opt == "singletest" )
       {
          m_doRunSingleTest = true;
+      }
+      else if ( opt == "analyse" )
+      {
+         m_doRunAnalyses = true;
+      }
+      else if ( opt == "analysis" )
+      {
+         m_doRunSingleAnalysis = true;
       }
       else if ( opt == "compare" )
       {
@@ -197,6 +207,8 @@ void ProgramOptions::printOptions( std::ostream& os )
    os << "develop             : Run development code.\n";
    os << "test                : Run all tests.\n";
    os << "singletest          : Run single test.\n";
+   os << "analyse             : Run all analyses.\n";
+   os << "analysis            : Run single analysis.\n";
    os << "compare <old> <new> : Compare root-files.\n";
    os << "\n";
    os << "Options:\n";
@@ -228,6 +240,22 @@ bool ProgramOptions::doRunTests() const
 bool ProgramOptions::doRunSingleTest() const
 {
    return m_doRunSingleTest;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// doRunAnalyses
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+bool ProgramOptions::doRunAnalyses() const
+{
+   return m_doRunAnalyses;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// doRunSingleAnalysis
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+bool ProgramOptions::doRunSingleAnalysis() const
+{
+   return m_doRunSingleAnalysis;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

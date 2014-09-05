@@ -205,60 +205,65 @@ std::vector< Feature::SrSpecPeak > SrSpecPeakAlgorithm::execute( const WaveAnaly
       }
    }
 
-   if ( magAboveBaseline.size() == 0 )
+   std::vector< Feature::SrSpecPeak > result;
+   if ( magAboveBaseline.size() > 0 )
    {
-      return std::vector< Feature::SrSpecPeak >();
-   }
 
-   /// Create peaks from the points above baseline.
-   std::vector< std::vector< size_t > > peaks;
-   peaks.push_back( std::vector< size_t >() );
-   peaks.back().push_back( 0 );
+      /// Create peaks from the points above baseline.
+      std::vector< std::vector< size_t > > peaks;
+      peaks.push_back( std::vector< size_t >() );
+      peaks.back().push_back( 0 );
 
-   for ( size_t i = 1; i < freqAboveBaseline.size(); ++i )
-   {
-      double dist = fabs( freqAboveBaseline[ i ] - freqAboveBaseline[ i - 1 ] ) / fourierBinSize;
-
-      if ( dist < m_freqProximityCutoff * 2 )
+      for ( size_t i = 1; i < freqAboveBaseline.size(); ++i )
       {
-         peaks.back().push_back( i );
-      }
-      else
-      {
-         peaks.push_back( std::vector< size_t >() );
-         peaks.back().push_back( i );
-      }
-   }
+         double dist = fabs( freqAboveBaseline[ i ] - freqAboveBaseline[ i - 1 ] ) / fourierBinSize;
 
-
-   RealVector peakHeights;
-   RealVector peakFreqs;
-   for ( size_t i = 0; i < peaks.size(); ++i )
-   {
-      double maxHeight = -1;
-      double maxFreq = 0;
-      for ( size_t j = 0; j < peaks[ i ].size(); ++j )
-      {
-         size_t index = peaks[ i ][ j ];
-         if ( magAboveBaseline[ index ] > maxHeight )
+         if ( dist < m_freqProximityCutoff * 2 )
          {
-            maxHeight = magAboveBaseline[ index ];
-            maxFreq = freqAboveBaseline[ index ];
+            peaks.back().push_back( i );
+         }
+         else
+         {
+            peaks.push_back( std::vector< size_t >() );
+            peaks.back().push_back( i );
          }
       }
-      if ( maxHeight > 0 )
-      {
-         peakHeights.push_back( maxHeight * ampCorrectionFactor );
-         peakFreqs.push_back( maxFreq );
-      }
-   }
 
-   /// Format peak vector.
-   std::vector< Feature::SrSpecPeak > result;
-   for ( size_t iPeak = 0; iPeak < peakHeights.size(); ++iPeak )
-   {
-      result.push_back( Feature::SrSpecPeak( peakFreqs[ iPeak ], peakHeights[ iPeak ] ) );
-   }
+
+      RealVector peakHeights;
+      RealVector peakFreqs;
+      for ( size_t i = 0; i < peaks.size(); ++i )
+      {
+         double maxHeight = -1;
+         double maxFreq = 0;
+         for ( size_t j = 0; j < peaks[ i ].size(); ++j )
+         {
+            size_t index = peaks[ i ][ j ];
+            if ( magAboveBaseline[ index ] > maxHeight )
+            {
+               maxHeight = magAboveBaseline[ index ];
+               maxFreq = freqAboveBaseline[ index ];
+            }
+         }
+         if ( maxHeight > 0 )
+         {
+            peakHeights.push_back( maxHeight * ampCorrectionFactor );
+            peakFreqs.push_back( maxFreq );
+         }
+      }
+
+      /// Format peak vector.
+      for ( size_t iPeak = 0; iPeak < peakHeights.size(); ++iPeak )
+      {
+         result.push_back( Feature::SrSpecPeak( peakFreqs[ iPeak ], peakHeights[ iPeak ] ) );
+      }
+
+      if ( monitor )
+      {
+         monitor->peakFrequencies = peakFreqs;
+         monitor->peakHeights = peakHeights;
+      }
+   } /// Condition: magAboveBaseline.size() > 0
 
    /// Set all monitor values except frequencyDistance.
    if ( monitor )
@@ -274,8 +279,6 @@ std::vector< Feature::SrSpecPeak > SrSpecPeakAlgorithm::execute( const WaveAnaly
       monitor->baseline = new Math::LinearInterpolator( baseline );
       monitor->selectedFrequencies = freqAboveBaseline;
       monitor->selectedMagnitudes = magAboveBaseline;
-      monitor->peakFrequencies = peakFreqs;
-      monitor->peakHeights = peakHeights;
    }
 
    return result;

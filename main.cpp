@@ -1,4 +1,5 @@
 /// Framework classes
+#include "AnalysisSuite.h"
 #include "DevGui.h"
 #include "DevSuite.h"
 #include "Exceptions.h"
@@ -36,6 +37,7 @@
 /// Forward declarations
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void runTests( const ProgramOptions* programOptions );
+void runAnalyses( const ProgramOptions* programOptions );
 void runDevelopmentCode( const ProgramOptions* programOptions );
 void saveRootFileOutput( const ProgramOptions* programOptions );
 void compareRootFiles( const ProgramOptions* programOptions );
@@ -219,6 +221,14 @@ class MainWorkerThread : public IThread
             {
                runTests( m_programOptions );
             }
+            if ( m_programOptions->doRunAnalyses() )
+            {
+               runAnalyses( m_programOptions );
+            }
+            if ( m_programOptions->doRunSingleAnalysis() )
+            {
+               runAnalyses( m_programOptions );
+            }
             if ( m_programOptions->doRunDevelopmentCode() )
             {
                runDevelopmentCode( m_programOptions );
@@ -343,6 +353,41 @@ void runTests( const ProgramOptions* programOptions )
       else if ( programOptions->doRunSingleTest() )
       {
          TestSuite::singleTest();
+      }
+   }
+   catch ( ExceptionTestFailed exc )
+   {
+      gLog() << Msg::Fatal << "Test failed!" << Msg::EndReq;
+      gLog() << Msg::Error << exc << Msg::EndReq;
+      programStatus = PS_TEST_FAILED;
+      throw StopExecutionException();
+   }
+   catch ( const BaseException& exc )
+   {
+      gLog() << Msg::Fatal << "Test failed!" << Msg::EndReq;
+      gLog() << Msg::Error << exc << Msg::EndReq;
+      programStatus = PS_UNRECOVERABLE_INTERNAL_EXCEPTION;
+      throw StopExecutionException();
+   }
+   gLog() << Msg::Info << "Running tests successful." << Msg::EndReq;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// runAnalyses
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void runAnalyses( const ProgramOptions* programOptions )
+{
+   assert( programOptions );
+   assert( programStatus == PS_OK );
+   try
+   {
+      if ( programOptions->doRunAnalyses() )
+      {
+         AnalysisSuite::execute();
+      }
+      else if ( programOptions->doRunSingleAnalysis() )
+      {
+         AnalysisSuite::singleAnalysis();
       }
    }
    catch ( ExceptionTestFailed exc )

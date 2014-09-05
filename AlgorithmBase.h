@@ -20,8 +20,7 @@ class AlgorithmBase : public LoggerClient
       std::string formatIndentStr() const;
 
       const AlgorithmBase* m_parent;
-
-      size_t        m_hierarchyCount;
+      size_t               m_hierarchyCount;
 };
 
 #endif // ALGORITHMBASE_H

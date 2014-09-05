@@ -1,9 +1,7 @@
 #include "AnalysisSrpa.h"
 
-#include "RegularAccumArray.h"
 #include "IPlotFactory.h"
 #include "Logger.h"
-#include "Regular2DHistogram.h"
 #include "SineGenerator.h"
 #include "SpectralReassignmentTransform.h"
 #include "SortCache.h"
@@ -13,16 +11,25 @@
 namespace Analysis
 {
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// constructor
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 AnalysisSrpa::AnalysisSrpa( const std::string& name, const AlgorithmBase* parent ) :
    AlgorithmBase( name, parent ),
    m_fourierSize( 4096 ),
    m_zeroPadSize( 0 * m_fourierSize ),
-   m_frequency( 440 ),
-   m_phase( 0 ),
    m_amplitude( 1 ),
    m_samplingInfo( 44100 )
 {}
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// setFourierConfig
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void AnalysisSrpa::setFourierConfig( size_t fourierSize, size_t numSamplesZeroPadding )
+{
+   m_fourierSize = fourierSize;
+   m_zeroPadSize = numSamplesZeroPadding;
+}
 
 /// Correction factor is dependent on number of zero padding samples.
 /// The correction factor for zeropadding = 0 has been added to the SrSpecPeakAlgorithm
@@ -35,6 +42,9 @@ AnalysisSrpa::AnalysisSrpa( const std::string& name, const AlgorithmBase* parent
 /// Min frequency with reasonable error at 1024 samples = 30 Hz
 /// Min frequency with reasonable error at 512  samples = 60 Hz
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// studyFrequencyPerformance
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void AnalysisSrpa::studyFrequencyPerformance( const std::vector< double >& frequencies )
 {
    Synthesizer::SineGenerator generator( m_samplingInfo );
@@ -50,7 +60,6 @@ void AnalysisSrpa::studyFrequencyPerformance( const std::vector< double >& frequ
 
       generator.setFrequency( frequency );
       generator.setAmplitude( m_amplitude );
-      generator.setPhase( m_phase );
 
       RawPcmData::Ptr data = generator.generate( m_fourierSize );
       WaveAnalysis::StftData::Ptr stftData = transform.execute( *data );
@@ -100,16 +109,17 @@ void AnalysisSrpa::studyFrequencyPerformance( const std::vector< double >& frequ
 
 
 
-   gPlotFactory().createPlot( "Amp mismatch" );
+   gPlotFactory().createPlot( getName() + "/Amp mismatch" );
    gPlotFactory().createHistogram( hist );
 
-   gPlotFactory().createPlot( "RelAmpError vs Frequency" );
+   gPlotFactory().createPlot( getName() + "/RelAmpError vs Frequency" );
    gPlotFactory().createGraph( frequencies, relAmpErrorVec );
 
-   gPlotFactory().createPlot( "Delta frequency vs Frequency" );
+   gPlotFactory().createPlot( getName() + "/Delta frequency vs Frequency" );
    gPlotFactory().createGraph( frequencies, deltaFrequency );
 }
 
+/// Quality classification enumeration of twin peak detection.
 enum HistStatus
 {
    NotEnoughPeaks = 0,
@@ -119,9 +129,9 @@ enum HistStatus
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// studyFrequencyProximity
+/// studyTwinPeakPerformance
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void AnalysisSrpa::studyFrequencyProximity( const std::vector< double >& frequencies, const std::vector< double >& frequencyDifference, double amp2 )
+void AnalysisSrpa::studyTwinPeakPerformance( const std::vector< double >& frequencies, const std::vector< double >& frequencyDifference, double amp2 )
 {
    Synthesizer::SineGenerator generator1( m_samplingInfo );
    Synthesizer::SineGenerator generator2( m_samplingInfo );
@@ -129,12 +139,11 @@ void AnalysisSrpa::studyFrequencyProximity( const std::vector< double >& frequen
    WaveAnalysis::SpectralReassignmentTransform transform( m_samplingInfo, m_fourierSize, m_zeroPadSize, 1 );
 
    generator1.setAmplitude( m_amplitude );
-   generator1.setPhase( m_phase );
    generator2.setAmplitude( amp2 );
-   generator2.setPhase( m_phase );
 
    Math::RegularAccumArray statusHist( 3, -0.5, NumHistStatusItems - 0.5 );
-   Math::Regular2DHistogram statusHist2D( frequencies.size(), frequencies.front() - 0.5, frequencies.back() + 0.5, frequencyDifference.size(), frequencyDifference.front() - 0.5, frequencyDifference.back() + 0.5 );
+
+   /// Loop over frequencies.
    for ( size_t iFreq = 0; iFreq < frequencies.size(); ++iFreq )
    {
       double frequency = frequencies[ iFreq ];
@@ -145,6 +154,7 @@ void AnalysisSrpa::studyFrequencyProximity( const std::vector< double >& frequen
       RealVector freqDiffYMin;
       RealVector freqDiffYMax;
 
+      /// Loop over frequency differences.
       for ( size_t iFreqDiff = 0; iFreqDiff < frequencyDifference.size(); ++iFreqDiff )
       {
          double frequency2 = generator1.getFrequency() + frequencyDifference[ iFreqDiff ];
@@ -167,7 +177,7 @@ void AnalysisSrpa::studyFrequencyProximity( const std::vector< double >& frequen
 
          if ( monitor )
          {
-            monitor->createSpectrumPlot( "" );
+            monitor->createSpectrumPlot( getName() + "/FreqProx/FreqMonitor" );
             delete monitor;
          }
 
@@ -209,7 +219,6 @@ void AnalysisSrpa::studyFrequencyProximity( const std::vector< double >& frequen
             if ( estimate1 != estimate2 )
             {
                statusHist.add( PeaksCorrect, 1 );
-               statusHist2D.add( frequency, frequencyDifference[ iFreqDiff ], PeaksCorrect );
                freqDiffX.push_back( frequencyDifference[ iFreqDiff ] );
                freqDiffYMin.push_back( std::min( errDf1, errDf2 ) );
                freqDiffYMax.push_back( std::max( errDf1, errDf2 ) );
@@ -217,13 +226,11 @@ void AnalysisSrpa::studyFrequencyProximity( const std::vector< double >& frequen
             else
             {
                statusHist.add( PeaksIncorrect, 1 );
-               statusHist2D.add( frequency, frequencyDifference[ iFreqDiff ], PeaksIncorrect );
             }
          }
          else
          {
             statusHist.add( NotEnoughPeaks, 1 );
-            statusHist2D.add( frequency, frequencyDifference[ iFreqDiff ], NotEnoughPeaks );
          }
 
          for ( size_t iPeak = 0; iPeak < peaks.size(); ++iPeak )
@@ -235,18 +242,65 @@ void AnalysisSrpa::studyFrequencyProximity( const std::vector< double >& frequen
       } /// Loop over frequency differences.
 
       std::ostringstream plotTitleFreqDifMin;
-      plotTitleFreqDifMin << "AnalysisSrpa/FreqErrorMin" << frequency;
+      plotTitleFreqDifMin << getName() + "/FreqProx/FreqError" << frequency;
       gPlotFactory().createPlot( plotTitleFreqDifMin.str() );
       gPlotFactory().createGraph( freqDiffX, freqDiffYMin, Qt::blue );
       gPlotFactory().createGraph( freqDiffX, freqDiffYMax, Qt::red );
 
    } /// Loop over frequencies.
 
-   gPlotFactory().createPlot( "AnalysisSrpa/CategorisedCounts" );
+   gPlotFactory().createPlot( getName() + "/FroxProx/CategorisedCounts" );
    gPlotFactory().createHistogram( statusHist );
+}
 
-   gPlotFactory().createPlot( "AnalysisSrpa/CategorisedCountsFreqDiffVsFreq" );
-   gPlotFactory().create2DHist( statusHist2D );
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// studyAmpBehaviour
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void AnalysisSrpa::studyAmpBehaviour( double frequency, double ampFracBegin, double ampFracEnd )
+{
+   SamplingInfo samplingInfo;
+   FeatureAlgorithm::SrSpecPeakAlgorithm peakAlg( 0.25, "PeakAlg", this );
+   WaveAnalysis::SpectralReassignmentTransform transform( m_samplingInfo, m_fourierSize, m_zeroPadSize, 1 );
+
+   RawPcmData data( samplingInfo, m_fourierSize );
+
+   double ampStart = m_amplitude * ampFracBegin;
+   double ampEnd = m_amplitude * ampFracEnd;
+
+   double ampStep = ( ampStart- ampEnd ) / data.size();
+   double amp = ampStart;
+
+   double phase = 0;
+   double phaseStep = samplingInfo.getPhaseStepPerSample( frequency );
+
+   for ( size_t i = 0; i < data.size(); ++i )
+   {
+      data[ i ] = sin( phase ) * amp;
+      phase += phaseStep;
+      amp -= ampStep;
+   }
+
+   gPlotFactory().createPlot( getName() + "/AmpBehaviour/Data" );
+   gPlotFactory().createGraph( *data.copyToVectorData() );
+
+   WaveAnalysis::StftData::Ptr stftData = transform.execute( data );
+   const WaveAnalysis::SrSpectrum& spectrum = stftData->getSrSpectrum( 0 );
+
+   FeatureAlgorithm::SrSpecPeakAlgorithm::Monitor* monitor = 0;
+   monitor = new FeatureAlgorithm::SrSpecPeakAlgorithm::Monitor();
+
+   const std::vector< Feature::SrSpecPeak >& peaks = peakAlg.execute( spectrum, monitor );
+   /// Prevent compiler warning.
+   assert( &peaks );
+
+   if ( monitor )
+   {
+      monitor->createSpectrumPlot( getName() + "/AmpBehaviour/" );
+      delete monitor;
+   }
+
+   gPlotFactory().createScatter( spectrum.getFrequencies(), spectrum.getTimeCorrections() * 0.01 );
+
 }
 
 } /// namespace Analysis

@@ -146,7 +146,8 @@ SOURCES += main.cpp \
     AdditiveSynthesizer.cpp \
     LinearInterpolator.cpp \
     SrSpecPeakAlgorithm.cpp \
-    AnalysisSrpa.cpp
+    AnalysisSrpa.cpp \
+    AnalysisSuite.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -289,7 +290,8 @@ HEADERS += \
     AdditiveSynthesizer.h \
     LinearInterpolator.h \
     SrSpecPeakAlgorithm.h \
-    AnalysisSrpa.h
+    AnalysisSrpa.h \
+    AnalysisSuite.h
 
 OTHER_FILES += \
     Todos.txt

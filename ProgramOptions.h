@@ -26,6 +26,8 @@ class ProgramOptions
    public:
       bool doRunTests() const;
       bool doRunSingleTest() const;
+      bool doRunAnalyses() const;
+      bool doRunSingleAnalysis() const;
       bool doRunDevelopmentCode() const;
       bool doCompareRootFiles() const;
 
@@ -59,6 +61,8 @@ class ProgramOptions
    private:
       bool              m_doRunTests;
       bool					m_doRunSingleTest;
+      bool              m_doRunAnalyses;
+      bool              m_doRunSingleAnalysis;
       bool              m_doRunDevelopmentCode;
       bool              m_doCompareRootFiles;
 
