@@ -2,6 +2,7 @@
 
 #include "GlobalParameters.h"
 #include "IGenerator.h"
+#include "MonophonicSimpleRandomMusicGenerator.h"
 #include "MultiChannelRawPcmData.h"
 #include "NoteList.h"
 #include "SpectralReassignmentTransform.h"
@@ -110,6 +111,22 @@ Math::RegularAccumArray TestDataSupply::drawNoiseAndPeaks( RealVector peakLocs, 
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// generateRandomMelody
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+RawPcmData::Ptr TestDataSupply::generateRandomMelody( std::vector< Music::Note >* trueMelody )
+{
+   SamplingInfo samplingInfo( 44100 );
+
+   Music::MonophonicSimpleRandomMusicGenerator musicGen( Music::createMinorScale( Music::Note( Music::Note::C, 3, Music::Duration( 0.125 ) ) ), 42 );
+
+   Synthesizer::SquareGenerator generator( samplingInfo );
+   musicGen.useSynthesizer( &generator );
+   RawPcmData::Ptr result = musicGen.generateRandomMusic( 40, trueMelody );
+
+   return result;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// generateSoundData
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 RawPcmData::Ptr TestDataSupply::generateSoundData()
@@ -160,11 +177,12 @@ RawPcmData::Ptr TestDataSupply::getCurrentTestSample()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 RawPcmData::Ptr TestDataSupply::readSoundData()
 {
-   // std::string fileName = "atc_intro.wav";
+   std::string fileName = "atc_intro.wav";
    // std::string fileName = "Cscale.wav";
-   std::string fileName = "monophDistGuitar.wav";
    // std::string fileName = "monophDifficult.wav";
    // std::string fileName = "outcry.wav";
+
+   // std::string fileName = "monophDistGuitar.wav";
 
    MultiChannelRawPcmData* data = WaveFile::read( GlobalParameters::getTestDataDir() + fileName );
    return RawPcmData::Ptr( new RawPcmData( data->getChannel( 0 ) ) );

@@ -25,6 +25,7 @@ class TestDataSupply
       static RawPcmData::Ptr getCurrentTestSample();
       static WaveAnalysis::StftData::Ptr getSrFtData();
 
+      static RawPcmData::Ptr generateRandomMelody( std::vector< Music::Note >* trueMelody = 0 );
       static RawPcmData::Ptr generateSoundData();
       static RawPcmData::Ptr generateChord( Synthesizer::IGenerator& generator, size_t numSamples, const std::vector< Music::Note >& notes );
 

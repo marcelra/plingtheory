@@ -10,6 +10,9 @@ namespace Math
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 LinearInterpolator::LinearInterpolator( const RealVector& x, const RealVector& y )
 {
+   assert( x.size() > 0 );
+   assert( x.size() == y.size() );
+
    SortCache sc( x );
    m_x = sc.applyTo( x );
    m_y = sc.applyTo( y );

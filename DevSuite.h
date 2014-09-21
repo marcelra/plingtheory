@@ -5,6 +5,9 @@ class DevSuite
 {
    public:
       static void execute();
+
+   public:
+      static void devIterateSrPeaks();
 };
 
 #endif // DEVSUITE_H
