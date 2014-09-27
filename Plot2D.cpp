@@ -9,8 +9,10 @@
 #include "YAxisPaintArea.h"
 
 /// Qt includes
-#include <QGridLayout>
 #include <QDebug>
+#include <QFileDialog>
+#include <QGridLayout>
+#include <QMessageBox>
 
 /// STL includes
 #include <cassert>
@@ -75,6 +77,8 @@ Plot2D::Plot2D( QWidget* parent ) :
    isConnected = connect( m_yScroll, SIGNAL( updateViewportFromMarkers() ), this, SLOT( synchroniseWithGraphViewport() ) );
    assert( isConnected );
    isConnected = connect( m_graph, SIGNAL( zoomModeChanged( PaintArea::ZoomMode ) ), this, SLOT( animateActiveScrollbar( PaintArea::ZoomMode ) ) );
+   assert( isConnected );
+   isConnected = connect( m_graph, SIGNAL( exportPlot() ), this, SLOT( exportPlot() ) );
    assert( isConnected );
 
    /// Enable grid by default.
@@ -185,6 +189,44 @@ void Plot2D::animateActiveScrollbar( PaintArea::ZoomMode zoomMode )
    {
       m_xScroll->animateActive();
       m_yScroll->animateActive();
+   }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// exportPlot
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void Plot2D::exportPlot()
+{
+   QString fileName = QFileDialog::getSaveFileName( this, tr( "Export plot" ), ".", tr( "Images (*.png *.xpm *.jpg)" ) );
+
+   QPalette::ColorRole prevBkgRole = backgroundRole();
+   setBackgroundRole( QPalette::Base );
+   setAutoFillBackground( true );
+
+   m_xScroll->setVisible( false );
+   m_yScroll->setVisible( false );
+
+   QPixmap exportedPlot( size() );
+   render( &exportedPlot );
+
+   m_xScroll->setVisible( true );
+   m_yScroll->setVisible( true );
+
+   setBackgroundRole( prevBkgRole );
+   setAutoFillBackground( true );
+
+   bool success = exportedPlot.save( fileName );
+
+   if ( success )
+   {
+      QString msg( "Plot saved as ");
+      msg += fileName;
+      QMessageBox::information( this, "Export complete", msg );
+   }
+   else
+   {
+      QString msg( "Could not export plot. Check write permissions for the location specified." );
+      QMessageBox::warning( this, "Export failed", msg );
    }
 }
 

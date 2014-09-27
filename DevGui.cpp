@@ -6,6 +6,7 @@
 #include "RegLargeDataCurve.h"
 #include "StftAlgorithm.h"
 #include "TestDataSupply.h"
+#include "Utils.h"
 
 #include <boost/thread.hpp>
 
@@ -15,7 +16,8 @@
 void DevGui::execute()
 {
    // devPlotFactory();
-   devMakeALotOfPlots();
+   // devMakeALotOfPlots();
+   devPlotExport();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -45,4 +47,20 @@ void DevGui::devMakeALotOfPlots()
 
       boost::this_thread::sleep_for( boost::chrono::milliseconds( 50 ) );
    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// devPlotExport
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void DevGui::devPlotExport()
+{
+   RealVector x = Utils::createRangeReal( -2, 2, 100 );
+   RealVector y( x.size() );
+   for ( size_t i = 0; i < x.size(); ++i )
+   {
+      y[ i ] = x[ i ] * x[ i ];
+   }
+
+   gPlotFactory().createPlot( "NewPlot" );
+   gPlotFactory().createGraph( x, y );
 }

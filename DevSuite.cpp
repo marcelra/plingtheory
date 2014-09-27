@@ -13,7 +13,8 @@ void DevSuite::execute()
    Logger msg( "DevSuite" );
    msg << Msg::Info << "Running development code..." << Msg::EndReq;
 
-   devIterateSrPeaks();
+   DevGui::devPlotExport();
+   // devIterateSrPeaks();
 
    return;
 }
@@ -22,7 +23,7 @@ void DevSuite::execute()
 /// Include section
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "SrSpecPeakAlgorithm.h"
-#include "RebinnedSrGraph.h"
+#include "RebinnedSRGraph.h"
 #include "SpectralReassignmentTransform.h"
 
 

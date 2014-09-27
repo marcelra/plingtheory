@@ -4,6 +4,7 @@
 #include "IPaintItem.h"
 #include "GridItem.h"
 
+#include <QMenu>
 #include <QPainter>
 #include <QPaintEvent>
 #include <QPen>
@@ -299,22 +300,36 @@ QRectF PaintArea::getZoomViewportVertical( double zoomFactor, const QRectF& oldV
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void PaintArea::mouseDoubleClickEvent( QMouseEvent* event )
 {
-   if ( m_zoomMode == ZoomBoth )
-   {
-      m_zoomMode = ZoomHorizontal;
-   }
-   else if ( m_zoomMode == ZoomHorizontal )
-   {
-      m_zoomMode = ZoomVertical;
-   }
-   else if ( m_zoomMode == ZoomVertical )
-   {
-      m_zoomMode = ZoomBoth;
-   }
+   QPoint mousePos = event->pos();
 
-   emit zoomModeChanged( m_zoomMode );
+   QPoint globalPos = mapToGlobal( mousePos );
 
+   QMenu contextMenu;
+   QAction* zoomVerticalAction = contextMenu.addAction(  "Zoom vertical" );
+   QAction* zoomHorizontalAction = contextMenu.addAction( "Zoom horizontal" );
+   QAction* zoomBothAction = contextMenu.addAction( "Zoom both directions" );
+   QAction* exportPlotAction = contextMenu.addAction( "Export plot" );
+
+   QAction* action = contextMenu.exec( globalPos );
    event->accept();
+
+   if ( action == zoomHorizontalAction )
+   {
+      setZoomMode( ZoomHorizontal );
+   }
+   else if ( action == zoomVerticalAction )
+   {
+      setZoomMode( ZoomVertical );
+   }
+   else if ( action == zoomBothAction )
+   {
+      setZoomMode( ZoomBoth );
+   }
+   else if ( action == exportPlotAction )
+   {
+      emit exportPlot();
+   }
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -495,8 +510,7 @@ void PaintArea::keyPressEvent( QKeyEvent* event )
       update();
       event->accept();
    }
-
-   if ( event->key() >= '0' && event->key() <= '9' )
+   else if ( event->key() >= '0' && event->key() <= '9' )
    {
       if ( event->modifiers() & Qt::ControlModifier && event->key() != '0' )
       {
@@ -511,7 +525,32 @@ void PaintArea::keyPressEvent( QKeyEvent* event )
       }
       event->accept();
    }
+   else if ( event->key() == 'h' || event->key() == 'H' )
+   {
+      setZoomMode( ZoomHorizontal );
+      event->accept();
+   }
+   else if ( event->key() == 'v' || event->key() == 'V' )
+   {
+      setZoomMode( ZoomVertical );
+      event->accept();
+   }
+   else if ( event->key() == 'b' || event->key() == 'B' )
+   {
+      setZoomMode( ZoomBoth );
+      event->accept();
+   }
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// setZoomMode
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void PaintArea::setZoomMode( ZoomMode zoomMode )
+{
+   m_zoomMode = zoomMode;
+   emit zoomModeChanged( m_zoomMode );
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Static members

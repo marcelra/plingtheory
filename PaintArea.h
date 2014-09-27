@@ -53,12 +53,14 @@ class PaintArea : public PaintAreaBase
 
    signals:
       void zoomModeChanged( PaintArea::ZoomMode zoomMode );
+      void exportPlot();
 
    private:
       void generatePaintCommands();
       void clearPaintCommands();
       QRectF getZoomViewportHorizontal( double zoomFactor, const QRectF& oldViewport, double xCentre ) const;
       QRectF getZoomViewportVertical( double zoomFactor, const QRectF& oldViewport, double yCentre ) const;
+      void setZoomMode( ZoomMode zoomMode );
 
    private:
       std::vector< const IPaintItem* >  m_paintItems;

@@ -39,6 +39,7 @@ class Plot2D : public QWidget
       void synchroniseViewports( const QRectF& viewport );
       void synchroniseWithGraphViewport();
       void animateActiveScrollbar( PaintArea::ZoomMode zoomMode );
+      void exportPlot();
 
    private:
       QGridLayout*       m_gridLayout;

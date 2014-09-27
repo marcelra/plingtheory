@@ -9,6 +9,7 @@ class DevGui
    public:
       static void devPlotFactory();
       static void devMakeALotOfPlots();
+      static void devPlotExport();
 };
 
 #endif // DEVGUI_H
