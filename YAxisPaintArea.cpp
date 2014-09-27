@@ -90,6 +90,41 @@ void YAxisPaintArea::drawAxisLine()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// drawAxisTitle
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void YAxisPaintArea::drawAxisTitle()
+{
+   QPainter& p = getPainter();
+
+   size_t textMaxSize = m_canvas.height();
+
+   QString label( m_title.c_str() );
+   QRectF textRect( QPoint( -textMaxSize / 2, 0 ), QSize( textMaxSize, 30 ) );
+
+
+   p.save();
+   p.translate( QPointF( 0, m_canvas.height() / 2 ) );
+   p.rotate( 270 );
+
+   QColor textBkgColor( Qt::white );
+   textBkgColor.setAlpha( 220 );
+   QBrush brush( textBkgColor );
+
+   p.save();
+   p.setBrush( brush );
+   p.setPen( QPen( brush, 0 ) );
+   p.drawRect( textRect );
+   p.restore();
+
+   QFont font;
+   font.setPixelSize( 15 );
+   p.setFont( font );
+   p.drawText( textRect, Qt::AlignHCenter | Qt::AlignVCenter, label );
+
+   p.restore();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// getMin
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 double YAxisPaintArea::getMin() const

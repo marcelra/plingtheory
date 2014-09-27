@@ -31,13 +31,14 @@ void RootPlotFactory::initialise()
    s_instance  = new RootPlotFactory();
 }
 
-void RootPlotFactory::createPlot( const std::string& name )
+Plotting::Plot2D& RootPlotFactory::createPlot( const std::string& name )
 {
    TString canvasName = RootUtilities::getInstance().generateUniqueName( "auto_plot_canvas" );
    TCanvas* canvas = new TCanvas( canvasName, name.c_str() );
    m_plots[ name ] = canvas;
    // canvas->cd();
    m_currentCanvas = canvas;
+   return m_dummyTodoRemove;
 }
 
 void RootPlotFactory::createGraph( const std::vector< double >& xData, const std::vector< double >& yData, const QColor& colour )

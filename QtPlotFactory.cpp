@@ -47,11 +47,12 @@ void QtPlotFactory::initialise()
    s_instance  = new QtPlotFactory();
 }
 
-void QtPlotFactory::createPlot( const std::string& name )
+Plotting::Plot2D& QtPlotFactory::createPlot( const std::string& name )
 {
    Gui::AvailablePlotsList& plotsList = Gui::AvailablePlotsList::getInstance();
    Plotting::Plot2D* plot2D = plotsList.addPlot( name );
    m_currentPlot = plot2D;
+   return *plot2D;
 }
 
 void QtPlotFactory::createGraph( const std::vector< double >& xData, const std::vector< double >& yData, const QColor& colour )

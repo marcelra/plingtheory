@@ -24,7 +24,7 @@ class QtPlotFactory : public IPlotFactory
       static void initialise();
 
    public:
-      void createPlot( const std::string& name );
+      Plotting::Plot2D& createPlot( const std::string& name );
 
    public:
       void createGraph( const std::vector< double >& xData, const std::vector< double >& yData, const QColor& colour );

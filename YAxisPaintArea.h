@@ -47,6 +47,10 @@ class YAxisPaintArea : public AxisPaintArea
        * Get the number of pixels on the canvas along the direction in which the axis points.
        */
       int getNumsPixelsAlongAxis();
+      /**
+       * Draws the axis title.
+       */
+      void drawAxisTitle();
 };
 
 } /// namespace Plotting

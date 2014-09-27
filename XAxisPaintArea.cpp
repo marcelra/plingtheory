@@ -90,6 +90,34 @@ void XAxisPaintArea::drawAxisLine()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// drawAxisTitle
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void XAxisPaintArea::drawAxisTitle()
+{
+   QPainter& p = getPainter();
+
+   size_t maxSize = m_canvas.width();
+
+   QString label( m_title.c_str() );
+   QRectF textRect( QPoint( m_canvas.width() / 2 - maxSize / 2, m_canvas.height() - 20 ), QSize( maxSize, 20 ) );
+
+   QColor textBkgColor( Qt::white );
+   textBkgColor.setAlpha( 220 );
+   QBrush brush( textBkgColor );
+
+   p.save();
+   p.setBrush( brush );
+   p.setPen( QPen( brush, 0 ) );
+   p.drawRect( textRect );
+   p.restore();
+
+   QFont font;
+   font.setPixelSize( 15 );
+   p.setFont( font );
+   p.drawText( textRect, Qt::AlignTop | Qt::AlignHCenter, label );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// getMin
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 double XAxisPaintArea::getMin() const

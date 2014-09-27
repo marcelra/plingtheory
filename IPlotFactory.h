@@ -24,6 +24,11 @@ namespace WaveAnalysis
 class StftData;
 }
 
+namespace Plotting
+{
+class Plot2D;
+}
+
 namespace PlotInterface
 {
 
@@ -46,7 +51,7 @@ class IPlotFactory : SingletonBase
       /**
        * Create new two dimensional plot canvas.
        */
-      virtual void createPlot( const std::string& name ) = 0;
+      virtual Plotting::Plot2D& createPlot( const std::string& name ) = 0;
 
    /**
     * Create different types of plots.

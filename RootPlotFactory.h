@@ -2,6 +2,7 @@
 #define ROOTPLOTFACTORY_H
 
 #include "IPlotFactory.h"
+#include "Plot2D.h"
 
 #include <map>
 
@@ -25,7 +26,7 @@ class RootPlotFactory : public IPlotFactory
       static void initialise();
 
    public:
-      void createPlot( const std::string& name );
+      Plotting::Plot2D& createPlot( const std::string& name );
 
    public:
       void createGraph( const std::vector< double >& xData, const std::vector< double >& yData, const QColor& colour );
@@ -49,6 +50,7 @@ class RootPlotFactory : public IPlotFactory
    private:
       std::map< std::string, TCanvas* >      m_plots;
       TCanvas*                               m_currentCanvas;
+      Plotting::Plot2D                       m_dummyTodoRemove;
 };
 
 } /// namespace PlotInterface

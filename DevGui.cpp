@@ -61,6 +61,9 @@ void DevGui::devPlotExport()
       y[ i ] = x[ i ] * x[ i ];
    }
 
-   gPlotFactory().createPlot( "NewPlot" );
+   Plotting::Plot2D& plot = gPlotFactory().createPlot( "NewPlot" );
    gPlotFactory().createGraph( x, y );
+
+   plot.setXAxisTitle( "This is the x-axis" );
+   plot.setYAxisTitle( "This is the y-axis" );
 }

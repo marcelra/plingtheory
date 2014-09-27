@@ -29,6 +29,15 @@ class AxisPaintArea : public PaintAreaBase
        * Query the major ticks.
        */
       const std::vector< double >& getMajorTicks() const;
+      /**
+       * Set the axis title.
+       */
+      void setTitle( const std::string& title );
+      /**
+       * Get the axis title.
+       */
+      const std::string& getTitle() const;
+
 
    public:
       /**
@@ -57,6 +66,10 @@ class AxisPaintArea : public PaintAreaBase
        * This method should return the number of pixels along the axis.
        */
       virtual int getNumsPixelsAlongAxis() = 0;
+      /**
+       * Draws the axis title.
+       */
+      virtual void drawAxisTitle() = 0;
 
    private:
       /**
@@ -70,6 +83,7 @@ class AxisPaintArea : public PaintAreaBase
       size_t                     m_tickBase;       //! Stores the tickbase, i.e. ( 2, 5, 10 ).
       std::vector< double >      m_majorTicks;     //! Stores the major ticks. Modified by updateTicks.
       std::vector< double >      m_minorTicks;     //! Stores the major ticks. Modified by updateTicks.
+      std::string                m_title;          //! The axis title.
 };
 
 } /// namespace Plotting

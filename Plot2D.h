@@ -32,6 +32,11 @@ class Plot2D : public QWidget
       void setEnableGrid( bool enableGrid );
       void setViewportConstraintsToData();
 
+      void setXAxisTitle( const std::string& xAxisTitle );
+      void setYAxisTitle( const std::string& yAxisTitle );
+      const std::string& getXAxisTitle() const;
+      const std::string& getYAxisTitle() const;
+
    public slots:
       void setViewport( const QRectF& viewport );
 
