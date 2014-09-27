@@ -1,6 +1,7 @@
 #include "StftGraph.h"
 
 #include "IPlotFactory.h"
+#include "Plot2D.h"
 #include "Regular2DHistogram.h"
 #include "RootUtilities.h"
 #include "StftAlgorithm.h"
@@ -61,7 +62,9 @@ void StftGraph::create( const std::string& name )
       }
    }
 
-   gPlotFactory().createPlot( name );
+   Plotting::Plot2D& plot = gPlotFactory().createPlot( name );
+   plot.setXAxisTitle( "STFT bin number" );
+   plot.setYAxisTitle( "Frequency (Hz)" );
    gPlotFactory().create2DHist( *m_hist, Plotting::Palette::heatPalette() );
 
 }

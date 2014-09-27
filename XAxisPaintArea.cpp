@@ -1,6 +1,7 @@
 #include "XAxisPaintArea.h"
 
 #include <QPainter>
+#include <QStaticText>
 
 namespace Plotting
 {
@@ -44,7 +45,8 @@ void XAxisPaintArea::drawMajorTick( double tickValue )
    p.setRenderHint( QPainter::Antialiasing, true );
    p.drawLine( tickLine );
 
-   QString label = QString( "%1" ).arg( tickValue );
+   double tickValueKiloReduced = tickValue / m_kiloPower;
+   QString label = QString( "%1" ).arg( tickValueKiloReduced );
 
    QFont font;
    font.setPixelSize( 15 );
@@ -115,6 +117,22 @@ void XAxisPaintArea::drawAxisTitle()
    font.setPixelSize( 15 );
    p.setFont( font );
    p.drawText( textRect, Qt::AlignTop | Qt::AlignHCenter, label );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// drawKiloPower
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void XAxisPaintArea::drawKiloPower()
+{
+   QPainter& p = getPainter();
+
+   QStaticText label = QString( "x 10<sup>%1</sup>" ).arg( static_cast< int >( log10( m_kiloPower )  ) );
+   label.setTextFormat( Qt::RichText );
+
+   QFont font;
+   font.setPixelSize( 15 );
+   p.setFont( font );
+   p.drawStaticText( m_canvas.width() - 50, m_canvas.height() - 20, label );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

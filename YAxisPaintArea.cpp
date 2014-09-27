@@ -1,6 +1,7 @@
 #include "YAxisPaintArea.h"
 
 #include <QPainter>
+#include <QStaticText>
 
 namespace Plotting
 {
@@ -45,7 +46,8 @@ void YAxisPaintArea::drawMajorTick( double tickValue )
    p.drawLine( tickLine );
 
    /// Render the label.
-   QString label = QString( "%1" ).arg( tickValue );
+   double tickValueKiloReduced = tickValue / m_kiloPower;
+   QString label = QString( "%1" ).arg( tickValueKiloReduced );
 
    QFont font;
    font.setPixelSize( 15 );
@@ -122,6 +124,22 @@ void YAxisPaintArea::drawAxisTitle()
    p.drawText( textRect, Qt::AlignHCenter | Qt::AlignVCenter, label );
 
    p.restore();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// drawKiloPower
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void YAxisPaintArea::drawKiloPower()
+{
+   QPainter& p = getPainter();
+
+   QStaticText label = QString( "x 10<sup>%1</sup>" ).arg( static_cast< int >( log10( m_kiloPower )  ) );
+   label.setTextFormat( Qt::RichText );
+
+   QFont font;
+   font.setPixelSize( 15 );
+   p.setFont( font );
+   p.drawStaticText( 5, 5, label );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -70,6 +70,10 @@ class AxisPaintArea : public PaintAreaBase
        * Draws the axis title.
        */
       virtual void drawAxisTitle() = 0;
+      /**
+       * drawKiloPower
+       */
+      virtual void drawKiloPower() = 0;
 
    private:
       /**
@@ -79,6 +83,7 @@ class AxisPaintArea : public PaintAreaBase
 
    protected:
       size_t      m_minDistMajTicks;               //! The min dist in pixels between two major ticks.
+      double      m_kiloPower;                     //! The factor of 10^3 for each axis label.
 
       size_t                     m_tickBase;       //! Stores the tickbase, i.e. ( 2, 5, 10 ).
       std::vector< double >      m_majorTicks;     //! Stores the major ticks. Modified by updateTicks.

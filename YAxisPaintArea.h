@@ -51,6 +51,10 @@ class YAxisPaintArea : public AxisPaintArea
        * Draws the axis title.
        */
       void drawAxisTitle();
+      /**
+       * drawKiloPower
+       */
+      void drawKiloPower();
 };
 
 } /// namespace Plotting

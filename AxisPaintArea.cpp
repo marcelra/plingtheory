@@ -30,6 +30,8 @@ void AxisPaintArea::paintEventImpl( QPaintEvent* paintEvent )
 
    updateTicks();
 
+   m_kiloPower = pow( 10, floor( log10( getMax() ) / 3 ) * 3 );
+
    for ( size_t iTick = 0; iTick < m_majorTicks.size(); ++iTick )
    {
       double tickValue = m_majorTicks[ iTick ];
@@ -47,6 +49,11 @@ void AxisPaintArea::paintEventImpl( QPaintEvent* paintEvent )
    if ( !m_title.empty() )
    {
       drawAxisTitle();
+   }
+
+   if ( fabs( m_kiloPower - 1 ) > 1e-12 )
+   {
+      drawKiloPower();
    }
 }
 

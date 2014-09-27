@@ -29,6 +29,7 @@ class XAxisPaintArea : public AxisPaintArea
       void drawMinorTick( double tickValue );
       int getNumsPixelsAlongAxis();
       void drawAxisTitle();
+      void drawKiloPower();
 };
 
 } /// namespace Plotting
