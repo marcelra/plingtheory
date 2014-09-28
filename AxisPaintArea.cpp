@@ -30,7 +30,7 @@ void AxisPaintArea::paintEventImpl( QPaintEvent* paintEvent )
 
    updateTicks();
 
-   m_kiloPower = pow( 10, floor( log10( getMax() ) / 3 ) * 3 );
+   m_kiloPower = pow( 10, floor( log10( std::max( fabs( getMin() ), fabs( getMax() ) ) ) / 3 ) * 3 );
 
    for ( size_t iTick = 0; iTick < m_majorTicks.size(); ++iTick )
    {
