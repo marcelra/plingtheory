@@ -3,6 +3,7 @@
 #include "IPlotFactory.h"
 #include "LinearInterpolator.h"
 #include "Logger.h"
+#include "Plot2D.h"
 #include "PredefinedRealFunctions.h"
 #include "SampledMovingAverage.h"
 #include "SortCache.h"
@@ -59,7 +60,9 @@ void SrSpecPeakAlgorithm::Monitor::createSpectrumPlot( const std::string& prefix
 {
    Math::Log10Function tr;
 
-   gPlotFactory().createPlot( prefix + "SpectrumPlot" );
+   Plotting::Plot2D& plot = gPlotFactory().createPlot( prefix + "SpectrumPlot" );
+   plot.setXAxisTitle( "Frequency (Hz)" );
+   plot.setYAxisTitle( "10log Amplitude" );
    gPlotFactory().createGraph( originalFrequencies, tr.evalMany( originalMagnitudes ), Qt::blue );
    gPlotFactory().createScatter( specFrequenciesSorted, tr.evalMany( specMagnitudeSorted ), Plotting::MarkerDrawAttr( Qt::black ) );
    gPlotFactory().createScatter( preselectedFrequencies, tr.evalMany( preselectedMagnitudes ), Plotting::MarkerDrawAttr( Qt::red, Plotting::MarkerCircle ) );
