@@ -3,6 +3,8 @@
 #include <QPainter>
 #include <QStaticText>
 
+#include <cmath>
+
 namespace Plotting
 {
 
