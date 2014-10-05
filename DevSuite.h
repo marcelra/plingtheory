@@ -8,6 +8,7 @@ class DevSuite
 
    public:
       static void devIterateSrPeaks();
+      static void devPeakSustainAlgorithm();
 };
 
 #endif // DEVSUITE_H

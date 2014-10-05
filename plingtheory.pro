@@ -147,7 +147,8 @@ SOURCES += main.cpp \
     LinearInterpolator.cpp \
     SrSpecPeakAlgorithm.cpp \
     AnalysisSrpa.cpp \
-    AnalysisSuite.cpp
+    AnalysisSuite.cpp \
+    PeakSustainAlgorithm.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -291,7 +292,10 @@ HEADERS += \
     LinearInterpolator.h \
     SrSpecPeakAlgorithm.h \
     AnalysisSrpa.h \
-    AnalysisSuite.h
+    AnalysisSuite.h \
+    PeakSustainAlgorithm.h \
+    IBasicSpectrumPeak.h \
+    IndexPair.h
 
 OTHER_FILES += \
     Todos.txt

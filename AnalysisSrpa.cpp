@@ -16,7 +16,7 @@ namespace Analysis
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 AnalysisSrpa::AnalysisSrpa( const std::string& name, const AlgorithmBase* parent ) :
    AlgorithmBase( name, parent ),
-   m_fourierSize( 4096 ),
+   m_fourierSize( 1024 ),
    m_zeroPadSize( 0 * m_fourierSize ),
    m_amplitude( 1 ),
    m_samplingInfo( 44100 )

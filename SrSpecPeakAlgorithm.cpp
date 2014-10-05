@@ -22,9 +22,10 @@ namespace Feature
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// constructor
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-SrSpecPeak::SrSpecPeak( double frequency, double height ) :
+SrSpecPeak::SrSpecPeak( double frequency, double height, double frequencyUncertainty ) :
    m_frequency( frequency ),
-   m_height( height )
+   m_height( height ),
+   m_freqUnc( frequencyUncertainty )
 {}
 
 } /// namespace Feature
@@ -121,7 +122,15 @@ SrSpecPeakAlgorithm::SrSpecPeakAlgorithm( double freqProximityCutoff, const std:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 std::vector< Feature::SrSpecPeak > SrSpecPeakAlgorithm::execute( const WaveAnalysis::SrSpectrum& spectrum, Monitor* monitor )
 {
+   /// The ampCorrectionFactor has been tuned by SrSpecPeakAnalysis (@sse SrSpecPeakAnalysis).
    const double ampCorrectionFactor = 3.95239;
+
+   /// The magic factor of 2.5 has been tuned by SrSpecPeakAnalysis (@see SrSpecPeakAnalysis).
+   /// The frequency uncertainty is independent of the frequency, but depends on the window size.
+   /// For the magic factor a zero padding size of 0 samples is assumed. It has not been studied how
+   /// a larger number zero padding samples influences the frequency uncertainty.
+   const double frequencyUncertainty = 2.5 * 1024.0 / spectrum.getConfig().getWindowSize();
+
 
    /// Get the reassigned frequencies and magnitudes (magnitude is identical to non-reassigned spectrum).
    const RealVector& frequencies = spectrum.getFrequencies();
@@ -258,7 +267,7 @@ std::vector< Feature::SrSpecPeak > SrSpecPeakAlgorithm::execute( const WaveAnaly
       /// Format peak vector.
       for ( size_t iPeak = 0; iPeak < peakHeights.size(); ++iPeak )
       {
-         result.push_back( Feature::SrSpecPeak( peakFreqs[ iPeak ], peakHeights[ iPeak ] ) );
+         result.push_back( Feature::SrSpecPeak( peakFreqs[ iPeak ], peakHeights[ iPeak ], frequencyUncertainty ) );
       }
 
       if ( monitor )

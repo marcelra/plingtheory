@@ -2,6 +2,7 @@
 #define SRSPECPEAKALGORITHM_H
 
 #include "AlgorithmBase.h"
+#include "IBasicSpectrumPeak.h"
 #include "RealVector.h"
 
 #include <vector>
@@ -25,13 +26,13 @@ namespace Feature
  * @class SrSpecPeak
  * @brief Simple reassigned Fourier spectrum peak feature that holds the peak frequency and its height.
  */
-class SrSpecPeak
+class SrSpecPeak : public IBasicSpectrumPeak
 {
    public:
       /**
        * Create a SrSpecPeak with frequency @param frequency and height @param height.
        */
-      SrSpecPeak( double frequency, double height );
+      SrSpecPeak( double frequency, double height, double frequencyUncertainty );
 
       /**
        * Get the frequency of the peak.
@@ -43,9 +44,15 @@ class SrSpecPeak
        */
       double getHeight() const;
 
+      /**
+       * Get the frequency uncertainty.
+       */
+      double getFrequencyUncertainty() const;
+
    private:
       double      m_frequency;      //! Frequency of the peak.
       double      m_height;         //! Height of the peak.
+      double      m_freqUnc;        //! Frequency uncertainty.
 };
 
 } /// namespace Feature
@@ -164,6 +171,14 @@ inline double SrSpecPeak::getFrequency() const
 inline double SrSpecPeak::getHeight() const
 {
    return m_height;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// getFrequencyUncertainty
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+inline double SrSpecPeak::getFrequencyUncertainty() const
+{
+   return m_freqUnc;
 }
 
 } /// namespace Feature
