@@ -148,7 +148,8 @@ SOURCES += main.cpp \
     SrSpecPeakAlgorithm.cpp \
     AnalysisSrpa.cpp \
     AnalysisSuite.cpp \
-    PeakSustainAlgorithm.cpp
+    PeakSustainAlgorithm.cpp \
+    WindowLocation.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -295,7 +296,8 @@ HEADERS += \
     AnalysisSuite.h \
     PeakSustainAlgorithm.h \
     IBasicSpectrumPeak.h \
-    IndexPair.h
+    IndexPair.h \
+    WindowLocation.h
 
 OTHER_FILES += \
     Todos.txt

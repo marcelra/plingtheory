@@ -84,6 +84,7 @@ void TestSuite::singleTest()
 #include "FftwAlgorithm.h"
 #include "FocalTones.h"
 #include "GaussPdf.h"
+#include "IThread.h"
 #include "Note.h"
 #include "NoteList.h"
 #include "MultiLayerPerceptron.h"
@@ -109,7 +110,7 @@ void TestSuite::singleTest()
 #include "SawtoothGenerator.h"
 #include "StftData.h"
 #include "SpectralReassignmentTransform.h"
-#include "IThread.h"
+#include "WindowLocation.h"
 
 #include "TLine.h"
 #include "TH2F.h"
@@ -835,8 +836,8 @@ void TestSuite::testStftAlgorithm()
 
    for ( size_t i = 0; i < stftData->getNumSpectra(); ++i )
    {
-      const WaveAnalysis::StftData::WindowLocation& winLoc = stftData->getWindowLocation( i );
-      const WaveAnalysis::StftData::WindowLocation& winLocNoOv = stftData->getWindowLocationNoOverlap( i );
+      const WaveAnalysis::WindowLocation& winLoc = stftData->getWindowLocation( i );
+      const WaveAnalysis::WindowLocation& winLocNoOv = stftData->getWindowLocationNoOverlap( i );
       msg << Msg::Info << "-------------------------------------------------------" << Msg::EndReq;
       msg << Msg::Info << "Spectrum i = " << i << ": Windowlocation [" << winLoc.getFirstSample() << ", " << winLoc.getLastSample() << "]" << Msg::EndReq;
       msg << Msg::Info << "Spectrum i = " << i << ": No overlap     [" << winLocNoOv.getFirstSample() << ", " << winLocNoOv.getLastSample() << "]" << Msg::EndReq;

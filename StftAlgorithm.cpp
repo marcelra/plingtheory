@@ -1,6 +1,7 @@
 #include "StftAlgorithm.h"
 
 #include "Logger.h"
+#include "WindowLocation.h"
 
 namespace WaveAnalysis
 {
@@ -33,7 +34,7 @@ StftData::Ptr StftAlgorithm::execute( const RawPcmData& data )
    for ( size_t iHop = 0; iHop < numHops; ++iHop )
    {
       size_t currentSampleI = currentSampleD;
-      StftData::WindowLocation* windowLocation = new StftData::WindowLocation( currentSampleI, currentSampleI + m_transform.getConfig().getWindowSize() );
+      WindowLocation* windowLocation = new WindowLocation( currentSampleI, currentSampleI + m_transform.getConfig().getWindowSize() );
 
       if ( currentSampleI + m_transform.getConfig().getWindowSize() < data.size() )
       {
@@ -66,7 +67,7 @@ RawPcmData::Ptr StftAlgorithm::reverseExecute( const StftData& stftData )
    for ( size_t iSpec = 0; iSpec < stftData.getNumSpectra(); ++iSpec )
    {
       RealVectorPtr vec = m_transform.transform( stftData.getSpectrum( iSpec ) );
-      const StftData::WindowLocation& winLocNoOverlap = stftData.getWindowLocationNoOverlap( iSpec );
+      const WindowLocation& winLocNoOverlap = stftData.getWindowLocationNoOverlap( iSpec );
       size_t vecIndex = stftData.getWindowLocationNoOverlap( iSpec ).getFirstSample() - stftData.getWindowLocation( iSpec ).getFirstSample();
       /// TODO: memcheck indicates invalid write (probably <= goes wrong for last batch)
       for ( size_t iSample = winLocNoOverlap.getFirstSample(); iSample <= winLocNoOverlap.getLastSample(); ++iSample, ++vecIndex )

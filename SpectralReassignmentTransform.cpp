@@ -2,6 +2,7 @@
 
 #include "Logger.h"
 #include "WindowFuncDef.h"
+#include "WindowLocation.h"
 
 namespace WaveAnalysis
 {
@@ -44,7 +45,7 @@ StftData::Ptr SpectralReassignmentTransform::execute( const RawPcmData& data )
       const FourierSpectrum& ft = stft->getSpectrum( iSpec );
       const FourierSpectrum& ftDerivative = stftDerivative->getSpectrum( iSpec );
       const FourierSpectrum& ftTimeRamped = stftTimeRamped->getSpectrum( iSpec );
-      result->addSpectrum( new SrSpectrum( ft, ftDerivative, ftTimeRamped ), new StftData::WindowLocation( stft->getWindowLocation( iSpec ) ) );
+      result->addSpectrum( new SrSpectrum( ft, ftDerivative, ftTimeRamped ), new WindowLocation( stft->getWindowLocation( iSpec ) ) );
    }
 
    msg << Msg::Verbose << "Done" << Msg::EndReq;
