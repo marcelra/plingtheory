@@ -113,6 +113,7 @@ void DevSuite::devPeakSustainAlgorithm()
    for ( size_t i = 0; i < sustainedPeaks.size(); ++i )
    {
       msg << Msg::Info << "Sustained peak " << i << ":" << Msg::EndReq;
+      msg << Msg::Info << "t0 = " << sustainedPeaks[ i ]->getStartTimeSamples() << ", t1 = " << sustainedPeaks[ i ]->getEndTimeSamples() << Msg::EndReq;
       msg << Msg::Info << "Consists of " << sustainedPeaks[ i ]->getAllPeaks().size() << " peaks." << Msg::EndReq;
       for ( size_t iSubPeak = 0; iSubPeak < sustainedPeaks[ i ]->getAllPeaks().size(); ++iSubPeak )
       {

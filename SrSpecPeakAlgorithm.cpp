@@ -9,6 +9,7 @@
 #include "SortCache.h"
 #include "SrSpectrum.h"
 #include "Utils.h"
+#include "WindowLocation.h"
 
 #include <limits>
 
@@ -22,10 +23,12 @@ namespace Feature
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// constructor
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-SrSpecPeak::SrSpecPeak( double frequency, double height, double frequencyUncertainty ) :
+SrSpecPeak::SrSpecPeak( double frequency, double height, double frequencyUncertainty, size_t startTimeSamples, size_t endTimeSamples ) :
    m_frequency( frequency ),
    m_height( height ),
-   m_freqUnc( frequencyUncertainty )
+   m_freqUnc( frequencyUncertainty ),
+   m_startTimeSamples( startTimeSamples ),
+   m_endTimeSamples( endTimeSamples )
 {}
 
 } /// namespace Feature
@@ -267,7 +270,9 @@ std::vector< Feature::SrSpecPeak > SrSpecPeakAlgorithm::execute( const WaveAnaly
       /// Format peak vector.
       for ( size_t iPeak = 0; iPeak < peakHeights.size(); ++iPeak )
       {
-         result.push_back( Feature::SrSpecPeak( peakFreqs[ iPeak ], peakHeights[ iPeak ], frequencyUncertainty ) );
+         size_t startTimeSamples = spectrum.getWindowLocation()->getFirstSample();
+         size_t endTimeSamples = spectrum.getWindowLocation()->getFirstSample();
+         result.push_back( Feature::SrSpecPeak( peakFreqs[ iPeak ], peakHeights[ iPeak ], frequencyUncertainty, startTimeSamples, endTimeSamples ) );
       }
 
       if ( monitor )

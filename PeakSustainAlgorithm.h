@@ -18,6 +18,9 @@ class SustainedPeak
 
       const std::vector< const IBasicSpectrumPeak* >& getAllPeaks() const;
 
+      size_t getStartTimeSamples() const;
+      size_t getEndTimeSamples() const;
+
    private:
       std::vector< const IBasicSpectrumPeak* >  m_connectedPeaks;
 };

@@ -8,12 +8,13 @@
 #include <limits>
 #include <map>
 
-/// TODO: temp
-#include <iostream>
-
+/// Anonymous namespace.
 namespace
 {
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// connectPeaks
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 std::vector< Feature::SustainedPeak* > connectPeaks( const std::vector< Feature::SustainedPeak* >& sustPeaks, const std::vector< Feature::IBasicSpectrumPeak* >& peaks, std::vector< Feature::IBasicSpectrumPeak* >& unconnectedPeaks )
 {
    assert( unconnectedPeaks.size() == 0 );
@@ -57,7 +58,6 @@ std::vector< Feature::SustainedPeak* > connectPeaks( const std::vector< Feature:
          if ( peakConnections[ iPeak ].begin()->first < 5 )
          {
             size_t sustIndex = peakConnections[ iPeak ].begin()->second;
-            std::cout << "Connect info: " << sustIndex << " ( " << sustPeaks.size() << " ), " << iPeak << " of " << peaks.size() << std::endl;
             sustPeaks[ sustIndex ]->connectPeak( peaks[ iPeak ] );
             currSustPeaks.push_back( sustPeaks[ sustIndex ] );
          }
@@ -94,6 +94,22 @@ SustainedPeak::SustainedPeak( const IBasicSpectrumPeak* firstPeak ) :
 void SustainedPeak::connectPeak( const IBasicSpectrumPeak* nextPeak )
 {
    m_connectedPeaks.push_back( nextPeak );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// getStartTimeSamples
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+size_t SustainedPeak::getStartTimeSamples() const
+{
+   return m_connectedPeaks.front()->getStartTimeSamples();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// getEndTimeSamples
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+size_t SustainedPeak::getEndTimeSamples() const
+{
+   return m_connectedPeaks.back()->getEndTimeSamples();
 }
 
 } //// namespace Feature

@@ -32,7 +32,7 @@ class SrSpecPeak : public IBasicSpectrumPeak
       /**
        * Create a SrSpecPeak with frequency @param frequency and height @param height.
        */
-      SrSpecPeak( double frequency, double height, double frequencyUncertainty );
+      SrSpecPeak( double frequency, double height, double frequencyUncertainty, size_t startTimeSamples, size_t endTimeSamples );
 
       /**
        * @see IBasicSpectrumPeak.
