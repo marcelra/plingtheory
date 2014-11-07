@@ -35,24 +35,33 @@ class SrSpecPeak : public IBasicSpectrumPeak
       SrSpecPeak( double frequency, double height, double frequencyUncertainty );
 
       /**
-       * Get the frequency of the peak.
+       * @see IBasicSpectrumPeak.
        */
       double getFrequency() const;
-
       /**
-       * Get the height of the peak.
+       * @see IBasicSpectrumPeak.
        */
       double getHeight() const;
-
       /**
-       * Get the frequency uncertainty.
+       * @see IBasicSpectrumPeak.
        */
       double getFrequencyUncertainty() const;
 
+      /**
+       * @see IBasicSpectrumPeak.
+       */
+      size_t getStartTimeSamples() const;
+      /**
+       * @see IBasicSpectrumPeak.
+       */
+      size_t getEndTimeSamples() const;
+
    private:
-      double      m_frequency;      //! Frequency of the peak.
-      double      m_height;         //! Height of the peak.
-      double      m_freqUnc;        //! Frequency uncertainty.
+      double      m_frequency;        //! Frequency of the peak.
+      double      m_height;           //! Height of the peak.
+      double      m_freqUnc;          //! Frequency uncertainty.
+      size_t      m_startTimeSamples; //! Start of the STFT window in which the peak was found.
+      size_t      m_endTimeSamples;   //! End of the STFT window in which the peak was found.
 };
 
 } /// namespace Feature
@@ -179,6 +188,22 @@ inline double SrSpecPeak::getHeight() const
 inline double SrSpecPeak::getFrequencyUncertainty() const
 {
    return m_freqUnc;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// getStartTimeSamples
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+inline size_t SrSpecPeak::getStartTimeSamples() const
+{
+   return m_startTimeSamples;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// getEndTimeSamples
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+inline size_t SrSpecPeak::getEndTimeSamples() const
+{
+   return m_endTimeSamples;
 }
 
 } /// namespace Feature
