@@ -21,7 +21,6 @@ StftData::~StftData()
    for ( size_t i = 0; i < getNumSpectra(); ++i )
    {
       delete m_transformedData[i];
-      delete m_windowLocations[i];
    }
 }
 
@@ -30,14 +29,11 @@ StftData::~StftData()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 StftData::StftData( const StftData& other ) :
    m_transformedData( other.m_transformedData.size() ),
-   m_windowLocations( other.m_windowLocations.size() ),
    m_config( other.m_config )
 {
-   assert( m_transformedData.size() == m_windowLocations.size() );
    for ( size_t i = 0; i < m_transformedData.size(); ++i )
    {
       m_transformedData[ i ] = other.m_transformedData[ i ]->clone();
-      m_windowLocations[ i ] = new WindowLocation( *other.m_windowLocations[ i ] );
    }
 }
 
@@ -95,7 +91,9 @@ const SrSpectrum& StftData::getSrSpectrum( size_t spectrumIndex ) const
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const WindowLocation& StftData::getWindowLocation( size_t spectrumIndex ) const
 {
-   return *m_windowLocations[ spectrumIndex ];
+   const WindowLocation* result = getSpectrum( spectrumIndex ).getWindowLocation();
+   assert( result );
+   return *result;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -141,10 +139,9 @@ WindowLocation StftData::getWindowLocationNoOverlap( size_t spectrumIndex ) cons
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// addSpectrum
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void StftData::addSpectrum( FourierSpectrum* spectrum, WindowLocation* windowLocation )
+void StftData::addSpectrum( FourierSpectrum* spectrum )
 {
    m_transformedData.push_back( spectrum );
-   m_windowLocations.push_back( windowLocation );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

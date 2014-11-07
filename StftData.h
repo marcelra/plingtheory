@@ -81,7 +81,7 @@ class StftData
       /**
        * Add another spectrum to the container. The added spectrum should be located after the last STFT data in time.
        */
-      void addSpectrum( FourierSpectrum* spec, WindowLocation* windowLocation );
+      void addSpectrum( FourierSpectrum* spec );
 
       /**
        * Friend class definitions.
@@ -91,7 +91,6 @@ class StftData
 
    private:
       std::vector< FourierSpectrum* >           m_transformedData;   //! The produced data
-      std::vector< WindowLocation* >            m_windowLocations;   //! Location of the window in the original data
       FourierConfig::CSPtr                      m_config;            //! Settings of Fourier algorithm used
 
     /**

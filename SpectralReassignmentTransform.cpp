@@ -45,7 +45,11 @@ StftData::Ptr SpectralReassignmentTransform::execute( const RawPcmData& data )
       const FourierSpectrum& ft = stft->getSpectrum( iSpec );
       const FourierSpectrum& ftDerivative = stftDerivative->getSpectrum( iSpec );
       const FourierSpectrum& ftTimeRamped = stftTimeRamped->getSpectrum( iSpec );
-      result->addSpectrum( new SrSpectrum( ft, ftDerivative, ftTimeRamped ), new WindowLocation( stft->getWindowLocation( iSpec ) ) );
+      SrSpectrum* spec = new SrSpectrum( ft, ftDerivative, ftTimeRamped );
+      const WindowLocation* windowLocation = ft.getWindowLocation();
+      assert( windowLocation );
+      spec->setWindowLocation( new WindowLocation( *windowLocation ) );
+      result->addSpectrum( spec );
    }
 
    msg << Msg::Verbose << "Done" << Msg::EndReq;

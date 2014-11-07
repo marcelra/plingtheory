@@ -1,6 +1,7 @@
 #include "FourierSpectrum.h"
 
 #include "FourierTransform.h"
+#include "WindowLocation.h"
 
 namespace WaveAnalysis
 {
@@ -8,9 +9,10 @@ namespace WaveAnalysis
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// constructor
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-FourierSpectrum::FourierSpectrum( FourierConfig::CSPtr fourierConfig, const Complex* first, const Complex* last ) :
+FourierSpectrum::FourierSpectrum( FourierConfig::CSPtr fourierConfig, const Complex* first, const Complex* last, WindowLocation* windowLocation ) :
    ComplexVector( first, last ),
-   m_config( fourierConfig )
+   m_config( fourierConfig ),
+   m_windowLocation( windowLocation )
 {}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -18,7 +20,8 @@ FourierSpectrum::FourierSpectrum( FourierConfig::CSPtr fourierConfig, const Comp
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 FourierSpectrum::FourierSpectrum( const FourierSpectrum& other ) :
    ComplexVector( &other[0], &other[0] + other.size() ),
-   m_config( other.m_config )
+   m_config( other.m_config ),
+   m_windowLocation( other.m_windowLocation ? new WindowLocation( *other.m_windowLocation ) : 0 )
 {}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -38,6 +41,8 @@ FourierSpectrum& FourierSpectrum::operator=( const FourierSpectrum& other )
       (*this)[i] = other[i];
    }
    m_config = other.m_config;
+
+   m_windowLocation.reset( new WindowLocation( *other.m_windowLocation ) );
 
    return *this;
 }
@@ -137,5 +142,22 @@ double FourierSpectrum::getFrequency( double x ) const
 {
    return m_config->getLowestFrequency() * x;
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// getWindowLocation
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+const WindowLocation* FourierSpectrum::getWindowLocation() const
+{
+   return m_windowLocation.get();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// setWindowLocation
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void FourierSpectrum::setWindowLocation( WindowLocation* windowLocation )
+{
+   m_windowLocation.reset( windowLocation );
+}
+
 
 } /// namespace WaveAnalysis

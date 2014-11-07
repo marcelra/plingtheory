@@ -6,6 +6,14 @@
 #include "SamplingInfo.h"
 #include "Typedefs.h"
 
+#include <memory>
+
+/// Forward declarations.
+namespace WaveAnalysis
+{
+class WindowLocation;
+}
+
 namespace WaveAnalysis
 {
 
@@ -22,8 +30,9 @@ class FourierSpectrum : private ComplexVector
        * @param fourierConfig: the configuration of the Fourier transform that created the spectrum.
        * @param first: starting iterator to the complex data.
        * @param last: end iteration to the complex data.
+       * @param windowLocation: Specify the window location (@see class WindowLocation). Pointer will be owned by this class.
        */
-      FourierSpectrum( FourierConfig::CSPtr fourierConfig, const Complex* first, const Complex* last );
+      FourierSpectrum( FourierConfig::CSPtr fourierConfig, const Complex* first, const Complex* last, WindowLocation* windowLocation = 0 );
       /**
        * Copy-constructor and assignment operator.
        */
@@ -76,6 +85,15 @@ class FourierSpectrum : private ComplexVector
       size_t getNumSamplesTimeDomain() const;
 
       /**
+       * Get the location of the Fourier window. Might yield a zero pointer, depending on the algorithm that created this spectrum.
+       */
+      const WindowLocation* getWindowLocation() const;
+      /**
+       * Set the window location of the Fourier window. WindowLocation instance will be owned by this instance.
+       */
+      void setWindowLocation( WindowLocation* windowLocation );
+
+      /**
        * Get the magnitude of bin @param binIndex
        */
       double getMagnitudeInBin( size_t binIndex ) const;
@@ -96,7 +114,8 @@ class FourierSpectrum : private ComplexVector
       typedef std::unique_ptr< FourierSpectrum > Ptr;
 
    private:
-      FourierConfig::CSPtr    m_config;      //! Pointer to the configuration of the transform
+      FourierConfig::CSPtr                    m_config;         //! Pointer to the configuration of the transform.
+      std::unique_ptr< const WindowLocation > m_windowLocation; //! Pointer to the window location instance.
 };
 
 } /// namespace WaveAnalysis

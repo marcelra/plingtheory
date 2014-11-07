@@ -39,12 +39,16 @@ StftData::Ptr StftAlgorithm::execute( const RawPcmData& data )
       if ( currentSampleI + m_transform.getConfig().getWindowSize() < data.size() )
       {
          const double* timeData = &(data[currentSampleI]);
-         result->addSpectrum( m_transform.transform( timeData ).release(), windowLocation );
+         FourierSpectrum* spec = m_transform.transform( timeData ).release();
+         spec->setWindowLocation( windowLocation );
+         result->addSpectrum( spec );
       }
       else
       {
          const RealVector& extendedVector = extendDataWithZeros( data, currentSampleI );
-         result->addSpectrum( m_transform.transform( &extendedVector[0] ).release(), windowLocation );
+         FourierSpectrum* spec = m_transform.transform( &extendedVector[ 0 ] ).release();
+         spec->setWindowLocation( windowLocation );
+         result->addSpectrum( spec );
       }
       currentSampleD += getHopShift();
    }
