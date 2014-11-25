@@ -29,10 +29,16 @@ std::vector< Feature::SustainedPeak* > connectPeaks( const std::vector< Feature:
       size_t minDistIndex = peaks.size();
 
       double freqSust = sustPeaks[ iSustPeak ]->getAllPeaks().back()->getFrequency();
+      double uncSust = sustPeaks[ iSustPeak ]->getAllPeaks().back()->getFrequencyUncertainty();
 
       for ( size_t iPeak = 0; iPeak < peaks.size(); ++iPeak )
       {
-         double dist = fabs( freqSust - peaks[ iPeak ]->getFrequency() );
+         double dist = freqSust - peaks[ iPeak ]->getFrequency();
+         double dist2 = dist * dist;
+         double uncThisPeak = peaks[ iPeak ]->getFrequencyUncertainty();
+         double totalUnc = uncSust * uncSust + uncThisPeak * uncThisPeak;
+         dist = dist2 / totalUnc;
+
          if ( dist < minDist )
          {
             minDist = dist;
@@ -55,7 +61,7 @@ std::vector< Feature::SustainedPeak* > connectPeaks( const std::vector< Feature:
       else
       {
          /// TODO: Make use of frequency uncertainty to replace hard coded association distance of 5 Hz.
-         if ( peakConnections[ iPeak ].begin()->first < 5 )
+         if ( peakConnections[ iPeak ].begin()->first < 1 )
          {
             size_t sustIndex = peakConnections[ iPeak ].begin()->second;
             sustPeaks[ sustIndex ]->connectPeak( peaks[ iPeak ] );
@@ -85,7 +91,9 @@ namespace Feature
 /// constructor
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 SustainedPeak::SustainedPeak( const IBasicSpectrumPeak* firstPeak ) :
-   m_connectedPeaks( 1, firstPeak )
+   m_connectedPeaks( 1, firstPeak ),
+   m_meanFrequency( -1 ),
+   m_meanHeight( -1 )
 {}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -94,6 +102,30 @@ SustainedPeak::SustainedPeak( const IBasicSpectrumPeak* firstPeak ) :
 void SustainedPeak::connectPeak( const IBasicSpectrumPeak* nextPeak )
 {
    m_connectedPeaks.push_back( nextPeak );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// getFrequency
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+double SustainedPeak::getFrequency() const
+{
+   return m_meanFrequency;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// getHeight
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+double SustainedPeak::getHeight() const
+{
+   return m_meanHeight;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// getFrequencyUncertainty
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+double SustainedPeak::getFrequencyUncertainty() const
+{
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -110,6 +142,22 @@ size_t SustainedPeak::getStartTimeSamples() const
 size_t SustainedPeak::getEndTimeSamples() const
 {
    return m_connectedPeaks.back()->getEndTimeSamples();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// finishBuilding
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void SustainedPeak::finishBuilding()
+{
+   m_meanFrequency = 0;
+   m_meanHeight = 0;
+   for ( size_t iPeak = 0; iPeak < m_connectedPeaks.size(); ++iPeak )
+   {
+      m_meanFrequency += m_connectedPeaks[ iPeak ]->getFrequency();
+      m_meanHeight += m_connectedPeaks[ iPeak ]->getHeight();
+   }
+   m_meanFrequency /= m_connectedPeaks.size();
+   m_meanHeight /= m_connectedPeaks.size();
 }
 
 } //// namespace Feature
@@ -161,6 +209,12 @@ std::vector< Feature::SustainedPeak* > PeakSustainAlgorithm::execute( const std:
          currentSustainedPeaks.push_back( new Feature::SustainedPeak( unconnectedPeaks[ iUnconnectedPeak ] ) );
          result.push_back( currentSustainedPeaks.back() );
       }
+   }
+
+   /// Calculate derived quantities for the sustained peaks.
+   for ( size_t iSustainedPeak = 0; iSustainedPeak < result.size(); ++iSustainedPeak )
+   {
+      result[ iSustainedPeak ]->finishBuilding();
    }
 
    return result;

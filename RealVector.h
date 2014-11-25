@@ -47,6 +47,8 @@ RealVector realVector( double x0, double x1, double x2, double x3, double x4, do
  */
 RealVector calcDerivative( const RealVector& x );
 bool isEqual( const RealVector& x, const RealVector& y );
+double sumElements( const RealVector& x );
+double calcMean( const RealVector& x );
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// inline methods

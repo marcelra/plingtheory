@@ -9,20 +9,47 @@
 namespace Feature
 {
 
-class SustainedPeak
+class SustainedPeak : IBasicSpectrumPeak
 {
    public:
       SustainedPeak( const IBasicSpectrumPeak* firstPeak );
 
       void connectPeak( const IBasicSpectrumPeak* nextPeak );
+      void finishBuilding();
 
       const std::vector< const IBasicSpectrumPeak* >& getAllPeaks() const;
 
+   /**
+    * IBasicSpectrumPeak interface.
+    */
+   public:
+
+      /**
+       * Returns the mean frequency of all the peaks that are connected.
+       */
+      double getFrequency() const;
+      /**
+       * Returns the mean height of all the peaks that are connected.
+       */
+      double getHeight() const;
+      /**
+       * Returns zero for the moment (TODO).
+       */
+      double getFrequencyUncertainty() const;
+
+      /**
+       * Returns the start of the first connected peak in samples.
+       */
       size_t getStartTimeSamples() const;
+      /**
+       * Returns the end of the last connected peak in samples.
+       */
       size_t getEndTimeSamples() const;
 
    private:
       std::vector< const IBasicSpectrumPeak* >  m_connectedPeaks;
+      double                                    m_meanFrequency;
+      double                                    m_meanHeight;
 };
 
 } /// namespace Feature

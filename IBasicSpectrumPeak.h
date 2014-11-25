@@ -6,6 +6,10 @@
 namespace Feature
 {
 
+/**
+ * @class IBasicSpectrumPeak.
+ * @brief Basic interface for peaks detected in a Fourier spectrum.
+ */
 class IBasicSpectrumPeak
 {
    public:
