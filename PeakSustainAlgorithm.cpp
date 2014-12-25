@@ -15,7 +15,18 @@ namespace
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// connectPeaks
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-std::vector< Feature::SustainedPeak* > connectPeaks( const std::vector< Feature::SustainedPeak* >& sustPeaks, const std::vector< Feature::IBasicSpectrumPeak* >& peaks, std::vector< Feature::IBasicSpectrumPeak* >& unconnectedPeaks )
+/// Connect peaks @param peaks from with sustained peaks @param sustPeaks. Returns all peaks that are still sustaining,
+/// i.e. all the peaks from @param sustPeaks that are matched with a peak from @param peaks. All peaks from @param peaks
+/// that are not associated to any of the sustained peaks are collected in output argument @param unconnectedPeaks.
+///
+/// @note: the result should not be cleared, no dynamic memory is allocated in calls to this method.
+/// @note: The elements of @param sustPeaks will change.
+/// @note: deficiency: one peak, A, might be close enough for association to two peaks. The peak closest to A is taken, even when
+/// another peak, B, only matches to this closest peak and not to the other association candidate from peak A. It has to
+/// be investigated how often this occurs and if it occurs, if it might be a better solution to associate the closest peak
+/// of B with B, discard this candidate from peak A, and choose the other peak to associate with peak A.
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+std::vector< Feature::SustainedPeak* > connectPeaks( std::vector< Feature::SustainedPeak* >& sustPeaks, const std::vector< Feature::IBasicSpectrumPeak* >& peaks, std::vector< Feature::IBasicSpectrumPeak* >& unconnectedPeaks )
 {
    assert( unconnectedPeaks.size() == 0 );
 
