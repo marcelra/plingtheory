@@ -15,7 +15,9 @@ void DevSuite::execute()
 
    // devIterateSrPeaks();
 
-   devPeakSustainAlgorithm();
+   // devPeakSustainAlgorithm();
+
+   devFundamentalFreqFinder();
 
    return;
 }
@@ -27,6 +29,8 @@ void DevSuite::execute()
 #include "RebinnedSRGraph.h"
 #include "SpectralReassignmentTransform.h"
 #include "SrSpecPeakAlgorithm.h"
+#include "RandomNumberGenerator.h"
+#include "ApproximateGcdAlgorithm.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -121,6 +125,12 @@ void DevSuite::devPeakSustainAlgorithm()
          const Feature::IBasicSpectrumPeak& subPeak = *sustainedPeaks[ i ]->getAllPeaks()[ iSubPeak ];
          msg << Msg::Info << " > A = " << subPeak.getHeight() << ", f = " << subPeak.getFrequency() << Msg::EndReq;
       }
+
+      size_t startPeak = sustainedPeaks[ i ]->getStartTimeSamples();
+      size_t endPeak = sustainedPeaks[ i ]->getEndTimeSamples();
+      double freq = sustainedPeaks[ i ]->getFrequency();
+
+      gPlotFactory().createGraph( realVector( startPeak, endPeak ), realVector( freq, freq ), Qt::white );
    }
 
    for ( size_t iSustainedPeak = 0; iSustainedPeak < sustainedPeaks.size(); ++iSustainedPeak )
@@ -135,4 +145,46 @@ void DevSuite::devPeakSustainAlgorithm()
          delete allPeaks[ i ][ j ];
       }
    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// devFundamentalFreqFinder
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void DevSuite::devFundamentalFreqFinder()
+{
+   Logger msg( "devFundamentalFreqFinder" );
+   msg << Msg::Info << "Running devFundamentalFreqFinder..." << Msg::EndReq;
+
+   RandomNumberGenerator rng( 1 );
+
+   double pDetect = 0.8;
+   double baseFreq = 100;
+   double freqBlur = 5;
+
+   gPlotFactory().createPlot( "Toy model of detected Fourier frequencies" );
+
+   RealVector frequencies;
+
+   for ( size_t i = 1; i < 40; ++i )
+   {
+      bool isDetect = rng.uniform() < pDetect;
+      if ( !isDetect )
+      {
+         continue;
+      }
+
+      double freq = i * baseFreq + rng.uniform( -freqBlur, freqBlur );
+      frequencies.push_back( freq );
+
+      msg << Msg::Info << "Frequency: " << freq << Msg::EndReq;
+
+      gPlotFactory().createGraph( realVector( freq, freq ), realVector( 0, 1 ) );
+   }
+
+   Math::ApproximateGcdAlgorithm gcdAlg( 50 );
+
+   Math::ApproximateGcdAlgorithm::Result result = gcdAlg.execute( frequencies );
+
+   msg << Msg::Info << "Basefrequency = " << result.gcd << Msg::EndReq;
+
 }

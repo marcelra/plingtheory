@@ -149,7 +149,8 @@ SOURCES += main.cpp \
     AnalysisSrpa.cpp \
     AnalysisSuite.cpp \
     PeakSustainAlgorithm.cpp \
-    WindowLocation.cpp
+    WindowLocation.cpp \
+    ApproximateGcdAlgorithm.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -297,7 +298,8 @@ HEADERS += \
     PeakSustainAlgorithm.h \
     IBasicSpectrumPeak.h \
     IndexPair.h \
-    WindowLocation.h
+    WindowLocation.h \
+    ApproximateGcdAlgorithm.h
 
 OTHER_FILES += \
     Todos.txt
