@@ -150,7 +150,8 @@ SOURCES += main.cpp \
     AnalysisSuite.cpp \
     PeakSustainAlgorithm.cpp \
     WindowLocation.cpp \
-    ApproximateGcdAlgorithm.cpp
+    ApproximateGcdAlgorithm.cpp \
+    TimeStretcher.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -299,7 +300,8 @@ HEADERS += \
     IBasicSpectrumPeak.h \
     IndexPair.h \
     WindowLocation.h \
-    ApproximateGcdAlgorithm.h
+    ApproximateGcdAlgorithm.h \
+    TimeStretcher.h
 
 OTHER_FILES += \
     Todos.txt
@@ -324,7 +326,7 @@ linux: INCLUDEPATH += /usr/local/include/root
 macx: LIBS += -L/usr/local/lib -lfftw3
 linux: LIBS += -L/usr/local/lib -lfftw3
 
-macx: QMAKE_CXXFLAGS += -g -ffast-math -O3
+macx: QMAKE_CXXFLAGS += -g -ffast-math
 linux: QMAKE_CXXFLAGS += -g -ffast-math -mfpmath=387 -O3
 # QMAKE_CXXFLAGS_RELEASE -= -O2
 

@@ -10,6 +10,7 @@ class DevSuite
       static void devIterateSrPeaks();
       static void devPeakSustainAlgorithm();
       static void devFundamentalFreqFinder();
+      static void devTimeStretcher();
 };
 
 #endif // DEVSUITE_H

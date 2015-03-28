@@ -16,7 +16,7 @@ namespace Feature
  * @note The peaks are not owned by this class. This means that if the peaks are destructed, the individual peaks cannot
  * be queried anymore.
  */
-class SustainedPeak : IBasicSpectrumPeak
+class SustainedPeak : public IBasicSpectrumPeak
 {
    public:
       /**

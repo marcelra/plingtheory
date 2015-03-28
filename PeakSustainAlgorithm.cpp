@@ -40,7 +40,7 @@ std::vector< Feature::SustainedPeak* > connectPeaks( std::vector< Feature::Susta
       size_t minDistIndex = peaks.size();
 
       double freqSust = sustPeaks[ iSustPeak ]->getAllPeaks().back()->getFrequency();
-      double uncSust = sustPeaks[ iSustPeak ]->getAllPeaks().back()->getFrequencyUncertainty();
+      double uncSust = 5 * sustPeaks[ iSustPeak ]->getAllPeaks().back()->getFrequencyUncertainty();
 
       for ( size_t iPeak = 0; iPeak < peaks.size(); ++iPeak )
       {
@@ -71,7 +71,6 @@ std::vector< Feature::SustainedPeak* > connectPeaks( std::vector< Feature::Susta
       }
       else
       {
-         /// TODO: Make use of frequency uncertainty to replace hard coded association distance of 5 Hz.
          if ( peakConnections[ iPeak ].begin()->first < 1 )
          {
             size_t sustIndex = peakConnections[ iPeak ].begin()->second;

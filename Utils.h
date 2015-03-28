@@ -70,8 +70,23 @@ class Utils
       template< class T >
       static RealVector convertToRealVec( const std::vector< T >& vec );
 
+      /**
+       * Transpose matrix @param matrix.
+       */
       template< class T >
       static std::vector< std::vector< T > > transpose( const std::vector< std::vector< T > >& matrix );
+
+      /**
+       * Converts a value vector to a pointer vector. The copy constructor of the objects in the vector should be well defined.
+       */
+      template< class T >
+      static std::vector< std::unique_ptr< T > > convertToPointerVector( const std::vector< T >& input );
+
+      /**
+       * Cleanup vector.
+       */
+      template< class T >
+      static void cleanupVector( std::vector< T* > vector );
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -177,6 +192,32 @@ std::vector< std::vector< T > > Utils::transpose( const std::vector< std::vector
    }
 
    return result;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// convertToPointerVector
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+template< class T >
+std::vector< std::unique_ptr< T > > Utils::convertToPointerVector( const std::vector< T >& input )
+{
+   std::vector< std::unique_ptr< T > > result( input.size() );
+   for ( size_t i = 0; i < input.size(); ++i )
+   {
+      result[ i ] = std::unique_ptr< T >( new T( input[ i ] ) );
+   }
+   return result;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// cleanupVector
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+template< class T >
+void Utils::cleanupVector( std::vector< T* > vector )
+{
+   for ( size_t i = 0; i < vector.size(); ++i )
+   {
+      delete vector[ i ];
+   }
 }
 
 #endif // UTILS_H

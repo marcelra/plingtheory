@@ -4,6 +4,9 @@
 #include "PcLinePaint.h"
 #include "PcSetDrawAttr.h"
 
+/// TODO: temp
+#include <QDebug>
+
 #include <cmath>
 
 namespace Plotting
@@ -39,6 +42,11 @@ void RegLargeDataCurve::generatePlotCommands( PaintArea *paintArea ) const
       lastVisiblePoint = ( m_data.getSize() - ( getMaxX() - viewport.right() ) / xSpacing ) + 1;
    }
    lastVisiblePoint = lastVisiblePoint > static_cast< long >( m_data.getSize() ) ? m_data.getSize() : lastVisiblePoint;
+
+   if ( firstVisiblePoint >= lastVisiblePoint )
+   {
+      return;
+   }
 
    size_t nPointsDraw = lastVisiblePoint - firstVisiblePoint;
 
@@ -94,6 +102,7 @@ const YVsXData& RegLargeDataCurve::getData( int compressionFactor ) const
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void RegLargeDataCurve::createLowResDataSet( int compressionFactor ) const
 {
+   qDebug() << "compressionFactor = " << compressionFactor;
    std::vector< double > xData;
    std::vector< double > yData;
 

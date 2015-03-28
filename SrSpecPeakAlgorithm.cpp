@@ -205,7 +205,22 @@ std::vector< Feature::SrSpecPeak > SrSpecPeakAlgorithm::execute( const WaveAnaly
    /// Create baseline from all non-peak candidate points.
    Math::SampledMovingAverage movAvgCalc( Math::SampledMovingAverage::createGaussianFilter( 21, 10 ) );
    const RealVector& baselinePoints = movAvgCalc.calculate( inverseSelectionMag );
-   Math::LinearInterpolator baseline( inverseSelectionFreq, baselinePoints );
+
+   RealVector baselineX = inverseSelectionFreq;
+   RealVector baselineY = baselinePoints;
+
+   if ( baselineX.size() < 2 )
+   {
+      getLogger() << Msg::Warning << "Baseline determination failed!" << Msg::EndReq;
+      baselineX.clear();
+      baselineY.clear();
+      baselineX.push_back( freqSorted.front() );
+      baselineX.push_back( freqSorted.back() );
+      baselineY.push_back( 0 );
+      baselineY.push_back( 0 );
+   }
+
+   Math::LinearInterpolator baseline( baselineX, baselineY );
 
    /// Record the points above baseline.
    RealVector magAboveBaseline;
@@ -271,7 +286,7 @@ std::vector< Feature::SrSpecPeak > SrSpecPeakAlgorithm::execute( const WaveAnaly
       for ( size_t iPeak = 0; iPeak < peakHeights.size(); ++iPeak )
       {
          size_t startTimeSamples = spectrum.getWindowLocation()->getFirstSample();
-         size_t endTimeSamples = spectrum.getWindowLocation()->getFirstSample();
+         size_t endTimeSamples = spectrum.getWindowLocation()->getLastSample();
          result.push_back( Feature::SrSpecPeak( peakFreqs[ iPeak ], peakHeights[ iPeak ], frequencyUncertainty, startTimeSamples, endTimeSamples ) );
       }
 

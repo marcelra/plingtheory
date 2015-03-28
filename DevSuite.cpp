@@ -17,7 +17,8 @@ void DevSuite::execute()
 
    // devPeakSustainAlgorithm();
 
-   devFundamentalFreqFinder();
+   // devFundamentalFreqFinder();
+   devTimeStretcher();
 
    return;
 }
@@ -25,13 +26,16 @@ void DevSuite::execute()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Include section
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#include "MultiChannelRawPcmData.h"
 #include "PeakSustainAlgorithm.h"
 #include "RebinnedSRGraph.h"
 #include "SpectralReassignmentTransform.h"
 #include "SrSpecPeakAlgorithm.h"
 #include "RandomNumberGenerator.h"
 #include "ApproximateGcdAlgorithm.h"
-
+#include "TimeStretcher.h"
+#include "WaveFile.h"
+#include "SineGenerator.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// devIterateSrPeaks
@@ -133,6 +137,7 @@ void DevSuite::devPeakSustainAlgorithm()
       gPlotFactory().createGraph( realVector( startPeak, endPeak ), realVector( freq, freq ), Qt::white );
    }
 
+
    for ( size_t iSustainedPeak = 0; iSustainedPeak < sustainedPeaks.size(); ++iSustainedPeak )
    {
       delete sustainedPeaks[ iSustainedPeak ];
@@ -187,4 +192,38 @@ void DevSuite::devFundamentalFreqFinder()
 
    msg << Msg::Info << "Basefrequency = " << result.gcd << Msg::EndReq;
 
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// devTimeStretcher
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void DevSuite::devTimeStretcher()
+{
+   Logger msg( "devTimeStretcher" );
+   msg << Msg::Info << "Running devTimeStretcher..." << Msg::EndReq;
+
+   // std::unique_ptr< std::vector< Music::Note > > trueMelody( new std::vector< Music::Note >() );
+   // RawPcmData::Ptr data = TestDataSupply::generateRandomMelody( trueMelody.get() );
+   // RawPcmData::Ptr data = TestDataSupply::getCurrentTestSample();
+
+   SamplingInfo samplingInfo;
+   Synthesizer::SineGenerator sineGen( samplingInfo );
+   sineGen.setFrequency( 440 );
+   RawPcmData::Ptr data = sineGen.generate( 1024 * 128 + 46 );
+
+   Music::TimeStretcher timeStretchAlg( 2 );
+   RawPcmData stretchedMusic = timeStretchAlg.execute( *data );
+
+   gPlotFactory().createPlot( "RegeneratedWaveFile" );
+   gPlotFactory().drawPcmData( *data );
+   gPlotFactory().drawPcmData( stretchedMusic, Qt::red );
+
+   data->normaliseToPeak();
+   stretchedMusic.normaliseToPeak();
+
+   MultiChannelRawPcmData waveData( new RawPcmData( *data ) );
+   MultiChannelRawPcmData waveDataStretched( new RawPcmData( stretchedMusic ) );
+
+   // WaveFile::write( "OriginalBeforeStretch.wav", waveData );
+   // WaveFile::write( "StretchedMusic.wav", waveDataStretched );
 }
