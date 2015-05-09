@@ -18,7 +18,9 @@ void DevSuite::execute()
    // devPeakSustainAlgorithm();
 
    // devFundamentalFreqFinder();
-   devTimeStretcher();
+   // devTimeStretcher();
+
+   devImprovedPeakAlgorithm();
 
    return;
 }
@@ -36,6 +38,10 @@ void DevSuite::execute()
 #include "TimeStretcher.h"
 #include "WaveFile.h"
 #include "SineGenerator.h"
+#include "PredefinedRealFunctions.h"
+#include "KernelPdf.h"
+#include "GaussPdf.h"
+#include "LinearInterpolator.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// devIterateSrPeaks
@@ -191,6 +197,105 @@ void DevSuite::devFundamentalFreqFinder()
    Math::ApproximateGcdAlgorithm::Result result = gcdAlg.execute( frequencies );
 
    msg << Msg::Info << "Basefrequency = " << result.gcd << Msg::EndReq;
+
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// devImprovedPeakAlgorithm
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void DevSuite::devImprovedPeakAlgorithm()
+{
+   Logger msg( "devImprovedPeakAlgorithm" );
+   msg << Msg::Info << "Running devImprovedPeakAlgorithm..." << Msg::EndReq;
+
+   SamplingInfo samplingInfo;
+   Synthesizer::SineGenerator sineGen( samplingInfo );
+   Math::Log10Function log10Fct;
+
+   RealVector freqsToGenerate = Utils::createRangeReal( 1000, 1100, 100 );
+   size_t fourierSize = 1024;
+
+   WaveAnalysis::SpectralReassignmentTransform srAlg( samplingInfo, fourierSize, 0, 1 );
+   gPlotFactory().createPlot( "plot" );
+
+   const RealVector& relFreqSampling = Utils::createRangeReal( 0.75, 1.25, 100 );
+
+   std::vector< RealVector > relFreqAmps;
+
+   Plotting::Palette pal = Plotting::Palette::heatPalette();
+
+   for ( size_t iFreq = 0; iFreq < freqsToGenerate.size(); ++iFreq )
+   {
+      double freq = freqsToGenerate[ iFreq ];
+      sineGen.setFrequency( freq );
+      RawPcmData::Ptr data = sineGen.generate( 1024 * 4 + 46 );
+
+      const WaveAnalysis::StftData::Ptr stftData = srAlg.execute( *data );
+      const WaveAnalysis::SrSpectrum& spec = stftData->getSrSpectrum( 0 );
+
+      RealVector xData = ( spec.getFrequencies() /*- spec.getFrequencyCorrections()*/ ) / freq;
+      RealVector yData = spec.getMagnitude();
+
+      Math::LinearInterpolator interp( xData, yData );
+      relFreqAmps.push_back( interp.evalMany( relFreqSampling ) );
+      gPlotFactory().createGraph( relFreqSampling, log10Fct.evalMany( relFreqAmps.back() ), pal.getColour( 1.0 * iFreq / freqsToGenerate.size() ) );
+   }
+
+
+
+//   gPlotFactory().createPlot( "test" );
+//   gPlotFactory().drawPcmData( *data );
+//
+//   size_t fourierSize = 1024;
+//
+//   WaveAnalysis::SpectralReassignmentTransform srAlg( samplingInfo, fourierSize, 0, 1 );
+//   const WaveAnalysis::StftData::Ptr stftData = srAlg.execute( *data );
+//
+//   Math::Log10Function log10Fct;
+//
+//   for ( size_t iSpec = 0; iSpec < 1 /*stftData->getNumSpectra()*/; ++iSpec )
+//   {
+//      const WaveAnalysis::SrSpectrum& srSpec = stftData->getSrSpectrum( iSpec );
+//      std::ostringstream msg;
+//      msg << "Spectrum " << iSpec;
+//
+//      Math::KernelPdf kernPdf( Math::IPdf::CPtr( new Math::GaussPdf( 0, 10 ) ), srSpec.getFrequencies(), srSpec.getMagnitude() );
+//      Math::IRealFunction::Ptr kernPdfFunc = kernPdf.getDensityAsFunc();
+//
+//      RealVector modKernWeights = srSpec.getTimeCorrections();
+//      for ( size_t i = 0; i < modKernWeights.size(); ++i )
+//      {
+//         modKernWeights[ i ] = fabs( modKernWeights[ i ] );
+//      }
+//      modKernWeights = 1 - modKernWeights/fourierSize;
+//
+//      Math::KernelPdf modKernPdf( Math::IPdf::CPtr( new Math::GaussPdf( 0, 10 ) ), srSpec.getFrequencies(), pwm( modKernWeights, srSpec.getMagnitude() ) );
+//      Math::IRealFunction::Ptr modKernPdfFunc = modKernPdf.getDensityAsFunc();
+//
+//      const RealVector& originalFreqs = srSpec.getFrequencies() - srSpec.getFrequencyCorrections();
+//      const RealVector& freqs = Utils::createRangeReal( originalFreqs.front(), originalFreqs.back(), 4000 );
+//
+//      double integral = sumElements( srSpec.getMagnitude() );
+//      double integralPdf = sumElements( kernPdfFunc->evalMany( originalFreqs ) );
+//
+//      gPlotFactory().createPlot( msg.str() );
+//      gPlotFactory().createGraph( freqs, log10Fct.evalMany( kernPdfFunc->evalMany( freqs ) / integralPdf ) );
+//      gPlotFactory().createGraph( freqs, log10Fct.evalMany( modKernPdfFunc->evalMany( freqs ) / integralPdf ), Qt::red );
+//      gPlotFactory().createGraph( originalFreqs, log10Fct.evalMany( srSpec.getMagnitude() / integral ), Qt::blue );
+//      gPlotFactory().createScatter( srSpec.getFrequencies(), log10Fct.evalMany( srSpec.getMagnitude() / integral ), Plotting::MarkerDrawAttr( Qt::red ) );
+//      gPlotFactory().createScatter( srSpec.getFrequencies(), srSpec.getTimeCorrections() );
+//
+//      gPlotFactory().createPlot( msg.str() + " (reassigned)" );
+//      gPlotFactory().createScatter( srSpec.getFrequencies(), log10Fct.evalMany( srSpec.getMagnitude() ) );
+//      gPlotFactory().createGraph( srSpec.getFrequencies(), log10Fct.evalMany( srSpec.getMagnitude() ), Qt::red );
+//      gPlotFactory().createGraph( originalFreqs, log10Fct.evalMany( srSpec.getMagnitude() ), Qt::blue );
+//
+//      gPlotFactory().createPlot( msg.str() + " (original)" );
+//      // gPlotFactory().createScatter( srSpec.getFrequencies(), log10Fct.evalMany( srSpec.getMagnitude() ) );
+//      gPlotFactory().createGraph( originalFreqs, log10Fct.evalMany( srSpec.getMagnitude() ), Qt::blue );
+//   }
 
 }
 

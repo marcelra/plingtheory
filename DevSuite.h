@@ -11,6 +11,7 @@ class DevSuite
       static void devPeakSustainAlgorithm();
       static void devFundamentalFreqFinder();
       static void devTimeStretcher();
+      static void devImprovedPeakAlgorithm();
 };
 
 #endif // DEVSUITE_H

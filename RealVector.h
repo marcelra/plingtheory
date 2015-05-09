@@ -24,6 +24,11 @@ double operator*( const RealVector& x, const RealVector& y );
 
 RealVector operator*=( const RealVector& x, double lambda );
 
+RealVector operator+( const RealVector& x, double a );
+RealVector operator+( double a, const RealVector& x );
+RealVector operator-( const RealVector& x, double a );
+RealVector operator-( double a, const RealVector& x );
+
 /**
  * Modify vector.
  */
@@ -49,6 +54,8 @@ RealVector calcDerivative( const RealVector& x );
 bool isEqual( const RealVector& x, const RealVector& y );
 double sumElements( const RealVector& x );
 double calcMean( const RealVector& x );
+/** Point wise multiplication */
+RealVector pwm( const RealVector& x, const RealVector& y );
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// inline methods
@@ -111,12 +118,52 @@ inline double operator*( const RealVector& x, const RealVector& y )
    return result;
 }
 
+inline RealVector operator+( const RealVector& x, double a )
+{
+   RealVector result( x );
+   for ( size_t i = 0; i < x.size(); ++i )
+   {
+      result[ i ] += a;
+   }
+   return result;
+}
+
+inline RealVector operator+( double a, const RealVector& x )
+{
+   return x + a;
+}
+
+inline RealVector operator-( const RealVector& x, double a )
+{
+   RealVector result( x );
+   for ( size_t i = 0; i < x.size(); ++i )
+   {
+      result[ i ] -= a;
+   }
+   return result;
+}
+
+inline RealVector operator-( double a, const RealVector& x )
+{
+   return x - a;
+}
+
 inline double sum( const RealVector& x )
 {
    double result = 0;
    for ( size_t i = 0; i < x.size(); ++i )
    {
       result += x[ i ];
+   }
+   return result;
+}
+
+inline RealVector pwm( const RealVector& x, const RealVector& y )
+{
+   RealVector result( x );
+   for ( size_t i = 0; i < x.size(); ++i )
+   {
+      result[ i ] *= y[ i ];
    }
    return result;
 }

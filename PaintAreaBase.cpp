@@ -36,7 +36,7 @@ QPointF PaintAreaBase::transformToCanvasCoordinates( const QPointF& point ) cons
    QPointF result;
 
    double scaleX = m_canvas.width() / m_viewport.width();
-   double scaleY = - m_canvas.height() / m_viewport.height();
+   double scaleY = -m_canvas.height() / m_viewport.height();
 
    double shiftX = -m_viewport.left();
 

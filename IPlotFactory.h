@@ -71,9 +71,13 @@ class IPlotFactory : SingletonBase
                                    const Plotting::Palette& palette,
                                    const Plotting::MarkerDrawAttr& markerDrawAttr = Plotting::MarkerDrawAttr() )
       {
-         /// Use params in order to suppress compiler warnings.
-         assert( &xData && &yData && &zData && &palette && &markerDrawAttr );
          assert( false );
+         /// Use params in order to suppress compiler warnings.
+         assert( sizeof( xData ) );
+         assert( sizeof( yData ) );
+         assert( sizeof( zData ) );
+         assert( sizeof( palette ) );
+         assert( sizeof( markerDrawAttr ) );
       }
 
       virtual void createStftGraph( const WaveAnalysis::StftData& stftData ) = 0;
