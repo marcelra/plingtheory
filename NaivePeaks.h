@@ -1,7 +1,8 @@
 #ifndef FEATUREALGORITHM_NAIVEPEAKS_H
 #define FEATUREALGORITHM_NAIVEPEAKS_H
 
-#include <vector>
+#include "RealVector.h"
+
 #include <cstddef>
 
 /// Forward declares
@@ -35,6 +36,12 @@ class NaivePeaks
          MaxAndMin
       };
 
+      class Monitor
+      {
+         public:
+            RealVector signChangeIndices;
+      };
+
    public:
       /**
        * Constructor
@@ -42,48 +49,25 @@ class NaivePeaks
        * @param mode: @see Mode
        * @param maxNumPeaks: The maximum number of peaks, selected by prominence
        */
-      NaivePeaks( const std::vector<double>& realArray, Mode mode, size_t maxNumPeaks = 0 );
-      /**
-       * Destructor
-       */
-      ~NaivePeaks();
+      NaivePeaks( Mode mode, size_t maxNumPeaks = 0 );
 
-      /**
-       * Get the number of peaks detected
-       */
-      size_t getNumPeaks() const;
-      /**
-       * Get the index-th peak
-       */
-      const Feature::Peak& getPeak( size_t index ) const;
-      /**
-       * Get all peaks
-       */
-      const std::vector< Feature::Peak* >& getAllPeaks() const;
       /**
        * Worker method
        */
-      void execute();
+      std::vector< Feature::Peak* > execute( const RealVector& realArray, Monitor* monitor = 0 );
 
    private:
       /**
        * Calculate the half width of the peak (TODO: not yet implemented)
        */
-      double calculateHalfWidth( size_t position, const std::vector< size_t >& peakPositions, size_t posVecIndex ) const;
+      double calculateHalfWidth( const RealVector& realArray, size_t position, const std::vector< size_t >& peakPositions, size_t posVecIndex ) const;
 
    /**
     * Reference to the constructor parameters
     */
    private:
-      const std::vector<double>&  m_realArray;
       Mode                        m_mode;
       size_t                      m_maxNumPeaks;
-
-   /**
-    * Results
-    */
-   private:
-      std::vector< Feature::Peak* > m_peaks;
 
    /**
     * Helper data
@@ -91,29 +75,6 @@ class NaivePeaks
    private:
       std::vector< double > m_pedestalCentre;
 };
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// Inline methods (getNumPeaks)
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-inline size_t NaivePeaks::getNumPeaks() const
-{
-   return m_peaks.size();
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// Inline methods (getPeak)
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-inline const Feature::Peak& NaivePeaks::getPeak( size_t index ) const
-{
-   return *m_peaks[ index ];
-}
-
-inline const std::vector< Feature::Peak* >& NaivePeaks::getAllPeaks() const
-{
-   return m_peaks;
-}
-
 
 } /// namespace FeatureAlgorithm
 

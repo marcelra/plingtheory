@@ -12,6 +12,7 @@ class DevSuite
       static void devFundamentalFreqFinder();
       static void devTimeStretcher();
       static void devImprovedPeakAlgorithm();
+      static void devSidelobeRejection();
 };
 
 #endif // DEVSUITE_H

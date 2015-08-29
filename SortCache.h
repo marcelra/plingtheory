@@ -43,7 +43,7 @@ class SortCache
       RealVector applyReverseTo( const RealVector& vector ) const;
 
    private:
-      std::vector< size_t >   m_translation;
+      std::vector< size_t >   m_sortedIndices;
 };
 
 
@@ -53,12 +53,12 @@ class SortCache
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 inline size_t SortCache::getSortedIndex( size_t index ) const
 {
-   return m_translation[ index ];
+   return m_sortedIndices[ index ];
 }
 
 inline size_t SortCache::getReverseSortedIndex( size_t index ) const
 {
-   return *(m_translation.rbegin() + index);
+   return *(m_sortedIndices.rbegin() + index);
 }
 
 #endif // SORTCACHE_H

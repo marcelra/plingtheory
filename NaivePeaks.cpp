@@ -12,46 +12,32 @@ namespace FeatureAlgorithm
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Constructor
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-NaivePeaks::NaivePeaks( const std::vector<double>& realArray, Mode mode, size_t maxNumPeaks ) :
-   m_realArray( realArray ),
+NaivePeaks::NaivePeaks( Mode mode, size_t maxNumPeaks ) :
    m_mode( mode ),
    m_maxNumPeaks( maxNumPeaks )
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// Destructor
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-NaivePeaks::~NaivePeaks()
-{
-   for ( size_t i = 0; i < m_peaks.size(); ++i )
-   {
-      delete m_peaks[i];
-   }
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// execute
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void NaivePeaks::execute()
+std::vector< Feature::Peak* > NaivePeaks::execute( const RealVector& realArray, Monitor* monitor )
 {
+   std::vector< Feature::Peak* > peaks;
+
    double derivLeft = 0;
-   double derivRight = m_realArray[1] - m_realArray[0];
+   double derivRight = realArray[1] - realArray[0];
 
-   std::vector< bool > derivSignChange( m_realArray.size() );
-   derivSignChange[0] = false;
-   derivSignChange[ m_realArray.size() - 1 ] = false;
-
-   std::vector< Mode > typeOfExtremum( m_realArray.size() );
+   std::vector< Mode > typeOfExtremum( realArray.size() );
    std::vector< size_t > peakPos;
 
    int firstPeakMaxOrMin = 0;
 
    /// Get derivative sign changes and determine type of first peak (max or min)
-   for ( size_t iSample = 1; iSample < m_realArray.size() - 1; ++iSample )
+   for ( size_t iSample = 1; iSample < realArray.size() - 1; ++iSample )
    {
       derivLeft = derivRight;
-      derivRight = m_realArray[ iSample + 1 ] - m_realArray[ iSample ];
+      derivRight = realArray[ iSample + 1 ] - realArray[ iSample ];
 
       if ( derivLeft * derivRight < 0 )
       {
@@ -67,7 +53,7 @@ void NaivePeaks::execute()
    size_t numPeaks = peakPos.size();
    if ( numPeaks == 0 )
    {
-      return;
+      return peaks;
    }
 
    /// Get the array indices of the pedestal points
@@ -75,7 +61,7 @@ void NaivePeaks::execute()
    std::vector< size_t > rightPedestalIndex( numPeaks );
 
    leftPedestalIndex[ 0 ] = 0;
-   rightPedestalIndex[ numPeaks - 1 ] = m_realArray.size() - 1;
+   rightPedestalIndex[ numPeaks - 1 ] = realArray.size() - 1;
    for ( size_t i = 0; i < peakPos.size(); ++i )
    {
       if ( i != 0 )
@@ -97,12 +83,12 @@ void NaivePeaks::execute()
    {
       size_t lpi = leftPedestalIndex[i];
       size_t rpi = rightPedestalIndex[i];
-      double pedLeft = m_realArray[lpi];
-      double pedRight = m_realArray[rpi];
+      double pedLeft = realArray[lpi];
+      double pedRight = realArray[rpi];
       double pedSlope = ( pedRight - pedLeft ) / ( rpi - lpi );
       double pedCentre = pedSlope * ( peakPos[i] - lpi ) + pedLeft;
       centrePeakPedestals[i] = pedCentre;
-      peakProminence[i] = fabs( m_realArray[ peakPos[i] ] - pedCentre );
+      peakProminence[i] = fabs( realArray[ peakPos[i] ] - pedCentre );
       MMapDoubleInt::iterator it = prominenceSorted.find( peakProminence[i] );
       if ( it == prominenceSorted.end() )
       {
@@ -147,7 +133,7 @@ void NaivePeaks::execute()
 
 
       size_t arrayIndex = peakPos[ peakIndex ];
-      double height = m_realArray[ arrayIndex ];
+      double height = realArray[ arrayIndex ];
       double width = 0;
       double pedestal = centrePeakPedestals[ peakIndex ];
       double position = arrayIndex;
@@ -158,28 +144,30 @@ void NaivePeaks::execute()
       peak->setProminence( prominence );
       peak->setWidth( width );
       peak->setPedestal( pedestal );
-      m_peaks.push_back( peak );
+      peaks.push_back( peak );
    }
+
+   return peaks;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// calculateHalfWidth
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-double NaivePeaks::calculateHalfWidth( size_t position, const std::vector< size_t >& peakPositions, size_t posVecIndex ) const
+double NaivePeaks::calculateHalfWidth( const RealVector& realArray, size_t position, const std::vector< size_t >& peakPositions, size_t posVecIndex ) const
 {
-   double peakVal = m_realArray[ position ];
+   double peakVal = realArray[ position ];
 
    size_t leftNeighbourPeakIndex = posVecIndex > 0 ? peakPositions[posVecIndex - 1] : 0;
    size_t rightNeighbourPeakIndex = posVecIndex < peakPositions.size() - 1 ? peakPositions[ posVecIndex + 1 ] : peakPositions.size();
 
-   double pedestalLeft = m_realArray[ leftNeighbourPeakIndex ];
-   double pedestalRight = m_realArray[ rightNeighbourPeakIndex ];
+   double pedestalLeft = realArray[ leftNeighbourPeakIndex ];
+   double pedestalRight = realArray[ rightNeighbourPeakIndex ];
 
    /// Search half-width to left
    size_t iHwLeft = position - 1;
    while ( iHwLeft >= leftNeighbourPeakIndex )
    {
-      double ratio = ( m_realArray[iHwLeft] - pedestalLeft ) / ( peakVal - pedestalLeft );
+      double ratio = ( realArray[iHwLeft] - pedestalLeft ) / ( peakVal - pedestalLeft );
       if ( fabs( ratio ) < 0.5 )
       {
          break;
@@ -191,7 +179,7 @@ double NaivePeaks::calculateHalfWidth( size_t position, const std::vector< size_
    size_t iHwRight = position + 1;
    while ( iHwRight < rightNeighbourPeakIndex )
    {
-      double ratio = ( m_realArray[iHwRight] - pedestalRight ) / ( peakVal - pedestalRight );
+      double ratio = ( realArray[iHwRight] - pedestalRight ) / ( peakVal - pedestalRight );
       if ( fabs( ratio ) < 0.5 )
       {
          break;

@@ -2,25 +2,15 @@
 
 #include <map>
 #include <cassert>
+#include "Utils.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Constructor
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-SortCache::SortCache( const RealVector& values )
+SortCache::SortCache( const RealVector& values ) :
+   m_sortedIndices( Utils::createRange( 0, values.size() ) )
 {
-   std::map< double, int > sortedValueVsIndex;
-   for ( size_t i = 0; i < values.size(); ++i )
-   {
-      sortedValueVsIndex.insert( std::pair< double, int >( values[i], i ) );
-   }
-
-   m_translation.resize( sortedValueVsIndex.size() );
-
-   size_t sortedIndex = 0;
-   for ( std::map< double, int >::const_iterator it = sortedValueVsIndex.begin(); it != sortedValueVsIndex.end(); ++it, ++sortedIndex )
-   {
-      m_translation[ sortedIndex ] = it->second;
-   }
+   std::sort( m_sortedIndices.begin(), m_sortedIndices.end(), [ &values ]( size_t i1, size_t i2 ){ return values[ i1 ] < values[ i2 ]; } );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -34,7 +24,7 @@ SortCache::~SortCache()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 RealVector SortCache::applyTo( const RealVector& vector ) const
 {
-   assert( vector.size() == m_translation.size() );
+   assert( vector.size() == m_sortedIndices.size() );
    RealVector result( vector.size() );
    for ( size_t i = 0; i < result.size(); ++i )
    {
@@ -48,7 +38,7 @@ RealVector SortCache::applyTo( const RealVector& vector ) const
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 RealVector SortCache::applyReverseTo( const RealVector& vector ) const
 {
-   assert( vector.size() == m_translation.size() );
+   assert( vector.size() == m_sortedIndices.size() );
    RealVector result( vector.size() );
    for ( size_t i = 0; i < result.size(); ++i )
    {
@@ -62,6 +52,6 @@ RealVector SortCache::applyReverseTo( const RealVector& vector ) const
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 size_t SortCache::getSize() const
 {
-   return m_translation.size();
+   return m_sortedIndices.size();
 }
 

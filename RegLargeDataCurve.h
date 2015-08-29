@@ -5,6 +5,8 @@
 #include "IYVsXItem.h"
 #include "LineDrawAttr.h"
 
+#include <map>
+
 namespace Plotting
 {
 

@@ -22,7 +22,8 @@ RealVector operator*( double lambda, const RealVector& x );
 RealVector operator/( const RealVector& x, double lambda );
 double operator*( const RealVector& x, const RealVector& y );
 
-RealVector operator*=( const RealVector& x, double lambda );
+RealVector& operator*=( RealVector& x, double lambda );
+RealVector& operator/=( RealVector& x, double lambda );
 
 RealVector operator+( const RealVector& x, double a );
 RealVector operator+( double a, const RealVector& x );
@@ -54,6 +55,7 @@ RealVector calcDerivative( const RealVector& x );
 bool isEqual( const RealVector& x, const RealVector& y );
 double sumElements( const RealVector& x );
 double calcMean( const RealVector& x );
+
 /** Point wise multiplication */
 RealVector pwm( const RealVector& x, const RealVector& y );
 
@@ -166,6 +168,24 @@ inline RealVector pwm( const RealVector& x, const RealVector& y )
       result[ i ] *= y[ i ];
    }
    return result;
+}
+
+inline RealVector& operator*=( RealVector& x, double lambda )
+{
+   for ( size_t i = 0; i < x.size(); ++i )
+   {
+      x[ i ] *= lambda;
+   }
+   return x;
+}
+
+inline RealVector& operator/=( RealVector& x, double lambda )
+{
+   for ( size_t i = 0; i < x.size(); ++i )
+   {
+      x[ i ] /= lambda;
+   }
+   return x;
 }
 
 #endif // REALVECTOR_H

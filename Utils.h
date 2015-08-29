@@ -87,7 +87,14 @@ class Utils
        */
       template< class T >
       static void cleanupVector( std::vector< T* > vector );
+
+      /**
+       * Make a contiguous selection of a vector.
+       */
+      template< class T >
+      static std::vector< T > selectContiguous( const std::vector< T >& vector, size_t firstIndex, size_t numElements );
 };
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// getMinValue
@@ -218,6 +225,21 @@ void Utils::cleanupVector( std::vector< T* > vector )
    {
       delete vector[ i ];
    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// selectContiguous
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+template< class T >
+std::vector< T > Utils::selectContiguous( const std::vector< T >& vector, size_t firstIndex, size_t numElements )
+{
+   std::vector< T > result( numElements );
+
+   for ( size_t i = 0; i < numElements; ++i )
+   {
+      result[ i ] = vector[ i + firstIndex ];
+   }
+   return result;
 }
 
 #endif // UTILS_H

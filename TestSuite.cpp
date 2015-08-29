@@ -553,16 +553,22 @@ void TestSuite::testPeakDetection()
    TGraph* graph = RootUtilities::createGraph( array );
    graph->Draw( "AL" );
 
-   FeatureAlgorithm::NaivePeaks peakAlg( array, FeatureAlgorithm::NaivePeaks::Max );
+   FeatureAlgorithm::NaivePeaks peakAlg( FeatureAlgorithm::NaivePeaks::Max );
+   std::vector< Feature::Peak* > peaks = peakAlg.execute( array );
 
-   msg << Msg::Info << "The number of peaks is: " << peakAlg.getNumPeaks() << Msg::EndReq;
+   msg << Msg::Info << "The number of peaks is: " << peaks.size() << Msg::EndReq;
 
-   for ( size_t iPeak = 0; iPeak < peakAlg.getNumPeaks(); ++iPeak )
+   for ( size_t iPeak = 0; iPeak < peaks.size(); ++iPeak )
    {
-      const Feature::Peak& peak = peakAlg.getPeak( iPeak );
+      const Feature::Peak& peak = *peaks[ iPeak ];
       msg << Msg::Info << "Peak[" << iPeak << "] : pos = " << peak.getPosition()
                        << ", height = " << peak.getProminence()
                        << ", width = " << peak.getWidth() << Msg::EndReq;
+   }
+
+   for ( size_t i = 0; i < peaks.size(); ++i )
+   {
+      delete peaks[ i ];
    }
 }
 
@@ -656,14 +662,14 @@ void TestSuite::testIntegration()
          g->Draw( "AL" );
       }
 
-      FeatureAlgorithm::NaivePeaks peakAlg( specMag, FeatureAlgorithm::NaivePeaks::Max, 20 );
-      peakAlg.execute();
+      FeatureAlgorithm::NaivePeaks peakAlg( FeatureAlgorithm::NaivePeaks::Max, 20 );
+      std::vector< Feature::Peak* > peaks = peakAlg.execute( specMag );
 
       if ( doMonitor )
       {
-         for ( size_t iPeak = 0; iPeak < peakAlg.getNumPeaks(); ++iPeak )
+         for ( size_t iPeak = 0; iPeak < peaks.size(); ++iPeak )
          {
-            const Feature::Peak& p = peakAlg.getPeak( iPeak );
+            const Feature::Peak& p = *peaks[ iPeak ];
             double x = spec.getFrequency( p.getPositionIndex() );
             TLine* line = new TLine( x, 0, x, 10000 );
             line->SetLineWidth( 2 );
@@ -671,9 +677,9 @@ void TestSuite::testIntegration()
          }
       }
 
-      msg << Msg::Info << "The number of peaks is: " << peakAlg.getNumPeaks() << Msg::EndReq;
+      msg << Msg::Info << "The number of peaks is: " << peaks.size() << Msg::EndReq;
 
-      FeatureAlgorithm::FocalTones naiveTones( peakAlg.getAllPeaks() );
+      FeatureAlgorithm::FocalTones naiveTones( peaks );
       naiveTones.setDoMonitor( doMonitor );
       naiveTones.execute();
 
@@ -704,11 +710,17 @@ void TestSuite::testIntegration()
          {
             // regeneratedData->mixAdd( *synth.generate( nSamples, regeneratedData->getSamplingInfo() ), regeneratedData->size() - nSamples );
          }
+
       }
 
       for ( size_t i = 0; i < specMag.size(); ++i )
       {
          result->SetBinContent( iSpec + 1, i + 1, specMag[i] );
+      }
+
+      for ( size_t i = 0; i < peaks.size(); ++i )
+      {
+         delete peaks[ i ];
       }
    }
 
@@ -729,6 +741,7 @@ void TestSuite::testIntegration()
 
    MultiChannelRawPcmData dataRegen( regeneratedData );
    WaveFile::write( "dataRegen.wav", dataRegen );
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

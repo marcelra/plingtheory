@@ -20,7 +20,8 @@ void DevSuite::execute()
    // devFundamentalFreqFinder();
    // devTimeStretcher();
 
-   devImprovedPeakAlgorithm();
+   // devImprovedPeakAlgorithm();
+   devSidelobeRejection();
 
    return;
 }
@@ -42,6 +43,10 @@ void DevSuite::execute()
 #include "KernelPdf.h"
 #include "GaussPdf.h"
 #include "LinearInterpolator.h"
+#include "WindowLocation.h"
+#include "SortCache.h"
+#include "NaivePeaks.h"
+#include "Peak.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// devIterateSrPeaks
@@ -202,6 +207,43 @@ void DevSuite::devFundamentalFreqFinder()
 
 
 
+void DevSuite::devSidelobeRejection()
+{
+   Logger msg( "devSidelobeRejection" );
+   msg << Msg::Info << "Running devSidelobeRejection..." << Msg::EndReq;
+
+   size_t fourierSize = 4096;
+
+   const SamplingInfo samplingInfo;
+
+   Synthesizer::SineGenerator sinGen( samplingInfo );
+   sinGen.setFrequency( 440 );
+
+   RawPcmData::Ptr waveData = sinGen.generate( fourierSize );
+   WaveAnalysis::SpectralReassignmentTransform transformAlg( samplingInfo, fourierSize, 3*fourierSize, 2 );
+
+   const WaveAnalysis::StftData::Ptr stftData = transformAlg.execute( *waveData );
+   const WaveAnalysis::SrSpectrum& spec = stftData->getSrSpectrum( 0 );
+
+   Math::Log10Function log10;
+
+   gPlotFactory().createPlot( "devSidelobeRejection/Spectrum" );
+   gPlotFactory().createGraph( spec.getFrequencies() - spec.getFrequencyCorrections(), spec.getMagnitude() );
+
+   const RealVector& magnitudeVec = spec.getMagnitude();
+   FeatureAlgorithm::NaivePeaks peakAlg( FeatureAlgorithm::NaivePeaks::Max );
+   std::vector< Feature::Peak* > peaks = peakAlg.execute( magnitudeVec );
+   for ( size_t iPeak = 0; iPeak < peaks.size(); ++iPeak )
+   {
+      const Feature::Peak& peak = *peaks[ iPeak ];
+      msg << Msg::Info << "Peak " << iPeak << " with height " << peak.getPedestal() << Msg::EndReq;
+      delete peaks[ iPeak ];
+   }
+
+}
+
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// devImprovedPeakAlgorithm
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -210,92 +252,97 @@ void DevSuite::devImprovedPeakAlgorithm()
    Logger msg( "devImprovedPeakAlgorithm" );
    msg << Msg::Info << "Running devImprovedPeakAlgorithm..." << Msg::EndReq;
 
+   // Take fourier bin size = 4096
+   // Take sine with phase = 0
+   // Make center frequency variable
+   // Pick range around center frequency with delta_freq
+   // Compute max rel amp as function of freq delta (envelope)
+   // First sort by amp, remove all non-increasing frequency entries
+
+   size_t fourierSize = 4096;
+   size_t zeroPadSize = 3*fourierSize;
+
+   const RealVector& centreFreqs = realVector( 400 );
+   double deltaRange = 100;
+   size_t numFreqs = 100;
+   const double freqDelta = deltaRange / numFreqs;
+
    SamplingInfo samplingInfo;
    Synthesizer::SineGenerator sineGen( samplingInfo );
-   Math::Log10Function log10Fct;
 
-   RealVector freqsToGenerate = Utils::createRangeReal( 1000, 1100, 100 );
-   size_t fourierSize = 1024;
+   RealVector relMaxY;
+   RealVector diffX;
 
-   WaveAnalysis::SpectralReassignmentTransform srAlg( samplingInfo, fourierSize, 0, 1 );
-   gPlotFactory().createPlot( "plot" );
-
-   const RealVector& relFreqSampling = Utils::createRangeReal( 0.75, 1.25, 100 );
-
-   std::vector< RealVector > relFreqAmps;
-
-   Plotting::Palette pal = Plotting::Palette::heatPalette();
-
-   for ( size_t iFreq = 0; iFreq < freqsToGenerate.size(); ++iFreq )
+   for ( size_t iCentreFreq = 0; iCentreFreq < centreFreqs.size(); ++iCentreFreq )
    {
-      double freq = freqsToGenerate[ iFreq ];
-      sineGen.setFrequency( freq );
-      RawPcmData::Ptr data = sineGen.generate( 1024 * 4 + 46 );
+      for ( size_t iFreq = 0; iFreq < numFreqs; ++iFreq )
+      {
+         double frequency = centreFreqs[ iCentreFreq ] + freqDelta * iFreq;
+         sineGen.setFrequency( frequency );
+         RawPcmData::Ptr data = sineGen.generate( fourierSize );
 
-      const WaveAnalysis::StftData::Ptr stftData = srAlg.execute( *data );
-      const WaveAnalysis::SrSpectrum& spec = stftData->getSrSpectrum( 0 );
+         WaveAnalysis::SpectralReassignmentTransform transform( samplingInfo, fourierSize, zeroPadSize, 2 );
+         WaveAnalysis::StftData::Ptr stftData = transform.execute( *data );
+         const WaveAnalysis::SrSpectrum& spec = stftData->getSrSpectrum( 0 );
 
-      RealVector xData = ( spec.getFrequencies() /*- spec.getFrequencyCorrections()*/ ) / freq;
-      RealVector yData = spec.getMagnitude();
+         const RealVector& x = spec.getFrequencies();
+         RealVector&& y = spec.getMagnitude();
 
-      Math::LinearInterpolator interp( xData, yData );
-      relFreqAmps.push_back( interp.evalMany( relFreqSampling ) );
-      gPlotFactory().createGraph( relFreqSampling, log10Fct.evalMany( relFreqAmps.back() ), pal.getColour( 1.0 * iFreq / freqsToGenerate.size() ) );
+         y /= Utils::getMaxValue( y );
+         RealVector deltaX = x - frequency;
+         // msg << Msg::Info << deltaX << Msg::EndReq;
+
+         relMaxY.insert( relMaxY.end(), y.begin(), y.end() );
+         diffX.insert( diffX.end(), deltaX.begin(), deltaX.end() );
+      }
    }
 
+   SortCache relYSc( diffX );
+   const RealVector& relMaxYSorted = relYSc.applyTo( relMaxY );
+   const RealVector& relDiffXSorted = relYSc.applyTo( diffX );
+
+   Math::Log10Function log10;
+
+   gPlotFactory().createPlot( "envelope" );
+   gPlotFactory().createGraph( relDiffXSorted, relMaxYSorted );
+
+   // Create envelope by requiring linear interpolation is always above curve.
+   size_t nEnvelopeSamples = 500;
+
+   RealVector linearGrid = Utils::createRangeReal( -1000, 1000, nEnvelopeSamples );
+   RealVector zeros = RealVector( nEnvelopeSamples, 0 );
+
+   gPlotFactory().createScatter( linearGrid, zeros, Plotting::MarkerDrawAttr( Qt::red ) );
 
 
-//   gPlotFactory().createPlot( "test" );
-//   gPlotFactory().drawPcmData( *data );
-//
-//   size_t fourierSize = 1024;
-//
-//   WaveAnalysis::SpectralReassignmentTransform srAlg( samplingInfo, fourierSize, 0, 1 );
-//   const WaveAnalysis::StftData::Ptr stftData = srAlg.execute( *data );
-//
-//   Math::Log10Function log10Fct;
-//
-//   for ( size_t iSpec = 0; iSpec < 1 /*stftData->getNumSpectra()*/; ++iSpec )
-//   {
-//      const WaveAnalysis::SrSpectrum& srSpec = stftData->getSrSpectrum( iSpec );
-//      std::ostringstream msg;
-//      msg << "Spectrum " << iSpec;
-//
-//      Math::KernelPdf kernPdf( Math::IPdf::CPtr( new Math::GaussPdf( 0, 10 ) ), srSpec.getFrequencies(), srSpec.getMagnitude() );
-//      Math::IRealFunction::Ptr kernPdfFunc = kernPdf.getDensityAsFunc();
-//
-//      RealVector modKernWeights = srSpec.getTimeCorrections();
-//      for ( size_t i = 0; i < modKernWeights.size(); ++i )
-//      {
-//         modKernWeights[ i ] = fabs( modKernWeights[ i ] );
-//      }
-//      modKernWeights = 1 - modKernWeights/fourierSize;
-//
-//      Math::KernelPdf modKernPdf( Math::IPdf::CPtr( new Math::GaussPdf( 0, 10 ) ), srSpec.getFrequencies(), pwm( modKernWeights, srSpec.getMagnitude() ) );
-//      Math::IRealFunction::Ptr modKernPdfFunc = modKernPdf.getDensityAsFunc();
-//
-//      const RealVector& originalFreqs = srSpec.getFrequencies() - srSpec.getFrequencyCorrections();
-//      const RealVector& freqs = Utils::createRangeReal( originalFreqs.front(), originalFreqs.back(), 4000 );
-//
-//      double integral = sumElements( srSpec.getMagnitude() );
-//      double integralPdf = sumElements( kernPdfFunc->evalMany( originalFreqs ) );
-//
-//      gPlotFactory().createPlot( msg.str() );
-//      gPlotFactory().createGraph( freqs, log10Fct.evalMany( kernPdfFunc->evalMany( freqs ) / integralPdf ) );
-//      gPlotFactory().createGraph( freqs, log10Fct.evalMany( modKernPdfFunc->evalMany( freqs ) / integralPdf ), Qt::red );
-//      gPlotFactory().createGraph( originalFreqs, log10Fct.evalMany( srSpec.getMagnitude() / integral ), Qt::blue );
-//      gPlotFactory().createScatter( srSpec.getFrequencies(), log10Fct.evalMany( srSpec.getMagnitude() / integral ), Plotting::MarkerDrawAttr( Qt::red ) );
-//      gPlotFactory().createScatter( srSpec.getFrequencies(), srSpec.getTimeCorrections() );
-//
-//      gPlotFactory().createPlot( msg.str() + " (reassigned)" );
-//      gPlotFactory().createScatter( srSpec.getFrequencies(), log10Fct.evalMany( srSpec.getMagnitude() ) );
-//      gPlotFactory().createGraph( srSpec.getFrequencies(), log10Fct.evalMany( srSpec.getMagnitude() ), Qt::red );
-//      gPlotFactory().createGraph( originalFreqs, log10Fct.evalMany( srSpec.getMagnitude() ), Qt::blue );
-//
-//      gPlotFactory().createPlot( msg.str() + " (original)" );
-//      // gPlotFactory().createScatter( srSpec.getFrequencies(), log10Fct.evalMany( srSpec.getMagnitude() ) );
-//      gPlotFactory().createGraph( originalFreqs, log10Fct.evalMany( srSpec.getMagnitude() ), Qt::blue );
-//   }
+   gPlotFactory().createPlot( "envelopLog" );
+   gPlotFactory().createGraph( relDiffXSorted, log10.evalMany( relMaxYSorted ) );
+
+
+
+   // RealVector fCorr = spec.getFrequencyCorrections();
+   // for ( size_t i = 0; i < spec.getFrequencies().size(); ++i )
+   // {
+   //    fCorr[ i ] /= spec.getFrequency( i );
+   // }
+
+
+   // Math::Log10Function log10Fct;
+
+   // gPlotFactory().createPlot( "plot1" );
+   // gPlotFactory().createGraph( x, log10Fct.evalMany( y ), Qt::blue );
+   // gPlotFactory().createScatter( x, log10Fct.evalMany( y ) );
+   // gPlotFactory().createGraph( x, log10Fct.evalMany( fCorr ), Qt::green );
+   // gPlotFactory().createScatter( x, log10Fct.evalMany( fCorr ), Plotting::MarkerDrawAttr( Qt::red ) );
+
+   // msg << Msg::Info << "Number of spectra in STFT: " << stftData->getNumSpectra() << Msg::EndReq;
+   // for ( size_t iSpec = 0; iSpec < stftData->getNumSpectra(); ++iSpec )
+   // {
+   //    const WaveAnalysis::WindowLocation* windowLoc = stftData->getSpectrum( iSpec ).getWindowLocation();
+   //    msg << Msg::Info << "WindowLocation: [" << windowLoc->getFirstSample() << ", " << windowLoc->getLastSample() << "]" << Msg::EndReq;
+   // }
+
+
 
 }
 
