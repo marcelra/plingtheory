@@ -80,14 +80,12 @@ class IPlotFactory : SingletonBase
          assert( sizeof( markerDrawAttr ) );
       }
 
-      virtual void createStftGraph( const WaveAnalysis::StftData& stftData ) = 0;
+      virtual void createStftGraph( const WaveAnalysis::StftData& /*stftData*/ ) = 0;
       virtual void createHistogram( const Math::IAccumArray& hist, const QColor& colour = Qt::black ) = 0;
 
-      virtual void create2DHist( const Math::Regular2DHistogram& hist,
-                                 const Plotting::Palette& palette = Plotting::Palette::heatPalette() )
-      {
-         assert( &hist ); assert( &palette); assert( false );
-      }
+      virtual void create2DHist( const Math::Regular2DHistogram& /*hist*/,
+                                 const Plotting::Palette& /*palette*/ = Plotting::Palette::heatPalette() )
+      {}
 
    protected:
       /**

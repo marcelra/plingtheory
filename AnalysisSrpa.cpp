@@ -192,9 +192,9 @@ void AnalysisSrpa::studyTwinPeakPerformance( const std::vector< double >& freque
             peakAmps[ iPeak ] = peaks[ iPeak ].getHeight();
          }
 
-         SortCache peakAmpsSc( peakAmps );
-         if ( peakAmpsSc.getSize() >= 2 )
+         if ( peakAmps.size() >= 2 )
          {
+            SortCache peakAmpsSc( peakAmps );
             double freqEstimate1 = peaks[ peakAmpsSc.getReverseSortedIndex( 0 ) ].getFrequency();
             double freqEstimate2 = peaks[ peakAmpsSc.getReverseSortedIndex( 1 ) ].getFrequency();
 

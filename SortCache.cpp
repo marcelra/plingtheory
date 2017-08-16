@@ -1,5 +1,6 @@
 #include "SortCache.h"
 
+#include <algorithm>
 #include <map>
 #include <cassert>
 #include "Utils.h"

@@ -307,6 +307,11 @@ int main( int argc, char* argv[] )
                mainWindow.startWorkerThread( new MainWorkerThread( programOptions ) );
                mainWindow.show();
 
+               QFont font("Ubuntu");
+               font.setPixelSize(14);
+               // font.setStyleHint(QFont::Monospace);
+               gApp->setFont(font);
+
                if ( gApp->exec() != 0 )
                {
                   programStatus = PS_GUI_NONZERO_STATUSCODE;

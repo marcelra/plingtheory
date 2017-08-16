@@ -143,7 +143,6 @@ int RootPlotFactory::rootColorFromQColor( const QColor& colour )
 
 void RootPlotFactory::createStftGraph( const WaveAnalysis::StftData& stftData )
 {
-   assert( &stftData );
    assert( false );
 }
 

@@ -36,7 +36,7 @@ class RootPlotFactory : public IPlotFactory
                           const std::vector< double >& yData,
                           const Plotting::MarkerDrawAttr& markerDrawAttr );
 
-      void createStftGraph( const WaveAnalysis::StftData& stftData );
+      void createStftGraph( const WaveAnalysis::StftData& /*stftData*/ );
       virtual void createHistogram( const Math::IAccumArray& hist, const QColor& colour );
 
    private:
