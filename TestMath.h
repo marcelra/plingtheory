@@ -45,6 +45,7 @@ class TestMath
       static void testNewtonSolver1D();
       static void testPdf();
       static void testLinearInterpolator();
+      static void testDecisionTree();
 };
 
 #endif // TESTMATH_H

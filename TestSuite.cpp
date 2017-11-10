@@ -66,8 +66,10 @@ void TestSuite::execute()
 
 void TestSuite::singleTest()
 {
-   TestSuite::testWaveFile();
+   // TestSuite::testDataFrame();
+   // TestSuite::testWaveFile();
    // TestMath::testParticleSwarm();
+   TestMath::testDecisionTree();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

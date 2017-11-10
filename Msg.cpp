@@ -60,13 +60,13 @@ const char* Msg::colorCode( Msg::LogLevel logLevel )
             return "\033[43;30m";
             break;
          case Msg::Info:
-            return "\033[30m";
+            return "";
             break;
          case Msg::Debug:
-            return "\033[0;30m";
+            return "";
             break;
          case Msg::Verbose:
-            return "\033[0;30m";
+            return "";
             break;
          default:
             assert( false );
