@@ -151,7 +151,10 @@ SOURCES += main.cpp \
     PeakSustainAlgorithm.cpp \
     WindowLocation.cpp \
     ApproximateGcdAlgorithm.cpp \
-    TimeStretcher.cpp
+    TimeStretcher.cpp \
+    DecisionTree.cpp \
+    Matrix.cpp \
+    MlLibUtils.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -301,7 +304,10 @@ HEADERS += \
     IndexPair.h \
     WindowLocation.h \
     ApproximateGcdAlgorithm.h \
-    TimeStretcher.h
+    TimeStretcher.h \
+    DecisionTree.h \
+    Matrix.h \
+    MlLibUtils.h
 
 OTHER_FILES += \
     Todos.txt

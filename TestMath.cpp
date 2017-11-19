@@ -23,6 +23,9 @@
 #include "SampledMovingAverage.h"
 #include "TwoDimExampleObjective.h"
 #include "UniformPdf.h"
+#include "DecisionTree.h"
+#include "Matrix.h"
+#include "MlLibUtils.h"
 
 
 #include <cmath>
@@ -648,6 +651,32 @@ void TestMath::testLinearInterpolator()
 }
 
 
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// testMatrix
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void TestMath::testMatrix()
+{
+   Logger msg( "testMatrix" );
+   msg << Msg::Info << "Running testMatrix..." << Msg::EndReq;
+
+   Matrix matrix( 4, 3, 1 );
+   assert( matrix.getNumRows() == 4 );
+   assert( matrix.getNumCols() == 3 );
+
+   for ( size_t iRow = 0; iRow < matrix.getNumRows(); ++iRow )
+   {
+      matrix.at(iRow, 1) = iRow;
+   }
+
+   assert( matrix.getColumn(1) == realVector(0, 1, 2, 3) );
+
+   msg << Msg::Info << matrix.getColumn(1) << Msg::EndReq;
+}
+
+
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// testDecisionTree
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -657,8 +686,42 @@ void TestMath::testDecisionTree()
 
    msg << Msg::Info << "Running testDecisionTree..." << Msg::EndReq;
 
+   size_t nTrainSamples = 5000;
+   size_t nTestSamples = 5000;
 
+   TRandom3 rand( 1 );
 
+   Matrix x( nTrainSamples + nTestSamples, 2 );
+   RealVector y( nTrainSamples + nTestSamples );
+
+   for ( size_t iSample = 0; iSample < nTrainSamples + nTestSamples; ++iSample )
+   {
+      double v0 = rand.Uniform( 0, 5 );
+      double v1 = rand.Uniform( 0, 5 );
+      double z = size_t( v0 ) % 2 + size_t( v1 ) % 2;
+
+      double v0Prime = v0 - 0.5*log( v1 );
+      double v1Prime = v1 + 0.5*sin( v0 );
+
+      x.at(iSample, 0) = v0Prime;
+      x.at(iSample, 1) = v1Prime;
+      y.at(iSample) = z;
+   }
+
+   MlLib::TrainTestSplit<RealVector, double> tts( x.getRows(), y, 0.5 );
+
+   Matrix xTrain(tts.xTrain);
+   Matrix xTest(tts.xTest);
+   RealVector yTrain(tts.yTrain);
+   RealVector yTest(tts.yTest);
+
+   /// Create plot of training set.
+   gPlotFactory().createPlot( "testMultiLayerPerceptron/trainingSet" );
+   gPlotFactory().createZScatter( xTrain.getColumn(0), xTrain.getColumn(1), yTrain, Plotting::Palette::heatPalette(), Plotting::MarkerDrawAttr( Qt::red, Plotting::MarkerPlus ) );
+
+   MlLib::DecisionTree decisionTree(10);
+   decisionTree.fit(xTrain.getRows(), yTrain);
+   auto prediction = decisionTree.predict(xTest.getRows());
 
    return;
 }

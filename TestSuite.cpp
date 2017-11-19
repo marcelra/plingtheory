@@ -69,6 +69,7 @@ void TestSuite::singleTest()
    // TestSuite::testDataFrame();
    // TestSuite::testWaveFile();
    // TestMath::testParticleSwarm();
+   TestMath::testMatrix();
    TestMath::testDecisionTree();
 }
 

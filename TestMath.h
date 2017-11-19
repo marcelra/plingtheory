@@ -37,6 +37,7 @@ class TestMath
       static void testSampledMovingAverage();
       static void testTwoTuple();
       static void testRegularAccumArray();
+      static void testMatrix();
 
    /**
     * Other/uncategorized.
