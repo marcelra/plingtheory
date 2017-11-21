@@ -10,6 +10,9 @@ template< class T, class U >
 class TrainTestSplit
 {
    public:
+      /**
+       * Create a train-test split based on @param ratio. @param ratio should be between 0 and 1.
+       */
       TrainTestSplit( const std::vector<T>& x, const std::vector<U>& y, double ratio );
 
       std::vector<T> xTrain;

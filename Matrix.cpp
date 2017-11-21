@@ -1,6 +1,8 @@
 #include "Matrix.h"
 
 
+Matrix::Matrix()
+{}
 
 Matrix::Matrix( size_t nRows, size_t nCols ) :
    m_values( nRows, RealVector( nCols, 0 ) )
@@ -34,6 +36,16 @@ RealVector Matrix::getColumn( size_t iCol ) const
 }
 
 
+const RealVector& Matrix::getRow( size_t iRow ) const
+{
+   return m_values[iRow];
+}
+
+RealVector& Matrix::getRow( size_t iRow )
+{
+   return m_values[iRow];
+}
+
 
 void Matrix::updateDimensions()
 {
@@ -44,6 +56,13 @@ void Matrix::updateDimensions()
 
 
 std::vector<RealVector>& Matrix::getRows()
+{
+   return m_values;
+}
+
+
+
+const std::vector<RealVector>& Matrix::getRows() const
 {
    return m_values;
 }

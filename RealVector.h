@@ -56,6 +56,12 @@ bool isEqual( const RealVector& x, const RealVector& y );
 double sumElements( const RealVector& x );
 double calcMean( const RealVector& x );
 
+/**
+ * Templated Miscellaneous
+ */
+// template < class T >
+// RealVector applyIndexing( const std::vector< T >& x, const std::vector< size_t >& indices );
+
 /** Point wise multiplication */
 RealVector pwm( const RealVector& x, const RealVector& y );
 
@@ -169,6 +175,18 @@ inline RealVector pwm( const RealVector& x, const RealVector& y )
    }
    return result;
 }
+
+template < class T >
+inline std::vector< T > applyIndexing( const std::vector< T >& x, const std::vector< size_t >& indices )
+{
+   std::vector< T > result( indices.size() );
+   for ( size_t i = 0; i < indices.size(); ++i )
+   {
+      result[i] = x[indices[i]];
+   }
+   return result;
+}
+
 
 inline RealVector& operator*=( RealVector& x, double lambda )
 {

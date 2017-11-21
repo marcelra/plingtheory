@@ -336,5 +336,5 @@ macx: QMAKE_CXXFLAGS += -g -ffast-math -O3
 linux: QMAKE_CXXFLAGS += -g -ffast-math -mfpmath=387 -O3
 # QMAKE_CXXFLAGS_RELEASE -= -O2
 
-QMAKE_CXXFLAGS += -std=c++11
+QMAKE_CXXFLAGS += -std=c++14
 

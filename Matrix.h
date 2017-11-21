@@ -4,17 +4,23 @@
 #include "RealVector.h"
 
 
-
 class Matrix
 {
    public:
-      Matrix(size_t nRows, size_t nCols);
-      Matrix(size_t nRows, size_t nCols, double defaultValue);
-      Matrix(const std::vector<RealVector>& values);
+      Matrix();
+      Matrix( size_t nRows, size_t nCols );
+      Matrix( size_t nRows, size_t nCols, double defaultValue );
+      Matrix( const std::vector<RealVector>& values );
 
       RealVector getColumn(size_t col) const;
 
-      double& at(size_t iRow, size_t iCol);
+      const double& at( size_t iRow, size_t iCol ) const;
+      double& at (size_t iRow, size_t iCol );
+
+      const RealVector& getRow( size_t iRow ) const;
+      RealVector& getRow( size_t iRow );
+
+      const std::vector<RealVector>& getRows() const;
       std::vector<RealVector>& getRows();
 
       size_t getNumRows() const;
@@ -52,6 +58,15 @@ inline double& Matrix::at(size_t iRow, size_t iCol)
 {
    return m_values[iRow][iCol];
 }
+
+
+
+inline const double& Matrix::at(size_t iRow, size_t iCol) const
+{
+   /// TODO: line with non-const method
+   return m_values[iRow][iCol];
+}
+
 
 
 #endif // MATRIX_H
