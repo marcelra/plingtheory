@@ -4,6 +4,7 @@
 #include "Utils.h"
 #include "Matrix.h"
 #include "Logger.h"
+#include "Timer.h"
 
 #include <iostream>
 
@@ -133,7 +134,7 @@ double DecisionTreeNode::eval( const RealVector& x ) const
    }
 }
 
-DecisionTreeSplit DecisionTreeNode::findBestSplit(const Matrix& xTrain, const RealVector& yTrain )
+DecisionTreeSplit DecisionTreeNode::findBestSplit( const Matrix& xTrain, const RealVector& yTrain )
 {
    const size_t nPoints = yTrain.size();
    assert ( xTrain.getNumRows() == yTrain.size() );
@@ -252,12 +253,16 @@ DecisionTree& DecisionTree::fit( const std::vector<RealVector>& xTrain, const Re
 {
    Logger msg( "DecisionTree" );
 
+   Timer timer( msg, Msg::Info, "DecisionTree::fit" );
+
    msg << Msg::Info << "Fitting decision tree..." << Msg::EndReq;
 
    /// TODO: casting it to matrix. Consider changing signature.
    const Matrix& xAsMatrix( xTrain );
 
    m_tree = new DecisionTreeNode( 0, m_maxDepth, xAsMatrix, yTrain );
+
+   timer.end();
 
    return *this;
 }
