@@ -155,7 +155,8 @@ SOURCES += main.cpp \
     DecisionTree.cpp \
     Matrix.cpp \
     MlLibUtils.cpp \
-    Timer.cpp
+    Timer.cpp \
+    DecisionTreeNodes.cpp
 
 HEADERS += \
     RawPcmData.h \
@@ -309,7 +310,8 @@ HEADERS += \
     DecisionTree.h \
     Matrix.h \
     MlLibUtils.h \
-    Timer.h
+    Timer.h \
+    DecisionTreeNodes.h
 
 OTHER_FILES += \
     Todos.txt
