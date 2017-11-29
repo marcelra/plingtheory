@@ -6,16 +6,8 @@
 namespace MlLib
 {
 
-
-
-class IDecisionTreeGraphElement
-{
-   public:
-      virtual ~IDecisionTreeGraphElement() {}
-      virtual double eval( const RealVector& x ) const = 0;
-};
-
-
+/// Forward declaration of IDecisionTreeGraphElement
+class IDecisionTreeGraphElement;
 
 class DecisionTree
 {

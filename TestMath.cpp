@@ -681,7 +681,7 @@ void TestMath::testDecisionTree()
 
    msg << Msg::Info << "Running testDecisionTree..." << Msg::EndReq;
 
-   size_t nTrainSamples = 5000000;
+   size_t nTrainSamples = 25e4;
    size_t nTestSamples = 5000;
 
    TRandom3 rand( 3 );
@@ -717,9 +717,9 @@ void TestMath::testDecisionTree()
    // gPlotFactory().createZScatter( xTrain.getColumn(0), xTrain.getColumn(1), yTrain, Plotting::Palette::heatPalette(), Plotting::MarkerDrawAttr( Qt::red, Plotting::MarkerPlus ) );
    gPlotFactory().createScatter( xTrain.getColumn(0), yTrain );
 
-   MlLib::DecisionTree decisionTree(40);
-   decisionTree.fit(xTrain.getRows(), yTrain);
-   auto prediction = decisionTree.predict(xTest.getRows());
+   MlLib::DecisionTree decisionTree( 120 );
+   decisionTree.fit( xTrain.getRows(), yTrain );
+   auto prediction = decisionTree.predict( xTest.getRows() );
 
    gPlotFactory().createPlot( "testMultiLayerPerceptron/testSet" );
    // gPlotFactory().createZScatter( xTest.getColumn(0), xTest.getColumn(1), prediction, Plotting::Palette::heatPalette(), Plotting::MarkerDrawAttr( Qt::red, Plotting::MarkerPlus ) );
